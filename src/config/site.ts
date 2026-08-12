@@ -176,6 +176,58 @@ export const services = [
   },
 ] as const;
 
+/**
+ * Fertige Automatisierungs-Module.
+ *
+ * `name` ist der Produktname, `benefit` die Nutzenaussage in der Sprache
+ * des Betriebs. Die Texte sind bewusst kurz gehalten — Details stehen auf
+ * der Leistungsseite.
+ */
+export const automationModules = [
+  {
+    slug: 'whatsapp-assistenz',
+    name: 'WhatsApp-Assistenz',
+    benefit: 'Anfragen werden beantwortet, auch wenn Sie auf dem Dach stehen',
+    text: 'Die KI beantwortet Anfragen auf Ihrer Geschäftsnummer und übergibt an Sie, sobald es persönlich wird.',
+  },
+  {
+    slug: 'anruf-retter',
+    name: 'Anruf-Retter',
+    benefit: 'Kein verpasster Anruf ist mehr ein verlorener Auftrag',
+    text: 'Verpasste Anrufe werden automatisch per WhatsApp aufgefangen, der Bot führt das Gespräch weiter.',
+  },
+  {
+    slug: 'telefon-assistenz',
+    name: 'Telefon-Assistenz',
+    benefit: 'Es geht jemand ans Telefon, immer',
+    text: 'Sprachassistentin Lea nimmt ab, erfasst Anliegen und Rückrufwunsch und schickt Ihnen die Notiz weiter.',
+  },
+  {
+    slug: 'terminbuchung',
+    name: 'Terminbuchung',
+    benefit: 'Termine stehen im Kalender, ohne dass Sie telefonieren',
+    text: 'Kunden buchen freie Termine direkt im Chat, Ihr Kalender bleibt synchron.',
+  },
+  {
+    slug: 'bewertungs-service',
+    name: 'Bewertungs-Service',
+    benefit: 'Mehr Google-Bewertungen, ohne peinliches Nachfragen',
+    text: 'Auf ein kurzes Kommando hin geht die Bewertungsanfrage automatisch an den Kunden raus.',
+  },
+  {
+    slug: 'bewerber-assistenz',
+    name: 'Bewerber-Assistenz',
+    benefit: 'Nur noch Bewerbungen lesen, die wirklich passen',
+    text: 'Bewerbungen laufen über den Bot, unpassende werden vorab aussortiert.',
+  },
+  {
+    slug: 'dashboard',
+    name: 'Dashboard',
+    benefit: 'Ein Blick genügt, um zu wissen, was läuft',
+    text: 'Alle Anfragen, Termine, geretteten Anrufe und Bewertungen auf einer Übersichtsseite.',
+  },
+] as const;
+
 /** Einzugsgebiet — fließt in JSON-LD und in die Texte. */
 export const serviceArea = {
   primary: 'Essen',
