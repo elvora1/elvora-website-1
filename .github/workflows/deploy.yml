@@ -1,0 +1,165 @@
+name: Bauen und veröffentlichen
+
+# Bei jedem Push auf main wird gebaut und nach Netcup hochgeladen.
+# Auf allen anderen Zweigen wird nur gebaut. Ein kaputter Build kann die
+# laufende Seite dadurch nie erreichen.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Zwei gleichzeitige Uploads würden sich gegenseitig überschreiben.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bauen:
+    name: Bauen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Typprüfung
+        run: npm run check
+
+      - name: Bauen
+        run: npm run build
+
+      - name: Ergebnis prüfen
+        run: |
+          test -f dist/index.html || { echo "::error::dist/index.html fehlt"; exit 1; }
+          test -f dist/.htaccess  || { echo "::error::dist/.htaccess fehlt"; exit 1; }
+          echo "Gebaute Seiten: $(find dist -name 'index.html' | wc -l)"
+
+      - name: Ergebnis sichern
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  veroeffentlichen:
+    name: Nach Netcup hochladen
+    needs: bauen
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: produktion
+    steps:
+      - name: Ergebnis holen
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Zugangsdaten prüfen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_KEY: ${{ secrets.SFTP_KEY }}
+          SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+        run: |
+          fehlt=""
+          [ -z "$SFTP_HOST" ]       && fehlt="$fehlt SFTP_HOST"
+          [ -z "$SFTP_USER" ]       && fehlt="$fehlt SFTP_USER"
+          [ -z "$SFTP_REMOTE_DIR" ] && fehlt="$fehlt SFTP_REMOTE_DIR"
+          if [ -z "$SFTP_PASSWORD" ] && [ -z "$SFTP_KEY" ]; then
+            fehlt="$fehlt SFTP_PASSWORD-oder-SFTP_KEY"
+          fi
+          if [ -n "$fehlt" ]; then
+            echo "::error::Fehlende Secrets:$fehlt"
+            echo "Anzulegen unter Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+          # Schutz vor einem folgenschweren Tippfehler: mit --delete wuerde
+          # ein zu weit gefasstes Zielverzeichnis fremde Daten loeschen.
+          case "$SFTP_REMOTE_DIR" in
+            "/"|""|"/home"|"/home/")
+              echo "::error::SFTP_REMOTE_DIR ist zu weit gefasst: $SFTP_REMOTE_DIR"
+              exit 1
+              ;;
+          esac
+
+      - name: lftp installieren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Serverkennung hinterlegen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          ssh-keyscan -p "${SFTP_PORT:-22}" -H "$SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 600 ~/.ssh/known_hosts
+
+      # Der secrets-Kontext steht in if-Bedingungen von Schritten nicht zur
+      # Verfuegung. Die Fallunterscheidung muss deshalb in der Shell passieren,
+      # sonst wuerde die Bedingung still zu "falsch" auswerten.
+      - name: Schlüssel hinterlegen, falls vorhanden
+        env:
+          SFTP_KEY: ${{ secrets.SFTP_KEY }}
+        run: |
+          if [ -n "${SFTP_KEY:-}" ]; then
+            printf '%s\n' "$SFTP_KEY" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+            echo "Anmeldung über SSH-Schlüssel."
+          else
+            echo "Kein Schlüssel hinterlegt, Anmeldung über Passwort."
+          fi
+
+      - name: Hochladen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_KEY: ${{ secrets.SFTP_KEY }}
+          SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+        run: |
+          set -eu
+          PORT="${SFTP_PORT:-22}"
+
+          if [ -n "${SFTP_KEY:-}" ]; then
+            ANMELDUNG="set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/deploy_key -p $PORT\";
+                       open -u \"$SFTP_USER\", sftp://$SFTP_HOST"
+          else
+            ANMELDUNG="open -u \"$SFTP_USER\",\"$SFTP_PASSWORD\" sftp://$SFTP_HOST:$PORT"
+          fi
+
+          # mirror -R spiegelt lokal nach entfernt.
+          # --delete raeumt Dateien weg, die es lokal nicht mehr gibt. Ohne das
+          # bleiben geloeschte Seiten auf dem Server erreichbar.
+          lftp -c "
+            set cmd:fail-exit yes;
+            set net:max-retries 3;
+            set net:timeout 20;
+            set sftp:auto-confirm no;
+            $ANMELDUNG;
+            mirror --reverse --delete --verbose --parallel=4 \
+                   --exclude-glob .git/ \
+                   dist/ '$SFTP_REMOTE_DIR';
+            bye;
+          "
+
+      - name: Erreichbarkeit prüfen
+        run: |
+          set -eu
+          for versuch in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://elvora.me/ || echo 000)
+            [ "$code" = "200" ] && { echo "Seite antwortet mit 200."; exit 0; }
+            echo "Versuch $versuch: HTTP $code, warte 10 Sekunden."
+            sleep 10
+          done
+          echo "::error::Die Seite antwortet nicht mit 200."
+          exit 1
