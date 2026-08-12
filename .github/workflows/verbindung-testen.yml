@@ -1,0 +1,115 @@
+name: Verbindung testen
+
+# Reines Prüfwerkzeug. Es wird NICHTS hochgeladen und NICHTS gelöscht.
+#
+# Zweck: herausfinden, ob die hinterlegten Zugangsdaten stimmen und ob
+# SFTP_REMOTE_DIR auf das richtige Verzeichnis zeigt, bevor der erste
+# echte Upload mit --delete darüberfährt.
+#
+# Aufruf: Reiter "Actions" > "Verbindung testen" > "Run workflow".
+on:
+  workflow_dispatch:
+
+jobs:
+  pruefen:
+    name: Zugang und Verzeichnis prüfen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vorhandene Secrets auflisten
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_KEY: ${{ secrets.SFTP_KEY }}
+          SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+        run: |
+          # Werte werden nie ausgegeben, nur ob sie gesetzt sind.
+          zeige() { if [ -n "$2" ]; then echo "  $1: gesetzt"; else echo "  $1: FEHLT"; fi; }
+          echo "Hinterlegte Zugangsdaten:"
+          zeige SFTP_HOST       "${SFTP_HOST:-}"
+          zeige SFTP_PORT       "${SFTP_PORT:-}"
+          zeige SFTP_USER       "${SFTP_USER:-}"
+          zeige SFTP_PASSWORD   "${SFTP_PASSWORD:-}"
+          zeige SFTP_KEY        "${SFTP_KEY:-}"
+          zeige SFTP_REMOTE_DIR "${SFTP_REMOTE_DIR:-}"
+          echo
+          echo "SFTP_PORT darf fehlen, dann wird 22 verwendet."
+          echo "Von SFTP_PASSWORD und SFTP_KEY genügt eines von beiden."
+
+      - name: lftp installieren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Serverkennung hinterlegen
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          ssh-keyscan -p "${SFTP_PORT:-22}" -H "$SFTP_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 600 ~/.ssh/known_hosts
+          echo "Serverkennung übernommen."
+
+      - name: Verzeichnisse auflisten
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_KEY: ${{ secrets.SFTP_KEY }}
+          SFTP_REMOTE_DIR: ${{ secrets.SFTP_REMOTE_DIR }}
+        run: |
+          set -eu
+          PORT="${SFTP_PORT:-22}"
+
+          if [ -n "${SFTP_KEY:-}" ]; then
+            printf '%s\n' "$SFTP_KEY" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+            ANMELDUNG="set sftp:connect-program \"ssh -a -x -i $HOME/.ssh/deploy_key -p $PORT\";
+                       open -u \"$SFTP_USER\", sftp://$SFTP_HOST"
+          else
+            ANMELDUNG="open -u \"$SFTP_USER\",\"$SFTP_PASSWORD\" sftp://$SFTP_HOST:$PORT"
+          fi
+
+          echo "=============================================="
+          echo "Startverzeichnis nach der Anmeldung"
+          echo "=============================================="
+          lftp -c "set sftp:auto-confirm no; $ANMELDUNG; pwd; cls -l; bye"
+
+          echo
+          echo "=============================================="
+          echo "Inhalt von SFTP_REMOTE_DIR"
+          echo "=============================================="
+          if lftp -c "set cmd:fail-exit yes; set sftp:auto-confirm no; $ANMELDUNG; cd '$SFTP_REMOTE_DIR'; pwd; cls -l; bye"; then
+            echo
+            echo "Das Verzeichnis existiert und ist erreichbar."
+          else
+            echo "::error::SFTP_REMOTE_DIR ist nicht erreichbar."
+            echo "Vergleichen Sie den Wert mit der Auflistung oben."
+            exit 1
+          fi
+
+      - name: Ergebnis einordnen
+        if: always()
+        run: |
+          cat <<'HINWEIS'
+
+          So lesen Sie das Ergebnis
+          =========================
+
+          Richtig ist das Verzeichnis, in dem eine Datei liegt, die der
+          Browser unter elvora.me ausliefert: typischerweise index.html,
+          index.php oder eine vorhandene .htaccess.
+
+          Sehen Sie dort stattdessen Ordner wie httpdocs, html oder www,
+          dann zeigt SFTP_REMOTE_DIR eine Ebene zu hoch. Tragen Sie den
+          Unterordner nach.
+
+          Ist das Verzeichnis leer und Sie erwarten dort eine bestehende
+          Seite, zeigt der Wert vermutlich auf den falschen Ort.
+
+          WICHTIG: Der Upload läuft mit --delete. Alles, was in diesem
+          Verzeichnis liegt und nicht zur Website gehört, wird beim ersten
+          Deploy entfernt. Prüfen Sie die Auflistung deshalb genau.
+
+          HINWEIS
