@@ -176,57 +176,89 @@ export const services = [
   },
 ] as const;
 
+export type AutomationModule = {
+  slug: string;
+  /** Produktname. */
+  name: string;
+  /** Nutzenaussage in der Sprache des Betriebs — steht in der Überschrift. */
+  benefit: string;
+  /** Erklärung in ein bis zwei Sätzen. */
+  text: string;
+  /**
+   * Bildbeschreibung des Beleg-Screenshots.
+   *
+   * Der Screenshot selbst wird NICHT hier eingetragen: es genügt, eine Datei
+   * unter `src/assets/module/<slug>.png` (auch .jpg oder .webp) abzulegen —
+   * sie wird automatisch beim passenden Modul angezeigt und optimiert.
+   * Ohne Datei erscheint das Modul schlicht ohne Bild.
+   */
+  screenshotAlt: string;
+};
+
 /**
  * Fertige Automatisierungs-Module.
  *
- * `name` ist der Produktname, `benefit` die Nutzenaussage in der Sprache
- * des Betriebs. Die Texte sind bewusst kurz gehalten — Details stehen auf
- * der Leistungsseite.
+ * Reihenfolge = Reihenfolge auf der Seite. Vorn steht, was den größten
+ * unmittelbaren Schmerz löst.
  */
-export const automationModules = [
+export const automationModules: AutomationModule[] = [
   {
     slug: 'whatsapp-assistenz',
     name: 'WhatsApp-Assistenz',
     benefit: 'Anfragen werden beantwortet, auch wenn Sie auf dem Dach stehen',
     text: 'Die KI beantwortet Anfragen auf Ihrer Geschäftsnummer und übergibt an Sie, sobald es persönlich wird.',
+    screenshotAlt:
+      'WhatsApp-Verlauf: die Assistenz beantwortet eine Kundenanfrage und übergibt anschließend an den Betrieb',
   },
   {
     slug: 'anruf-retter',
     name: 'Anruf-Retter',
     benefit: 'Kein verpasster Anruf ist mehr ein verlorener Auftrag',
     text: 'Verpasste Anrufe werden automatisch per WhatsApp aufgefangen, der Bot führt das Gespräch weiter.',
+    screenshotAlt:
+      'WhatsApp-Nachricht, die nach einem verpassten Anruf automatisch an den Anrufer herausgegangen ist',
   },
   {
     slug: 'telefon-assistenz',
     name: 'Telefon-Assistenz',
     benefit: 'Es geht jemand ans Telefon, immer',
     text: 'Sprachassistentin Lea nimmt ab, erfasst Anliegen und Rückrufwunsch und schickt Ihnen die Notiz weiter.',
+    screenshotAlt:
+      'Gesprächsnotiz der Sprachassistentin mit Anliegen und Rückrufwunsch',
   },
   {
     slug: 'terminbuchung',
     name: 'Terminbuchung',
     benefit: 'Termine stehen im Kalender, ohne dass Sie telefonieren',
     text: 'Kunden buchen freie Termine direkt im Chat, Ihr Kalender bleibt synchron.',
+    screenshotAlt:
+      'Chat-Verlauf, in dem ein Kunde einen freien Termin auswählt und bestätigt bekommt',
   },
   {
     slug: 'bewertungs-service',
     name: 'Bewertungs-Service',
     benefit: 'Mehr Google-Bewertungen, ohne peinliches Nachfragen',
     text: 'Auf ein kurzes Kommando hin geht die Bewertungsanfrage automatisch an den Kunden raus.',
+    screenshotAlt:
+      'Automatisch versendete Bewertungsanfrage samt Link zum Google-Profil',
   },
   {
     slug: 'bewerber-assistenz',
     name: 'Bewerber-Assistenz',
     benefit: 'Nur noch Bewerbungen lesen, die wirklich passen',
     text: 'Bewerbungen laufen über den Bot, unpassende werden vorab aussortiert.',
+    screenshotAlt:
+      'Vorqualifizierte Bewerbung mit den vom Bot erfassten Angaben',
   },
   {
     slug: 'dashboard',
     name: 'Dashboard',
     benefit: 'Ein Blick genügt, um zu wissen, was läuft',
     text: 'Alle Anfragen, Termine, geretteten Anrufe und Bewertungen auf einer Übersichtsseite.',
+    screenshotAlt:
+      'Übersichtsseite mit Anfragen, Terminen, geretteten Anrufen und Bewertungen',
   },
-] as const;
+];
 
 /** Einzugsgebiet — fließt in JSON-LD und in die Texte. */
 export const serviceArea = {

@@ -1,0 +1,190 @@
+---
+import { Image } from 'astro:assets';
+import Service from '~/layouts/Service.astro';
+import Section from '~/components/Section.astro';
+import Button from '~/components/Button.astro';
+import { automationModules, cta, serviceArea } from '~/config/site';
+import type { FaqItem } from '~/types';
+
+/**
+ * Beleg-Screenshots werden über die Ordnerstruktur zugeordnet:
+ * eine Datei `src/assets/module/<slug>.png` erscheint automatisch beim
+ * passenden Modul. Fehlt sie, bleibt das Modul schlicht ohne Bild.
+ */
+const shots = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/module/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true },
+);
+
+const shotFor = (slug: string) => {
+  const key = Object.keys(shots).find((path) =>
+    path.split('/').pop()?.replace(/\.[^.]+$/, '') === slug,
+  );
+  return key ? shots[key]!.default : null;
+};
+
+const faq: FaqItem[] = [
+  {
+    question: 'Merken meine Kunden, dass da eine KI antwortet?',
+    answer:
+      'Es wird nicht verschleiert. Die Assistenz meldet sich sachlich, beantwortet was sie sicher beantworten kann, und reicht alles Weitere an Sie weiter. Erfahrungsgemäß ist Kunden eine sofortige Antwort deutlich lieber als ein Rückruf am nächsten Tag.',
+  },
+  {
+    question: 'Was passiert, wenn die Assistenz etwas nicht weiß?',
+    answer:
+      'Dann rät sie nicht, sondern übergibt an Sie. Sie bekommen den Verlauf mitsamt allem, was bis dahin erfasst wurde, und steigen ohne Informationsverlust ein.',
+  },
+  {
+    question: 'Muss ich meine Telefonnummer wechseln?',
+    answer:
+      'Nein. Die Module setzen auf Ihrer bestehenden Geschäftsnummer auf. Ihre Kunden merken keinen Unterschied, außer dass jetzt jemand erreichbar ist.',
+  },
+  {
+    question: 'Wie lange dauert die Einrichtung?',
+    answer:
+      'Ein einzelnes Modul ist meist innerhalb weniger Tage aktiv. Wir starten in der Regel mit einem Modul, das sofort Wirkung zeigt, und bauen von dort aus weiter.',
+  },
+  {
+    question: 'Muss ich alle Module nehmen?',
+    answer:
+      'Nein, das wäre auch selten sinnvoll. Wir schauen im Erstgespräch, wo bei Ihnen am meisten liegen bleibt, und fangen genau dort an.',
+  },
+  {
+    question: 'Lässt sich das mit meiner vorhandenen Software verbinden?',
+    answer:
+      'In vielen Fällen ja — Kalender, Handwerkersoftware und Buchhaltung lassen sich häufig anbinden. Ob es in Ihrem Fall geht, klären wir konkret anhand der Programme, die Sie einsetzen.',
+  },
+];
+
+/** Der wiederkehrende Ablauf, den ein Betrieb heute noch von Hand macht. */
+const painPoints = [
+  {
+    problem: 'Das Telefon klingelt, während Sie unter der Spüle liegen.',
+    result: 'Der Anrufer probiert den nächsten Betrieb. Sie erfahren nie davon.',
+  },
+  {
+    problem: 'Abends liegen zwölf WhatsApp-Nachrichten und vier Rückrufwünsche vor.',
+    result: 'Sie arbeiten sie nach Feierabend ab — oder eben nicht.',
+  },
+  {
+    problem: 'Ein zufriedener Kunde würde Sie gern bewerten.',
+    result: 'Sie vergessen zu fragen. Die Bewertung kommt nie.',
+  },
+];
+---
+
+<Service
+  label="KI-Prozessautomatisierung"
+  benefit="Kein verpasster Anruf, kein Angebot, das liegen bleibt"
+  intro="Sieben einsatzbereite Module, die Anfragen annehmen, beantworten und nachfassen, während Sie auf der Baustelle stehen. Aufgebaut für Handwerksbetriebe, nicht für Konzerne."
+  title="KI-Automatisierung für Handwerksbetriebe in Essen"
+  description="Verpasste Anrufe auffangen, Anfragen automatisch beantworten, Termine buchen lassen und Bewertungen einsammeln. Einsatzbereite Module für Handwerks- und SHK-Betriebe in Essen und im Ruhrgebiet."
+  faq={faq}
+>
+  {/* ===================== Das Problem ===================== */}
+  <Section tone="default">
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Der Auftrag geht selten an den Besseren</h2>
+      <p class="mt-4 text-ink-muted">
+        Er geht an den, der zuerst erreichbar war. Für einen Betrieb, der den
+        ganzen Tag beim Kunden ist, ist das eine unfaire Ausgangslage — und
+        genau die lässt sich abstellen.
+      </p>
+    </div>
+
+    <ul class="mt-12 grid gap-5 md:grid-cols-3">
+      {
+        painPoints.map((point) => (
+          <li class="rounded-card border border-border bg-surface p-6">
+            <p class="font-medium text-ink">{point.problem}</p>
+            <p class="mt-3 text-[0.9375rem] text-ink-muted">{point.result}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  {/* ===================== Die Module ===================== */}
+  <Section tone="subtle">
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Sieben Module, die bereits laufen</h2>
+      <p class="mt-4 text-ink-muted">
+        Nichts davon ist ein Konzept oder eine Absichtserklärung. Alles hier ist
+        im Einsatz und lässt sich für Ihren Betrieb einrichten.
+      </p>
+    </div>
+
+    <ol class="mt-14 flex flex-col gap-16 md:gap-20">
+      {
+        automationModules.map((module, index) => {
+          const shot = shotFor(module.slug);
+          /* Bild und Text wechseln die Seite, damit die Liste nicht
+             monoton wird. Ohne Bild läuft der Text über die volle Breite. */
+          const flip = index % 2 === 1;
+
+          return (
+            <li
+              id={module.slug}
+              class:list={[
+                'grid items-center gap-8 md:gap-12',
+                shot ? 'md:grid-cols-2' : 'md:grid-cols-1',
+              ]}
+            >
+              <div class:list={[shot && flip ? 'md:order-2' : '']}>
+                <span class="inline-flex items-center gap-2.5 text-sm font-medium text-accent">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-accent-soft text-xs">
+                    {index + 1}
+                  </span>
+                  {module.name}
+                </span>
+                <h3 class="mt-3 text-2xl">{module.benefit}</h3>
+                <p class="mt-3 max-w-xl text-ink-muted">{module.text}</p>
+              </div>
+
+              {shot && (
+                <div class:list={['min-w-0', flip ? 'md:order-1' : '']}>
+                  <Image
+                    src={shot}
+                    alt={module.screenshotAlt}
+                    widths={[400, 800]}
+                    sizes="(min-width: 768px) 40vw, 90vw"
+                    loading="lazy"
+                    class="w-full rounded-card border border-border bg-surface shadow-card"
+                  />
+                </div>
+              )}
+            </li>
+          );
+        })
+      }
+    </ol>
+  </Section>
+
+  {/* ===================== Individuelle Automatisierung ===================== */}
+  <Section tone="default">
+    <div class="mx-auto max-w-3xl rounded-card border border-border bg-surface p-8 md:p-12">
+      <h2 class="text-2xl md:text-3xl">Und wenn Ihr Zeitfresser nicht dabei ist?</h2>
+      <p class="mt-4 text-ink-muted">
+        Die sieben Module sind die, die fertig stehen. Vieles andere lässt sich
+        genauso automatisieren: Angebote und Rechnungen, Materialbestellungen,
+        Erinnerungen an Kunden, die Anbindung an Ihre vorhandene Software.
+      </p>
+      <p class="mt-4 text-ink-muted">
+        Beschreiben Sie einfach, was in Ihrem Betrieb gerade die meiste Zeit
+        frisst — wir prüfen gemeinsam, ob es sich lösen lässt. Wenn nicht, sage
+        ich Ihnen das auch.
+      </p>
+
+      <div class="mt-8 flex flex-col items-start gap-2">
+        <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+          {cta.primary.label}
+        </Button>
+        <p class="text-sm text-ink-faint">{cta.primary.note}</p>
+      </div>
+    </div>
+
+    <p class="mt-10 text-center text-sm text-ink-faint">
+      Eingerichtet für Betriebe in {serviceArea.display}.
+    </p>
+  </Section>
+</Service>

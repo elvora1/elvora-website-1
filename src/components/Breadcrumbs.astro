@@ -1,0 +1,34 @@
+---
+interface Props {
+  /** Ohne Startseite — die wird automatisch vorangestellt. */
+  trail: Array<{ label: string; href?: string }>;
+}
+
+const { trail }: Props = Astro.props;
+const items = [{ label: 'Start', href: '/' }, ...trail];
+---
+
+<nav aria-label="Sie befinden sich hier" class="text-sm">
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-faint">
+    {
+      items.map((item, i) => (
+        <li class="flex items-center gap-2">
+          {i > 0 && (
+            <span aria-hidden="true" class="text-border-strong">
+              /
+            </span>
+          )}
+          {item.href && i < items.length - 1 ? (
+            <a href={item.href} class="transition-colors hover:text-ink">
+              {item.label}
+            </a>
+          ) : (
+            <span aria-current="page" class="text-ink-muted">
+              {item.label}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

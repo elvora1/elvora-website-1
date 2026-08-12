@@ -1,0 +1,64 @@
+---
+import Base from './Base.astro';
+import Section from '~/components/Section.astro';
+import Button from '~/components/Button.astro';
+import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import Faq from '~/components/Faq.astro';
+import type { FaqItem } from '~/types';
+import CtaBand from '~/components/CtaBand.astro';
+import { cta } from '~/config/site';
+
+/**
+ * Gemeinsamer Bauplan aller Leistungsseiten.
+ * Aufbau: Problem benennen, Nutzen versprechen, Ablauf zeigen, Fragen
+ * ausräumen, zum Gespräch führen.
+ */
+interface Props {
+  /** Fachbezeichnung, tritt klein und untergeordnet auf. */
+  label: string;
+  /** Nutzenaussage — das ist die H1. */
+  benefit: string;
+  /** Ein bis zwei Sätze unter der Überschrift. */
+  intro: string;
+  title: string;
+  description: string;
+  faq?: FaqItem[];
+}
+
+const { label, benefit, intro, title, description, faq = [] }: Props = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <section class="border-b border-border bg-surface-subtle">
+    <div class="container-content py-10 md:py-14">
+      <Breadcrumbs trail={[{ label: 'Leistungen', href: '/leistungen/' }, { label }]} />
+
+      <div class="mt-8 max-w-3xl">
+        <p class="text-sm font-medium text-accent">{label}</p>
+        <h1 class="mt-3 text-3xl md:text-5xl">{benefit}</h1>
+        <p class="mt-5 text-lg text-ink-muted">{intro}</p>
+
+        <div class="mt-8 flex flex-col items-start gap-2">
+          <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+            {cta.primary.label}
+          </Button>
+          <p class="text-sm text-ink-faint">{cta.primary.note}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <slot />
+
+  {
+    faq.length > 0 && (
+      <Section tone="default">
+        <div class="max-w-3xl">
+          <Faq items={faq} />
+        </div>
+      </Section>
+    )
+  }
+
+  <CtaBand />
+</Base>
