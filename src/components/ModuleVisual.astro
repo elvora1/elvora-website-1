@@ -1,0 +1,218 @@
+---
+/**
+ * Schematische Darstellung eines Automatisierungs-Moduls.
+ *
+ * ZWECK: Die Module sollen sichtbar sein, solange keine echten Screenshots
+ * vorliegen. Bewusst schematisch gehalten und als solche beschriftet — eine
+ * nachgebaute Bildschirmaufnahme waere ein erfundener Beleg und hat auf einer
+ * Seite, die Vertrauen aufbauen soll, nichts verloren.
+ *
+ * Sobald unter src/assets/module/<slug>.png ein echter Screenshot liegt,
+ * ersetzt dieser die Darstellung automatisch.
+ *
+ * Alles hier ist reines HTML und CSS: keine Bilddatei, keine Ladezeit,
+ * gestochen scharf auf jedem Bildschirm.
+ */
+interface Props {
+  slug: string;
+  class?: string;
+}
+
+const { slug, class: className = '' }: Props = Astro.props;
+
+type Chat = { from: 'them' | 'us'; text: string };
+
+const chats: Record<string, Chat[]> = {
+  'whatsapp-assistenz': [
+    { from: 'them', text: 'Guten Tag, unsere Therme macht komische Geräusche. Was kostet eine Wartung?' },
+    { from: 'us', text: 'Guten Tag! Eine Wartung dauert bei uns etwa eine Stunde. Darf ich kurz fragen, welches Modell bei Ihnen verbaut ist?' },
+    { from: 'them', text: 'Vaillant, Baujahr 2016 glaube ich' },
+    { from: 'us', text: 'Danke. Ich gebe das an Herrn Meyer weiter — er meldet sich heute noch mit einem Termin bei Ihnen.' },
+  ],
+  'anruf-retter': [
+    { from: 'us', text: 'Guten Tag, Sie haben uns gerade angerufen und wir konnten leider nicht abnehmen. Worum geht es? Ich helfe direkt hier weiter.' },
+    { from: 'them', text: 'Heizung ausgefallen, kein Warmwasser' },
+    { from: 'us', text: 'Verstanden, das ist dringend. Wie lautet Ihre Adresse? Ich melde den Notfall sofort weiter.' },
+  ],
+  'terminbuchung': [
+    { from: 'them', text: 'Passt bei Ihnen nächste Woche was?' },
+    { from: 'us', text: 'Ja, ich habe Dienstag 9:00 Uhr und Donnerstag 14:30 Uhr frei. Was passt Ihnen besser?' },
+    { from: 'them', text: 'Donnerstag' },
+    { from: 'us', text: 'Eingetragen. Sie bekommen am Mittwoch eine Erinnerung.' },
+  ],
+};
+
+/** Zeilen der Gesprächsnotiz. */
+const callNote = [
+  { label: 'Anrufer', value: 'Frau Kern' },
+  { label: 'Rufnummer', value: '0201 ••• ••••' },
+  { label: 'Anliegen', value: 'Bad-Sanierung, möchte Angebot' },
+  { label: 'Rückruf', value: 'ab 16 Uhr erreichbar' },
+];
+
+/** Kennzahlen der Übersichtsseite. */
+const stats = [
+  { label: 'Anfragen', value: '34' },
+  { label: 'Gerettete Anrufe', value: '11' },
+  { label: 'Termine', value: '9' },
+  { label: 'Bewertungen', value: '6' },
+];
+
+/** Bewerbungs-Vorqualifizierung. */
+const applicant = [
+  { text: 'Gesellenbrief SHK', ok: true },
+  { text: 'Führerschein Klasse B', ok: true },
+  { text: 'Berufserfahrung 4 Jahre', ok: true },
+  { text: 'Verfügbar ab sofort', ok: false },
+];
+
+const chat = chats[slug];
+---
+
+<figure class={`min-w-0 ${className}`}>
+  <div class="overflow-hidden rounded-card border border-border bg-surface shadow-card">
+    {/* Kopfleiste, die ein Programmfenster andeutet */}
+    <div class="flex items-center gap-1.5 border-b border-border bg-surface-subtle px-4 py-3">
+      <span class="h-2 w-2 rounded-full bg-border-strong"></span>
+      <span class="h-2 w-2 rounded-full bg-border-strong"></span>
+      <span class="h-2 w-2 rounded-full bg-border-strong"></span>
+    </div>
+
+    <div class="p-4 md:p-5">
+      {/* --- Chatverläufe --- */}
+      {
+        chat && (
+          <ul class="flex flex-col gap-2.5">
+            {chat.map((message) => (
+              <li
+                class:list={[
+                  'flex',
+                  message.from === 'us' ? 'justify-end' : 'justify-start',
+                ]}
+              >
+                <span
+                  class:list={[
+                    'max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[0.8125rem] leading-snug',
+                    message.from === 'us'
+                      ? 'bg-accent text-accent-contrast rounded-br-sm'
+                      : 'bg-surface-subtle text-ink rounded-bl-sm',
+                  ]}
+                >
+                  {message.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+
+      {/* --- Gesprächsnotiz der Telefon-Assistenz --- */}
+      {
+        slug === 'telefon-assistenz' && (
+          <div>
+            <p class="text-[0.8125rem] font-medium text-ink">
+              Gesprächsnotiz · heute, 10:42 Uhr
+            </p>
+            <dl class="mt-4 flex flex-col gap-3">
+              {callNote.map((row) => (
+                <div class="flex gap-4 border-b border-border pb-3 last:border-0 last:pb-0">
+                  <dt class="w-28 shrink-0 text-[0.8125rem] text-ink-faint">{row.label}</dt>
+                  <dd class="text-[0.8125rem] text-ink">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )
+      }
+
+      {/* --- Bewertungsanfrage --- */}
+      {
+        slug === 'bewertungs-service' && (
+          <div>
+            <div class="rounded-xl bg-surface-subtle p-4">
+              <p class="text-[0.8125rem] leading-snug text-ink">
+                Vielen Dank für Ihren Auftrag! Wenn Sie zufrieden waren, würden wir
+                uns sehr über eine kurze Bewertung freuen.
+              </p>
+              <span class="mt-3 inline-flex rounded-lg bg-accent px-3 py-2 text-[0.75rem] font-medium text-accent-contrast">
+                Bei Google bewerten
+              </span>
+            </div>
+            <div class="mt-4 flex items-center gap-1" aria-hidden="true">
+              {Array.from({ length: 5 }).map(() => (
+                <svg viewBox="0 0 20 20" class="h-5 w-5 text-star" fill="currentColor">
+                  <path d="M10 1.6l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.21l-4.94 2.6.94-5.5-4-3.9 5.53-.8L10 1.6z" />
+                </svg>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {/* --- Vorqualifizierte Bewerbung --- */}
+      {
+        slug === 'bewerber-assistenz' && (
+          <div>
+            <p class="text-[0.8125rem] font-medium text-ink">
+              Bewerbung · Anlagenmechaniker/in
+            </p>
+            <ul class="mt-4 flex flex-col gap-2.5">
+              {applicant.map((row) => (
+                <li class="flex items-center gap-2.5 text-[0.8125rem]">
+                  <span
+                    class:list={[
+                      'flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full',
+                      row.ok ? 'bg-accent-soft text-accent' : 'bg-surface-subtle text-ink-faint',
+                    ]}
+                    aria-hidden="true"
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      class="h-3 w-3"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      {row.ok ? <path d="M4 10.5l4 4 8-9" /> : <path d="M5 5l10 10M15 5L5 15" />}
+                    </svg>
+                  </span>
+                  <span class:list={[row.ok ? 'text-ink' : 'text-ink-faint']}>{row.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {/* --- Übersichtsseite --- */}
+      {
+        slug === 'dashboard' && (
+          <div>
+            <div class="grid grid-cols-2 gap-2.5">
+              {stats.map((stat) => (
+                <div class="rounded-xl bg-surface-subtle p-3.5">
+                  <p class="font-display text-2xl text-ink">{stat.value}</p>
+                  <p class="mt-0.5 text-[0.75rem] text-ink-faint">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+            <div class="mt-4 flex h-16 items-end gap-1.5" aria-hidden="true">
+              {[35, 52, 44, 68, 60, 82, 74].map((height) => (
+                <span
+                  class="flex-1 rounded-t bg-accent-soft"
+                  style={`height: ${height}%`}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <figcaption class="mt-3 text-center text-xs text-ink-faint">
+    Schematische Darstellung
+  </figcaption>
+</figure>
