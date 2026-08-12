@@ -1,0 +1,42 @@
+---
+import Button from './Button.astro';
+import { cta } from '~/config/site';
+
+/**
+ * Wiederkehrender Abschluss jeder Seite.
+ * Genau ein hervorgehobener CTA, der zweite bleibt untergeordnet.
+ */
+interface Props {
+  heading?: string;
+  text?: string;
+}
+
+const {
+  heading = 'Klingt das nach Ihrem Betrieb?',
+  text = 'In einem kurzen Gespräch schauen wir, wo bei Ihnen gerade Anfragen verloren gehen. Ohne Vorbereitung, ohne Verpflichtung.',
+} = Astro.props;
+---
+
+<section class="bg-surface-ink">
+  <div class="container-content py-16 md:py-20">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl text-white md:text-4xl">{heading}</h2>
+      <p class="mt-4 text-white/70">{text}</p>
+
+      <div class="mt-8 flex flex-col items-center gap-4">
+        <Button href={cta.primary.href} size="lg">{cta.primary.label}</Button>
+        <p class="text-sm text-white/50">{cta.primary.note}</p>
+      </div>
+
+      <p class="mt-6 text-sm text-white/50">
+        Lieber direkt sprechen?{' '}
+        <a
+          href={cta.secondary.href}
+          class="text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+        >
+          Rufen Sie an
+        </a>
+      </p>
+    </div>
+  </div>
+</section>

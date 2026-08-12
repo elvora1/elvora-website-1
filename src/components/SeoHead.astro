@@ -1,0 +1,54 @@
+---
+import { Font } from 'astro:assets';
+import { site } from '~/config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** true blendet die Seite aus dem Index aus (z. B. Danke-Seite). */
+  noindex?: boolean;
+  /**
+   * Pfad zum Vorschaubild, relativ zur Domain.
+   * TODO: Standardbild ergänzen, sobald das Logo vorliegt — bis dahin wird
+   * bewusst kein og:image gesetzt, statt auf eine fehlende Datei zu zeigen.
+   */
+  image?: string;
+}
+
+const { title, description, noindex = false, image } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const imageUrl = image ? new URL(image, site.url).href : null;
+/** Startseite traegt den Markennamen bereits im Titel. */
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+<!-- Schriften: beim Build heruntergeladen, selbst ausgeliefert, vorgeladen -->
+<Font cssVariable="--font-body" preload />
+<Font cssVariable="--font-heading" preload />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content="de_DE" />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+{imageUrl && <meta property="og:image" content={imageUrl} />}
+
+<meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+{imageUrl && <meta name="twitter:image" content={imageUrl} />}
+
+<meta name="theme-color" content="#ffffff" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />

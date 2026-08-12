@@ -1,0 +1,144 @@
+---
+import Base from '~/layouts/Base.astro';
+import Section from '~/components/Section.astro';
+import Button from '~/components/Button.astro';
+import ReviewBadge from '~/components/ReviewBadge.astro';
+import CtaBand from '~/components/CtaBand.astro';
+import { cta, services, serviceArea, address, reviews } from '~/config/site';
+
+const title = 'Elvora — Mehr Anfragen für Handwerksbetriebe in Essen';
+const description =
+  'Website, Google-Sichtbarkeit und automatisierte Abläufe für SHK- und Handwerksbetriebe in Essen und im Ruhrgebiet. Fester Ansprechpartner statt Agentur-Apparat.';
+
+/** Kurze Vertrauensanker. Bewusst schlicht, damit sie dem CTA nicht Konkurrenz machen. */
+const trustMarkers = [
+  `Aus ${address.city}, für ${serviceArea.display}`,
+  'Ein fester Ansprechpartner, keine Hotline',
+  'Antwort auf Anfragen binnen 24 Stunden',
+];
+---
+
+<Base title={title} description={description}>
+  {/* ===================== Erster Sichtbereich ===================== */}
+  <section class="relative overflow-hidden bg-surface">
+    {/* Ruhiger Farbverlauf statt Bild — kostet null Ladezeit */}
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 bg-gradient-to-b from-accent-soft to-transparent"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="container-content py-16 md:py-24">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="text-sm font-medium text-accent">
+          Digitalagentur aus {address.city} · Schwerpunkt SHK
+        </p>
+
+        <h1 class="mt-5 text-4xl md:text-6xl">
+          Ihr Betrieb wird gefunden, angerufen und beauftragt
+        </h1>
+
+        <p class="mx-auto mt-6 max-w-2xl text-lg text-ink-muted">
+          Die meisten Handwerksbetriebe verlieren Aufträge nicht an die Konkurrenz,
+          sondern an verpasste Anrufe und eine Website, die niemand findet. Ich
+          bringe beides in Ordnung — und halte Ihnen den Rücken frei.
+        </p>
+
+        {/* Genau EIN hervorgehobener CTA. Der zweite bleibt bewusst leise. */}
+        <div class="mt-9 flex flex-col items-center gap-3">
+          <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+            {cta.primary.label}
+          </Button>
+          <p class="text-sm text-ink-faint">{cta.primary.note}</p>
+          <Button href={cta.secondary.href} variant="quiet" class="mt-1">
+            {cta.secondary.label}
+          </Button>
+        </div>
+
+        {/* Social Proof ohne Scrollen sichtbar. Der Block entfällt vollständig,
+            solange keine echten Bewertungen hinterlegt sind. */}
+        {
+          reviews.enabled && reviews.count > 0 && (
+            <div class="mt-10 flex justify-center">
+              <ReviewBadge />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  {/* ===================== Vertrauensanker ===================== */}
+  <div class="border-y border-border bg-surface-subtle">
+    <div class="container-content py-5">
+      <ul
+        class="flex flex-col gap-3 text-sm text-ink-muted sm:flex-row sm:justify-center sm:gap-10"
+      >
+        {
+          trustMarkers.map((marker) => (
+            <li class="flex items-center gap-2.5">
+              <svg
+                viewBox="0 0 20 20"
+                class="h-4 w-4 shrink-0 text-accent"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 10.5l4 4 8-9" />
+              </svg>
+              {marker}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  {/* ===================== Leistungen ===================== */}
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Was sich für Sie dadurch ändert</h2>
+      <p class="mt-4 text-ink-muted">
+        Vier Bausteine, die aufeinander aufbauen. Sie müssen nicht alle auf einmal
+        angehen — meistens beginnen wir dort, wo gerade am meisten liegen bleibt.
+      </p>
+    </div>
+
+    <ul class="mt-12 grid gap-5 md:grid-cols-2">
+      {
+        services.map((service) => (
+          <li>
+            <a
+              href={service.href}
+              class="group flex h-full flex-col rounded-card border border-border bg-surface p-7 transition-all hover:border-border-strong hover:shadow-card"
+            >
+              <span class="text-sm font-medium text-accent">{service.label}</span>
+              <h3 class="mt-2.5 text-xl">{service.benefit}</h3>
+              <p class="mt-3 text-[0.9375rem] text-ink-muted">{service.teaser}</p>
+              <span class="mt-5 inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-ink">
+                Mehr dazu
+                <svg
+                  viewBox="0 0 20 20"
+                  class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4 10h11M11 6l4 4-4 4" />
+                </svg>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <CtaBand />
+</Base>

@@ -1,0 +1,40 @@
+---
+/**
+ * Einheitlicher vertikaler Rhythmus und Container.
+ * Sorgt dafuer, dass der Weissraum ueber alle Seiten hinweg gleich atmet.
+ */
+interface Props {
+  /** Hintergrund. `subtle` setzt einen ruhigen Wechsel zwischen Abschnitten. */
+  tone?: 'default' | 'subtle' | 'accent-soft';
+  /** Vertikale Groesse. */
+  space?: 'md' | 'lg';
+  id?: string;
+  as?: 'section' | 'div' | 'article' | 'aside';
+  class?: string;
+}
+
+const {
+  tone = 'default',
+  space = 'lg',
+  id,
+  as: Tag = 'section',
+  class: className = '',
+}: Props = Astro.props;
+
+const tones: Record<string, string> = {
+  default: 'bg-surface',
+  subtle: 'bg-surface-subtle',
+  'accent-soft': 'bg-accent-soft',
+};
+
+const spaces: Record<string, string> = {
+  md: 'py-14 md:py-18',
+  lg: 'py-18 md:py-28',
+};
+---
+
+<Tag id={id} class={`${tones[tone]} ${spaces[space]} ${className}`}>
+  <div class="container-content">
+    <slot />
+  </div>
+</Tag>

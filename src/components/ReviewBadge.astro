@@ -1,0 +1,71 @@
+---
+import { reviews } from '~/config/site';
+
+/**
+ * Kompakter Bewertungsbeleg fuer den ersten Sichtbereich.
+ *
+ * Rendert nichts, solange `reviews.enabled` false ist -- damit steht auf der
+ * Seite nie eine Bewertungsbehauptung ohne Grundlage.
+ */
+interface Props {
+  /** `light` fuer helle Flaechen, `inverse` fuer dunkle. */
+  tone?: 'light' | 'inverse';
+  class?: string;
+}
+
+const { tone = 'light', class: className = '' } = Astro.props;
+
+const show = reviews.enabled && reviews.count > 0;
+
+const ratingText = reviews.rating.toLocaleString('de-DE', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+
+const label = `${ratingText} von 5 Sternen aus ${reviews.count} Google-Bewertungen`;
+
+// Fuellgrad je Stern: voll, teilweise oder leer.
+const stars = Array.from({ length: 5 }, (_, i) =>
+  Math.max(0, Math.min(1, reviews.rating - i)),
+);
+
+const textColor = tone === 'inverse' ? 'text-white/80' : 'text-ink-muted';
+const strongColor = tone === 'inverse' ? 'text-white' : 'text-ink';
+
+const Tag = reviews.profileUrl ? 'a' : 'div';
+---
+
+{
+  show && (
+    <Tag
+      class={`inline-flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.9375rem] ${textColor} ${reviews.profileUrl ? 'hover:opacity-80 transition-opacity' : ''} ${className}`}
+      {...(reviews.profileUrl
+        ? { href: reviews.profileUrl, target: '_blank', rel: 'noopener noreferrer' }
+        : {})}
+      aria-label={label}
+    >
+      <span class="flex items-center gap-0.5" aria-hidden="true">
+        {stars.map((fill, i) => (
+          <svg viewBox="0 0 20 20" class="h-[1.125rem] w-[1.125rem]" role="presentation">
+            <defs>
+              <linearGradient id={`star-${i}`}>
+                <stop offset={`${fill * 100}%`} stop-color="var(--color-star)" />
+                <stop offset={`${fill * 100}%`} stop-color="currentColor" stop-opacity="0.25" />
+              </linearGradient>
+            </defs>
+            <path
+              fill={`url(#star-${i})`}
+              d="M10 1.6l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.21l-4.94 2.6.94-5.5-4-3.9 5.53-.8L10 1.6z"
+            />
+          </svg>
+        ))}
+      </span>
+      <span aria-hidden="true">
+        <span class={`font-semibold ${strongColor}`}>{ratingText}</span>
+        {' aus '}
+        <span class={strongColor}>{reviews.count}</span>
+        {' Google-Bewertungen'}
+      </span>
+    </Tag>
+  )
+}

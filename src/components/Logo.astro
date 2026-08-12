@@ -1,0 +1,22 @@
+---
+/**
+ * Wortmarke.
+ *
+ * ZWISCHENSTAND: reine Typo-Fassung, bis die Logo-SVG vorliegt.
+ * Zum Austausch wird ausschliesslich der Inhalt dieses <span> durch das
+ * <svg> ersetzt -- alle Einbindungen im Projekt bleiben unveraendert.
+ */
+interface Props {
+  tone?: 'default' | 'inverse';
+  class?: string;
+}
+
+const { tone = 'default', class: className = '' } = Astro.props;
+const color = tone === 'inverse' ? 'text-white' : 'text-ink';
+---
+
+<span
+  class={`font-display text-[1.375rem] font-semibold tracking-[-0.03em] ${color} ${className}`}
+>
+  elvora<span class="text-accent">.</span>
+</span>

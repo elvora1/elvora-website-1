@@ -1,0 +1,69 @@
+---
+/**
+ * Handlungsaufruf.
+ *
+ * Hierarchie ist hier bewusst fest verdrahtet:
+ *   primary   -- flaechig in der Akzentfarbe. Pro Sichtbereich nur EINMAL.
+ *   secondary -- Umriss in Grau, klar untergeordnet, nie in der Akzentfarbe.
+ *   quiet     -- reiner Textlink, schwaechste Stufe.
+ *
+ * Damit kann kein zweiter CTA versehentlich mit dem Haupt-CTA konkurrieren.
+ */
+interface Props {
+  href?: string;
+  type?: 'button' | 'submit';
+  variant?: 'primary' | 'secondary' | 'quiet';
+  size?: 'md' | 'lg';
+  fullWidth?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  type = 'button',
+  variant = 'primary',
+  size = 'md',
+  fullWidth = false,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 rounded-button font-medium ' +
+  'transition-colors duration-150 whitespace-nowrap ' +
+  'disabled:opacity-50 disabled:pointer-events-none';
+
+const variants: Record<string, string> = {
+  primary:
+    'bg-accent text-accent-contrast hover:bg-accent-hover shadow-[0_1px_2px_rgb(25_29_33/0.10)]',
+  secondary:
+    'border border-border-strong bg-surface text-ink hover:bg-surface-subtle hover:border-ink-faint',
+  quiet: 'text-ink-muted underline underline-offset-4 decoration-border-strong hover:text-ink hover:decoration-ink-faint',
+};
+
+const sizes: Record<string, string> = {
+  md: variant === 'quiet' ? 'text-[0.9375rem]' : 'h-11 px-5 text-[0.9375rem]',
+  lg: variant === 'quiet' ? 'text-base' : 'h-13 px-7 text-base',
+};
+
+const classes = [
+  base,
+  variants[variant],
+  sizes[size],
+  fullWidth ? 'w-full' : '',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class={classes}
+  {...href ? { href } : { type }}
+  {...rest}
+>
+  <slot />
+</Tag>
