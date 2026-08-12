@@ -1,0 +1,122 @@
+---
+import Button from './Button.astro';
+import { booking } from '~/config/site';
+
+/**
+ * cal.com-Einbettung, die erst auf Klick lädt.
+ *
+ * WICHTIG: Vor dem Klick entsteht KEINE Verbindung zu cal.com. Weder ein
+ * Skript noch ein Bild noch ein Cookie. Erst wenn der Besucher aktiv auf
+ * "Kalender öffnen" tippt, wird nachgeladen. Genau darauf stützt sich die
+ * Entscheidung, ohne Cookie-Banner auszukommen.
+ *
+ * Ohne JavaScript bleibt der direkte Link sichtbar und funktionsfähig.
+ */
+---
+
+<div class="rounded-card border border-border bg-surface p-6 md:p-8">
+  {/* Zustand vor dem Klick */}
+  <div data-cal-placeholder>
+    <h2 class="text-xl">Kalender öffnen</h2>
+    <p class="mt-3 text-[0.9375rem] text-ink-muted">
+      Der Kalender wird von cal.com bereitgestellt und erst geladen, wenn Sie
+      ihn öffnen. Vorher werden keine Daten an Dritte übertragen.
+    </p>
+
+    <div class="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+      <Button type="button" data-cal-trigger class="max-sm:w-full">
+        Kalender öffnen
+      </Button>
+      <Button href={booking.url} variant="quiet" target="_blank" rel="noopener noreferrer">
+        Oder direkt bei cal.com buchen
+      </Button>
+    </div>
+  </div>
+
+  {/* Ziel der Einbettung */}
+  <div
+    data-cal-inline
+    data-cal-link={booking.link}
+    hidden
+    class="min-h-[36rem] w-full overflow-hidden"
+  >
+  </div>
+
+  {/* Rückfallebene, falls das Laden scheitert */}
+  <p data-cal-error hidden class="mt-4 text-[0.9375rem] text-ink-muted">
+    Der Kalender lässt sich gerade nicht laden.{' '}
+    <a
+      href={booking.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-accent underline underline-offset-2">Hier direkt bei cal.com buchen</a
+    >.
+  </p>
+</div>
+
+<script>
+  const trigger = document.querySelector<HTMLElement>('[data-cal-trigger]');
+  const placeholder = document.querySelector<HTMLElement>('[data-cal-placeholder]');
+  const target = document.querySelector<HTMLElement>('[data-cal-inline]');
+  const errorNote = document.querySelector<HTMLElement>('[data-cal-error]');
+
+  if (trigger && placeholder && target && errorNote) {
+    trigger.addEventListener(
+      'click',
+      () => {
+        const calLink = target.dataset.calLink;
+        if (!calLink) return;
+
+        placeholder.hidden = true;
+        target.hidden = false;
+
+        // Offizieller Einbettungs-Baustein von cal.com. Legt eine Warteschlange
+        // an und laedt das Skript nach; Aufrufe vor dem Laden gehen nicht verloren.
+        (function (C: any, A: string, L: string) {
+          const p = (a: any, ar: unknown) => {
+            a.q.push(ar);
+          };
+          const d = C.document;
+          C.Cal =
+            C.Cal ||
+            function (...ar: unknown[]) {
+              const cal = C.Cal;
+              if (!cal.loaded) {
+                cal.ns = {};
+                cal.q = cal.q || [];
+                const script = d.createElement('script');
+                script.src = A;
+                script.onerror = () => {
+                  target.hidden = true;
+                  errorNote.hidden = false;
+                };
+                d.head.appendChild(script);
+                cal.loaded = true;
+              }
+              if (ar[0] === L) {
+                const api: any = function (...a: unknown[]) {
+                  p(api, a);
+                };
+                const namespace = ar[1];
+                api.q = api.q || [];
+                if (typeof namespace === 'string') {
+                  cal.ns[namespace] = api;
+                  p(api, ar);
+                } else {
+                  p(cal, ar);
+                }
+                return;
+              }
+              p(cal, ar);
+            };
+        })(window, 'https://app.cal.com/embed/embed.js', 'init');
+
+        const Cal = (window as any).Cal;
+        Cal('init', { origin: 'https://cal.com' });
+        Cal('inline', { elementOrSelector: target, calLink });
+        Cal('ui', { hideEventTypeDetails: false, layout: 'month_view' });
+      },
+      { once: true },
+    );
+  }
+</script>

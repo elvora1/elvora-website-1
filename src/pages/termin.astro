@@ -1,0 +1,74 @@
+---
+import Base from '~/layouts/Base.astro';
+import Section from '~/components/Section.astro';
+import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import BookingEmbed from '~/components/BookingEmbed.astro';
+import WhatsappCta from '~/components/WhatsappCta.astro';
+import { booking, contact, contactLinks } from '~/config/site';
+
+/** Was im Gespräch passiert — nimmt die Sorge vor dem Verkaufsanruf. */
+const agenda = [
+  'Sie schildern kurz, was in Ihrem Betrieb gerade Zeit frisst oder liegen bleibt.',
+  'Ich sage Ihnen, ob und wie sich das lösen lässt — auch wenn die Antwort „nicht durch mich" lautet.',
+  'Wenn es passt, skizziere ich einen ersten Weg. Wenn nicht, haben Sie trotzdem eine Einschätzung.',
+];
+---
+
+<Base
+  title="Kostenloses Erstgespräch vereinbaren"
+  description="15 Minuten, unverbindlich und ohne Verkaufsgespräch: Termin bei Elvora aus Essen direkt online buchen."
+>
+  <section class="border-b border-border bg-surface-subtle">
+    <div class="container-content py-10 md:py-14">
+      <Breadcrumbs trail={[{ label: 'Termin' }]} />
+
+      <div class="mt-8 max-w-3xl">
+        <h1 class="text-3xl md:text-5xl">{booking.durationLabel}, die Ihnen Klarheit bringen</h1>
+        <p class="mt-5 text-lg text-ink-muted">
+          Kein Verkaufsgespräch, keine Vorbereitung nötig. Sie erzählen, wo es
+          klemmt, und bekommen eine ehrliche Einschätzung — auch dann, wenn ich
+          Ihnen nicht helfen kann.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <Section>
+    <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-7">
+        <BookingEmbed />
+      </div>
+
+      <div class="lg:col-span-5">
+        <h2 class="text-xl">Was in den {booking.durationLabel} passiert</h2>
+        <ol class="mt-6 flex flex-col gap-5">
+          {
+            agenda.map((item, index) => (
+              <li class="flex gap-4">
+                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-soft font-display text-xs font-semibold text-accent">
+                  {index + 1}
+                </span>
+                <span class="text-[0.9375rem] text-ink-muted">{item}</span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="mt-10 border-t border-border pt-8">
+          <h2 class="text-[0.8125rem] font-semibold uppercase tracking-wider text-ink-faint">
+            Kein passender Termin dabei?
+          </h2>
+          <div class="mt-4 flex flex-col gap-3 text-[0.9375rem] text-ink-muted">
+            <WhatsappCta variant="inline" class="text-ink-muted" />
+            <p>
+              Oder rufen Sie an:{' '}
+              <a href={contactLinks.tel} class="text-ink underline underline-offset-4">
+                {contact.phoneDisplay}
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Section>
+</Base>

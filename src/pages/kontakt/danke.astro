@@ -1,0 +1,73 @@
+---
+import Base from '~/layouts/Base.astro';
+import Button from '~/components/Button.astro';
+import WhatsappCta from '~/components/WhatsappCta.astro';
+import { services } from '~/config/site';
+---
+
+<Base
+  title="Vielen Dank für Ihre Anfrage"
+  description="Ihre Anfrage ist bei Elvora eingegangen."
+  noindex
+>
+  <section class="container-content py-20 md:py-28">
+    <div class="mx-auto max-w-xl text-center">
+      <span
+        class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-accent"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="h-7 w-7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M4 12.5l5 5 11-11" />
+        </svg>
+      </span>
+
+      <h1 class="mt-7 text-3xl md:text-4xl">Ihre Anfrage ist angekommen</h1>
+
+      <p class="mt-4 text-lg text-ink-muted">
+        Vielen Dank. Ich schaue sie mir persönlich an und melde mich innerhalb
+        von 24 Stunden bei Ihnen — werktags meist deutlich schneller.
+      </p>
+
+      <div class="mt-10 rounded-card border border-border bg-surface-subtle p-6 text-left">
+        <p class="text-[0.9375rem] text-ink">Eilt es?</p>
+        <p class="mt-2 text-[0.9375rem] text-ink-muted">
+          Dann schreiben Sie mir direkt auf WhatsApp — dort bekommen Sie sofort
+          eine Antwort.
+        </p>
+        <div class="mt-4">
+          <WhatsappCta variant="inline" class="text-accent" />
+        </div>
+      </div>
+
+      <div class="mt-12">
+        <p class="text-sm text-ink-faint">Solange Sie warten</p>
+        <ul class="mt-4 flex flex-wrap justify-center gap-2">
+          {
+            services.map((service) => (
+              <li>
+                <a
+                  href={service.href}
+                  class="inline-flex rounded-button border border-border bg-surface px-3.5 py-2 text-sm text-ink-muted transition-colors hover:border-border-strong hover:text-ink"
+                >
+                  {service.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="mt-12">
+        <Button href="/" variant="secondary">Zurück zur Startseite</Button>
+      </div>
+    </div>
+  </section>
+</Base>

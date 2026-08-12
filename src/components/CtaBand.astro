@@ -1,6 +1,6 @@
 ---
 import Button from './Button.astro';
-import { cta } from '~/config/site';
+import { cta, contactLinks } from '~/config/site';
 
 /**
  * Wiederkehrender Abschluss jeder Seite.
@@ -28,14 +28,19 @@ const {
         <p class="text-sm text-white/50">{cta.primary.note}</p>
       </div>
 
+      {/* Sekundaerer Weg, bewusst untergeordnet — und zugleich eine
+          Vorfuehrung: wer schreibt, erlebt die KI-Assistenz selbst. */}
       <p class="mt-6 text-sm text-white/50">
-        Lieber direkt sprechen?{' '}
+        Lieber schreiben?{' '}
         <a
-          href={cta.secondary.href}
+          href={contactLinks.whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
           class="text-white/80 underline underline-offset-4 transition-colors hover:text-white"
         >
-          Rufen Sie an
-        </a>
+          Auf WhatsApp antwortet sofort meine KI-Assistenz
+        </a>{' '}
+        — Sie sehen sie also gleich in Aktion.
       </p>
     </div>
   </div>
