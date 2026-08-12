@@ -14,6 +14,18 @@ export const site = {
   tagline: 'Digitalagentur für Handwerks- und Dienstleistungsbetriebe in Essen',
 } as const;
 
+/** Die Person hinter Elvora. */
+export const owner = {
+  firstName: 'Luan',
+  // TODO: Nachnamen ergänzen — wird für das Impressum nach § 5 DDG gebraucht
+  lastName: 'TODO Nachname',
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  /** Ausbildungsberuf, so wie er selbst ihn nennt. */
+  trade: 'Gas- und Wasserinstallateur',
+} as const;
+
 /** Geschäftsadresse. Bestätigt. */
 export const address = {
   street: 'Prinzenstraße 58A',
@@ -79,10 +91,19 @@ export const booking = {
 } as const;
 
 /**
- * Web3Forms.
- * Der Access Key ist ein öffentlicher Schlüssel und darf im Quelltext stehen.
+ * Zustellung der Formularanfragen — bewusst zweigleisig.
+ *
+ * 1. `webhook` ist der Hauptweg: der eigene n8n-Workflow. Die Anfrage landet
+ *    sofort als WhatsApp-Nachricht und als Ereignis im Dashboard.
+ * 2. `endpoint` (Web3Forms) ist die Rückfallebene. Sie greift, wenn n8n nicht
+ *    erreichbar ist, und trägt zusätzlich den Fall ohne JavaScript.
+ *
+ * Ein ausgefallener Server darf keine Anfrage kosten — deshalb zwei Wege.
+ * Der Web3Forms-Schlüssel ist ein öffentlicher Schlüssel und darf im
+ * Quelltext stehen.
  */
 export const forms = {
+  webhook: 'https://n8n.elvora.me/webhook/website-kontakt',
   accessKey: 'd7a8e08a-7a06-4c3b-bbbf-38b1d9e05745',
   endpoint: 'https://api.web3forms.com/submit',
   subject: 'Neue Anfrage über elvora.me',
@@ -276,8 +297,10 @@ export const serviceArea = {
 
 /** Angaben für das Impressum nach § 5 DDG. */
 export const legal = {
-  // TODO: vollständigen Namen des Inhabers eintragen
-  owner: 'TODO Vor- und Nachname',
+  /** Kommt aus `owner` — dort den Nachnamen ergänzen, nicht hier. */
+  get name() {
+    return owner.fullName;
+  },
   // TODO: Umsatzsteuer-ID eintragen ODER auf null lassen bei Kleinunternehmerregelung
   vatId: null as string | null,
   /** true, wenn nach § 19 UStG keine Umsatzsteuer ausgewiesen wird. */

@@ -25,6 +25,7 @@ const labelBase = 'block text-[0.9375rem] font-medium text-ink';
   action={forms.endpoint}
   method="POST"
   data-contact-form
+  data-webhook={forms.webhook}
   class="flex flex-col gap-5"
 >
   <input type="hidden" name="access_key" value={forms.accessKey} />
@@ -171,27 +172,63 @@ const labelBase = 'block text-[0.9375rem] font-medium text-ink';
         : 'rounded-button bg-surface-subtle px-4 py-3 text-[0.9375rem] text-danger';
     };
 
+    /** Hauptweg: eigener n8n-Workflow. Meldet sofort per WhatsApp. */
+    const sendeAnWebhook = async (data: FormData) => {
+      const url = form.dataset.webhook;
+      if (!url) return false;
+
+      const body: Record<string, string> = {};
+      data.forEach((value, key) => {
+        body[key] = String(value);
+      });
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      return response.ok;
+    };
+
+    /** Rückfallebene, falls der eigene Server gerade nicht erreichbar ist. */
+    const sendeAnWeb3Forms = async (data: FormData) => {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' },
+      });
+      return response.ok;
+    };
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
       submit.textContent = 'Wird gesendet …';
       submit.setAttribute('aria-disabled', 'true');
 
-      try {
-        const response = await fetch(form.action, {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { Accept: 'application/json' },
-        });
+      const data = new FormData(form);
 
-        if (response.ok) {
+      try {
+        let zugestellt = false;
+
+        try {
+          zugestellt = await sendeAnWebhook(data);
+        } catch {
+          zugestellt = false;
+        }
+
+        if (!zugestellt) {
+          zugestellt = await sendeAnWeb3Forms(data);
+        }
+
+        if (zugestellt) {
           form.reset();
           show(
             'Vielen Dank, Ihre Anfrage ist angekommen. Ich melde mich innerhalb von 24 Stunden.',
             true,
           );
         } else {
-          throw new Error(String(response.status));
+          throw new Error('Zustellung fehlgeschlagen');
         }
       } catch {
         show(

@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Porträtfoto.
+ *
+ * Es genügt, eine Datei `src/assets/portrait.jpg` (auch .png oder .webp)
+ * abzulegen — sie wird automatisch eingesetzt, zugeschnitten und in
+ * mehreren Größen ausgeliefert. Solange keine da ist, steht hier ein
+ * ruhiger Platzhalter statt eines leeren Kastens.
+ */
+interface Props {
+  alt: string;
+  class?: string;
+}
+
+const { alt, class: className = '' }: Props = Astro.props;
+
+const found = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/portrait.{jpg,jpeg,png,webp,avif}',
+  { eager: true },
+);
+const portrait = Object.values(found)[0]?.default ?? null;
+---
+
+<div class={`overflow-hidden rounded-card bg-surface-subtle ${className}`}>
+  {
+    portrait ? (
+      <Image
+        src={portrait}
+        alt={alt}
+        widths={[400, 800]}
+        sizes="(min-width: 1024px) 30vw, 90vw"
+        class="aspect-4/5 w-full object-cover"
+      />
+    ) : (
+      <div
+        class="flex aspect-4/5 w-full flex-col items-center justify-center gap-3 border border-dashed border-border-strong p-6 text-center"
+        role="img"
+        aria-label={alt}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="h-12 w-12 text-ink-faint"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="8.5" r="3.75" />
+          <path d="M4.5 20.5c0-3.6 3.4-6.2 7.5-6.2s7.5 2.6 7.5 6.2" />
+        </svg>
+        <p class="text-sm text-ink-faint">
+          Platzhalter — hier kommt Ihr Foto hin
+        </p>
+        <p class="text-xs text-ink-faint/80">
+          Datei als <code class="font-mono">src/assets/portrait.jpg</code> ablegen
+        </p>
+      </div>
+    )
+  }
+</div>

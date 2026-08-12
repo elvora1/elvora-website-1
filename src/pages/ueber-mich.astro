@@ -1,0 +1,189 @@
+---
+import Base from '~/layouts/Base.astro';
+import Section from '~/components/Section.astro';
+import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import Portrait from '~/components/Portrait.astro';
+import Button from '~/components/Button.astro';
+import CtaBand from '~/components/CtaBand.astro';
+import WhatsappCta from '~/components/WhatsappCta.astro';
+import { cta, address, owner } from '~/config/site';
+
+/**
+ * Was der Kunde davon hat, dass ich aus dem Handwerk komme.
+ * Bewusst als Nutzen formuliert, nicht als Lebenslauf.
+ */
+const advantages = [
+  {
+    title: 'Sie müssen mir nichts erklären',
+    text: 'Ich weiß, was eine Wartung ist, warum ein Notdienst anders läuft als ein Bad-Umbau und warum der Termin um acht nicht immer um acht anfängt. Das spart Ihnen die Hälfte des ersten Gesprächs.',
+  },
+  {
+    title: 'Ich baue nichts, was im Alltag stört',
+    text: 'Ein System, das drei zusätzliche Klicks kostet, wird nach zwei Wochen nicht mehr benutzt. Ich kenne den Unterschied zwischen einer schönen Lösung und einer, die neben der Arbeit übrig bleibt.',
+  },
+  {
+    title: 'Sie haben mit mir zu tun, nicht mit einem Team',
+    text: 'Kein Projektleiter, der weitergibt, was Sie gesagt haben. Wer das Angebot macht, macht auch die Arbeit und geht ans Telefon.',
+  },
+];
+
+/** Arbeitsweise — Aussagen, an denen man mich messen kann. */
+const principles = [
+  {
+    title: 'Ich sage auch, wenn etwas nichts bringt',
+    text: 'Wenn Ihr Problem nicht mit einer Website zu lösen ist, sage ich das. Ein Auftrag, der nichts bewirkt, kostet mich langfristig mehr, als er einbringt.',
+  },
+  {
+    title: 'Kein Fachchinesisch',
+    text: 'Ich erkläre in derselben Sprache, in der wir auf der Baustelle miteinander geredet hätten. Wenn Sie etwas nicht verstehen, liegt das an mir, nicht an Ihnen.',
+  },
+  {
+    title: 'Sie behalten alles in der Hand',
+    text: 'Zugänge, Dateien, Domain: alles läuft auf Sie. Sie sind an mich gebunden, weil es passt — nicht, weil Sie nicht wegkommen.',
+  },
+];
+---
+
+<Base
+  title="Über mich"
+  description="Luan von Elvora: gelernter Gas- und Wasserinstallateur, heute zuständig für Sichtbarkeit und Automatisierung bei Betrieben, in denen der Chef mitarbeitet."
+>
+  <section class="border-b border-border bg-surface-subtle">
+    <div class="container-content py-10 md:py-14">
+      <Breadcrumbs trail={[{ label: 'Über mich' }]} />
+
+      <div class="mt-10 grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+        <div class="lg:col-span-4">
+          <Portrait
+            alt={`${owner.firstName}, Inhaber von Elvora aus ${address.city}`}
+            class="max-w-sm"
+          />
+        </div>
+
+        <div class="lg:col-span-8">
+          <p class="text-sm font-medium text-accent">Über mich</p>
+          <h1 class="mt-3 text-3xl md:text-5xl">
+            Ich komme aus dem Handwerk. Deshalb muss man mir nichts erklären.
+          </h1>
+          <p class="mt-5 text-lg text-ink-muted">
+            Mein Name ist {owner.firstName}. Ich habe Gas- und Wasserinstallateur
+            gelernt und weiß, wie ein Betrieb von innen aussieht: Der Chef
+            arbeitet mit. Das Telefon klingelt, während man unter der Spüle
+            liegt. Und der Papierkram ist das, was abends übrig bleibt.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ===================== Der Weg dahin ===================== */}
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Wie ich hier gelandet bin</h2>
+
+      <div class="mt-6 flex flex-col gap-5 text-ink-muted">
+        <p>
+          Irgendwann habe ich angefangen, mich abends mit Websites zu
+          beschäftigen, dann mit Google, später mit Automatisierung und
+          künstlicher Intelligenz. Zuerst aus Neugier. Dann, weil mir auffiel,
+          wie viel davon in Betrieben ungenutzt liegen bleibt — nicht aus
+          Desinteresse, sondern weil niemand die Zeit hat, sich damit zu
+          befassen.
+        </p>
+        <p>
+          Gleichzeitig habe ich gesehen, wie Betriebe von Agenturen betreut
+          werden, die noch nie auf einer Baustelle standen. Da entstehen dann
+          Websites mit Bildern aus dem Katalog und Texten über
+          „ganzheitliche Lösungskompetenz". Der Kunde, der eine kaputte Heizung
+          hat, sucht etwas anderes.
+        </p>
+        <p>
+          Genau in dieser Lücke arbeite ich: Ich kann beides — das Handwerk
+          verstehen und die Technik bauen, die dahinter laufen muss.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  {/* ===================== Was Sie davon haben ===================== */}
+  <Section tone="subtle">
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Was das für Sie bedeutet</h2>
+    </div>
+
+    <ul class="mt-12 grid gap-5 md:grid-cols-3">
+      {
+        advantages.map((item) => (
+          <li class="rounded-card border border-border bg-surface p-7">
+            <h3 class="text-lg">{item.title}</h3>
+            <p class="mt-3 text-[0.9375rem] text-ink-muted">{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  {/* ===================== Für wen ich arbeite ===================== */}
+  <Section>
+    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
+      <div>
+        <h2 class="text-3xl md:text-4xl">Nicht nur Handwerk</h2>
+        <p class="mt-4 text-ink-muted">
+          Angefangen habe ich im Handwerk, weil ich es kenne, und der Schwerpunkt
+          liegt bis heute dort — besonders bei Sanitär, Heizung und Klima.
+        </p>
+        <p class="mt-4 text-ink-muted">
+          Inzwischen arbeite ich mit allen Betrieben, bei denen der Inhaber
+          selbst mitarbeitet. Praxen, Kanzleien, Studios, Dienstleister. Das
+          Muster ist überall dasselbe: Die Arbeit ist gut, die Kundschaft
+          zufrieden — aber niemand hat die Zeit, sich um Sichtbarkeit und
+          Abläufe zu kümmern.
+        </p>
+        <p class="mt-4 text-ink-muted">
+          Wenn Sie sich darin wiedererkennen, ist Ihre Branche zweitrangig.
+        </p>
+      </div>
+
+      <div class="rounded-card border border-border bg-surface-subtle p-7 md:p-8">
+        <h3 class="text-lg">Woran Sie mich messen können</h3>
+        <dl class="mt-6 flex flex-col gap-6">
+          {
+            principles.map((item) => (
+              <div>
+                <dt class="font-medium text-ink">{item.title}</dt>
+                <dd class="mt-1.5 text-[0.9375rem] text-ink-muted">{item.text}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </Section>
+
+  {/* ===================== Direkter Kontakt ===================== */}
+  <Section tone="subtle" space="md">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-2xl md:text-3xl">Lernen wir uns kennen</h2>
+      <p class="mt-4 text-ink-muted">
+        Am einfachsten in einem kurzen Gespräch. Sie erzählen, wo es klemmt, ich
+        sage Ihnen ehrlich, ob ich der Richtige dafür bin.
+      </p>
+
+      <div class="mt-8 flex flex-col items-center gap-3">
+        <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+          {cta.primary.label}
+        </Button>
+        <p class="text-sm text-ink-faint">{cta.primary.note}</p>
+      </div>
+
+      <div class="mt-6 flex justify-center">
+        <WhatsappCta variant="inline" class="text-ink-muted" />
+      </div>
+    </div>
+  </Section>
+
+  <CtaBand
+    heading="Klingt das nach jemandem, mit dem Sie arbeiten würden?"
+    text="Dann lassen Sie uns kurz sprechen. Ohne Vorbereitung, ohne Verpflichtung."
+  />
+</Base>
