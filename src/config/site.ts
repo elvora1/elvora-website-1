@@ -295,14 +295,50 @@ export const serviceArea = {
   display: 'Essen und das gesamte Ruhrgebiet',
 } as const;
 
-/** Angaben für das Impressum nach § 5 DDG. */
+/**
+ * Angaben für Impressum und Datenschutzerklärung.
+ *
+ * Rechtsgrundlage für das Impressum ist § 5 DDG (loest seit 2024 § 5 TMG ab).
+ * Die Steuernummer gehoert ausdruecklich NICHT hinein, nur die
+ * Umsatzsteuer-Identifikationsnummer oder die Wirtschafts-Identifikationsnummer.
+ */
 export const legal = {
   /** Kommt aus `owner`. Dort den Nachnamen ergänzen, nicht hier. */
   get name() {
     return owner.fullName;
   },
-  // TODO: Umsatzsteuer-ID eintragen ODER auf null lassen bei Kleinunternehmerregelung
+  /**
+   * Umsatzsteuer-Identifikationsnummer nach § 27a UStG.
+   * Bei Kleinunternehmerregelung meist nicht vorhanden, dann auf null lassen.
+   */
   vatId: null as string | null,
+  /**
+   * Wirtschafts-Identifikationsnummer nach § 139c AO.
+   * Das Bundeszentralamt für Steuern vergibt sie seit Ende 2024 an alle
+   * wirtschaftlich Tätigen. Sobald sie vorliegt, muss sie nach § 5 DDG hier
+   * eingetragen werden.
+   * TODO: eintragen, sobald zugeteilt.
+   */
+  economicId: null as string | null,
   /** true, wenn nach § 19 UStG keine Umsatzsteuer ausgewiesen wird. */
   smallBusiness: true,
+  /**
+   * Bereitschaft zur Verbraucherschlichtung nach § 36 VSBG.
+   * Die EU-Streitschlichtungsplattform wurde im Juli 2025 eingestellt; ein
+   * Link darauf ist heute ein toter Verweis und gehört nicht mehr hinein.
+   */
+  disputeResolution: false,
+  /** Hostinganbieter, wird in der Datenschutzerklärung benannt. */
+  host: {
+    name: 'netcup GmbH',
+    address: 'Daimlerstraße 25, 76185 Karlsruhe',
+  },
+  /** Zuständige Aufsichtsbehörde nach dem Sitz des Verantwortlichen. */
+  authority: {
+    name: 'Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen',
+    address: 'Kavalleriestraße 2-4, 40213 Düsseldorf',
+    url: 'https://www.ldi.nrw.de',
+  },
+  /** Stand der Rechtstexte, wird auf den Seiten ausgewiesen. */
+  lastUpdated: 'August 2026',
 } as const;
