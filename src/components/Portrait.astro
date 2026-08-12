@@ -5,7 +5,7 @@ import { Image } from 'astro:assets';
  * Porträtfoto.
  *
  * Es genügt, eine Datei `src/assets/portrait.jpg` (auch .png oder .webp)
- * abzulegen — sie wird automatisch eingesetzt, zugeschnitten und in
+ * abzulegen. Sie wird automatisch eingesetzt, zugeschnitten und in
  * mehreren Größen ausgeliefert. Solange keine da ist, steht hier ein
  * ruhiger Platzhalter statt eines leeren Kastens.
  */
@@ -53,7 +53,7 @@ const portrait = Object.values(found)[0]?.default ?? null;
           <path d="M4.5 20.5c0-3.6 3.4-6.2 7.5-6.2s7.5 2.6 7.5 6.2" />
         </svg>
         <p class="text-sm text-ink-faint">
-          Platzhalter — hier kommt Ihr Foto hin
+          Platzhalter: hier kommt Ihr Foto hin
         </p>
         <p class="text-xs text-ink-faint/80">
           Datei als <code class="font-mono">src/assets/portrait.jpg</code> ablegen

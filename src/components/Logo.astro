@@ -1,22 +1,33 @@
 ---
+import logo from '~/assets/logo.svg';
+
 /**
- * Wortmarke.
+ * Wortmarke aus der Original-SVG.
  *
- * ZWISCHENSTAND: reine Typo-Fassung, bis die Logo-SVG vorliegt.
- * Zum Austausch wird ausschliesslich der Inhalt dieses <span> durch das
- * <svg> ersetzt -- alle Einbindungen im Projekt bleiben unveraendert.
+ * Wird als Bild eingebunden statt inline: die Datei enthält Farbverläufe mit
+ * eigenen Kennungen, und bei mehrfacher Einbindung auf einer Seite (Kopf-
+ * und Fußbereich) käme es sonst zu doppelten Kennungen im Dokument.
+ * Die Datei ist rund 3 kB groß und wird vom Browser einmal geladen und
+ * danach zwischengespeichert.
  */
 interface Props {
-  tone?: 'default' | 'inverse';
+  /** Höhe in Pixeln. Die Breite ergibt sich aus dem Seitenverhältnis. */
+  height?: number;
   class?: string;
 }
 
-const { tone = 'default', class: className = '' } = Astro.props;
-const color = tone === 'inverse' ? 'text-white' : 'text-ink';
+const { height = 28, class: className = '' }: Props = Astro.props;
+
+const ratio = logo.width / logo.height;
 ---
 
-<span
-  class={`font-display text-[1.375rem] font-semibold tracking-[-0.03em] ${color} ${className}`}
->
-  elvora<span class="text-accent">.</span>
-</span>
+<img
+  src={logo.src}
+  width={Math.round(height * ratio)}
+  height={height}
+  alt="Elvora"
+  class={className}
+  style={`height:${height / 16}rem;width:auto`}
+  loading="eager"
+  decoding="async"
+/>

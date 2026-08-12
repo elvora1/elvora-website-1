@@ -17,7 +17,7 @@ export const site = {
 /** Die Person hinter Elvora. */
 export const owner = {
   firstName: 'Luan',
-  // TODO: Nachnamen ergänzen — wird für das Impressum nach § 5 DDG gebraucht
+  // TODO: Nachnamen ergänzen, wird für das Impressum nach § 5 DDG gebraucht
   lastName: 'TODO Nachname',
   get fullName() {
     return `${this.firstName} ${this.lastName}`;
@@ -47,7 +47,7 @@ export const address = {
 export const contact = {
   phoneRaw: '491608524279',
   phoneDisplay: '0160 8524279',
-  /** Identisch mit der Mobilnummer — dort läuft die KI-Assistenz. */
+  /** Identisch mit der Mobilnummer, dort läuft die KI-Assistenz. */
   whatsappRaw: '491608524279',
   // TODO: echte E-Mail-Adresse bestätigen
   email: 'kontakt@elvora.me',
@@ -61,7 +61,7 @@ export const contactLinks = {
   mail: `mailto:${contact.email}`,
 } as const;
 
-/** Erreichbarkeit — fließt in JSON-LD und in die Kontaktseite. */
+/** Erreichbarkeit, fließt in JSON-LD und in die Kontaktseite. */
 export const openingHours = {
   display: 'Montag bis Freitag, 8 bis 18 Uhr',
   schema: ['Mo-Fr 08:00-18:00'],
@@ -70,7 +70,7 @@ export const openingHours = {
 /**
  * Terminbuchung über die selbst gehostete cal.com-Instanz.
  *
- * Sie läuft unter einer eigenen Subdomain — Besucher sehen also nie
+ * Sie läuft unter einer eigenen Subdomain. Besucher sehen also nie
  * "cal.com", sondern durchgehend elvora.me. Das ist der Grund, warum hier
  * `origin` konfigurierbar ist und nicht fest auf cal.com zeigt.
  */
@@ -91,14 +91,14 @@ export const booking = {
 } as const;
 
 /**
- * Zustellung der Formularanfragen — bewusst zweigleisig.
+ * Zustellung der Formularanfragen, bewusst zweigleisig.
  *
  * 1. `webhook` ist der Hauptweg: der eigene n8n-Workflow. Die Anfrage landet
  *    sofort als WhatsApp-Nachricht und als Ereignis im Dashboard.
  * 2. `endpoint` (Web3Forms) ist die Rückfallebene. Sie greift, wenn n8n nicht
  *    erreichbar ist, und trägt zusätzlich den Fall ohne JavaScript.
  *
- * Ein ausgefallener Server darf keine Anfrage kosten — deshalb zwei Wege.
+ * Ein ausgefallener Server darf keine Anfrage kosten, deshalb zwei Wege.
  * Der Web3Forms-Schlüssel ist ein öffentlicher Schlüssel und darf im
  * Quelltext stehen.
  */
@@ -113,7 +113,7 @@ export const forms = {
 /**
  * Google-Bewertungen. Erscheinen im ersten Sichtbereich der Startseite.
  *
- * `enabled: false` blendet den Bewertungsbeleg überall aus — so steht nie
+ * `enabled: false` blendet den Bewertungsbeleg überall aus. So steht nie
  * eine Bewertungsbehauptung ohne Grundlage auf der Seite.
  */
 export const reviews = {
@@ -208,7 +208,7 @@ export type AutomationModule = {
   slug: string;
   /** Produktname. */
   name: string;
-  /** Nutzenaussage in der Sprache des Betriebs — steht in der Überschrift. */
+  /** Nutzenaussage in der Sprache des Betriebs, steht in der Überschrift. */
   benefit: string;
   /** Erklärung in ein bis zwei Sätzen. */
   text: string;
@@ -216,8 +216,8 @@ export type AutomationModule = {
    * Bildbeschreibung des Beleg-Screenshots.
    *
    * Der Screenshot selbst wird NICHT hier eingetragen: es genügt, eine Datei
-   * unter `src/assets/module/<slug>.png` (auch .jpg oder .webp) abzulegen —
-   * sie wird automatisch beim passenden Modul angezeigt und optimiert.
+   * unter `src/assets/module/<slug>.png` (auch .jpg oder .webp) abzulegen.
+   * Sie wird automatisch beim passenden Modul angezeigt und optimiert.
    * Ohne Datei erscheint das Modul schlicht ohne Bild.
    */
   screenshotAlt: string;
@@ -288,7 +288,7 @@ export const automationModules: AutomationModule[] = [
   },
 ];
 
-/** Einzugsgebiet — fließt in JSON-LD und in die Texte. */
+/** Einzugsgebiet, fließt in JSON-LD und in die Texte. */
 export const serviceArea = {
   primary: 'Essen',
   places: ['Essen', 'Mülheim an der Ruhr', 'Bochum', 'Gelsenkirchen', 'Oberhausen', 'Duisburg'],
@@ -297,7 +297,7 @@ export const serviceArea = {
 
 /** Angaben für das Impressum nach § 5 DDG. */
 export const legal = {
-  /** Kommt aus `owner` — dort den Nachnamen ergänzen, nicht hier. */
+  /** Kommt aus `owner`. Dort den Nachnamen ergänzen, nicht hier. */
   get name() {
     return owner.fullName;
   },

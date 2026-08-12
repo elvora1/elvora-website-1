@@ -7,7 +7,7 @@ import { forms, services, site } from '~/config/site';
  *
  * Funktioniert VOLLSTÄNDIG ohne JavaScript: ein normales POST-Formular mit
  * Weiterleitung auf die Danke-Seite. Das Skript darunter ist nur eine
- * Verbesserung — es hält den Nutzer auf der Seite und zeigt die Rückmeldung
+ * Verbesserung: es hält den Nutzer auf der Seite und zeigt die Rückmeldung
  * direkt im Formular.
  */
 const redirectUrl = new URL(forms.redirectPath, site.url).href;
@@ -33,7 +33,7 @@ const labelBase = 'block text-[0.9375rem] font-medium text-ink';
   <input type="hidden" name="from_name" value={site.name} />
   <input type="hidden" name="redirect" value={redirectUrl} />
 
-  {/* Honigtopf gegen Spam — für Menschen unsichtbar, für Bots verlockend. */}
+  {/* Honigtopf gegen Spam, für Menschen unsichtbar, für Bots verlockend. */}
   <input
     type="checkbox"
     name="botcheck"
@@ -232,7 +232,7 @@ const labelBase = 'block text-[0.9375rem] font-medium text-ink';
         }
       } catch {
         show(
-          'Das hat leider nicht geklappt. Schreiben Sie mir gern direkt auf WhatsApp oder rufen Sie an — dann geht es sofort weiter.',
+          'Das hat leider nicht geklappt. Schreiben Sie mir gern direkt auf WhatsApp oder rufen Sie an, dann geht es sofort weiter.',
           false,
         );
       } finally {

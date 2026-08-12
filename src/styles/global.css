@@ -27,14 +27,22 @@
   --color-border-strong: #cfd5da;
 
   /* --- Akzent ------------------------------------------------------------
-     >>> EINZIGER TAUSCHPUNKT FUER DIE MARKENFARBE <<<
-     Vorlaeufiger Arbeitswert, bis die Logo-SVG vorliegt. Danach werden
-     genau diese vier Werte ersetzt -- sonst nichts im Projekt.
-     Kontrast des aktuellen Werts auf Weiss: 5.9:1 (WCAG AA erfuellt). */
-  --color-accent: #0e6a6a;
-  --color-accent-hover: #0a5252;
-  --color-accent-soft: #eef6f6;
+     Aus dem Logo abgeleitet. Die Marke ist ein Verlauf von Indigo ueber
+     Magenta nach Orange; als einzelne Akzentfarbe dient der mittlere Ton,
+     weil er die ganze Marke vertritt statt nur ein Ende davon.
+     Kontrast auf Weiss: 5.35:1 -- erfuellt WCAG AA auch fuer Fliesstext.
+     Hover: 6.6:1. */
+  --color-accent: #b23a94;
+  --color-accent-hover: #96307d;
+  --color-accent-soft: #fbf0f8;
   --color-accent-contrast: #ffffff;
+
+  /* --- Markenverlauf -----------------------------------------------------
+     Nur fuer Zierelemente. Verlaeufe erfuellen keine Kontrastanforderungen,
+     deshalb steht darauf niemals Text. */
+  --color-brand-start: #5c67db;
+  --color-brand-mid: #b23a94;
+  --color-brand-end: #f45e3d;
 
   /* --- Signalfarben ------------------------------------------------------ */
   --color-success: #17754b;

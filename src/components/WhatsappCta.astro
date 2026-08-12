@@ -6,7 +6,7 @@ import { contactLinks } from '~/config/site';
  * WhatsApp als bevorzugter Kontaktweg.
  *
  * Der eigentliche Kniff: Wer hier schreibt, wird von der KI-Assistenz
- * empfangen — also genau von dem Produkt, das verkauft werden soll.
+ * empfangen, also genau von dem Produkt, das verkauft werden soll.
  * Der Kontaktweg ist damit zugleich die Vorführung.
  */
 interface Props {
@@ -30,12 +30,12 @@ const { variant = 'panel', class: className = '' }: Props = Astro.props;
         WhatsApp
       </span>
 
-      <h2 class="mt-3 text-2xl">Schreiben Sie mir — und sehen Sie die Assistenz gleich in Aktion</h2>
+      <h2 class="mt-3 text-2xl">Schreiben Sie mir und sehen Sie die Assistenz gleich in Aktion</h2>
 
       <p class="mt-4 text-ink-muted">
         Auf WhatsApp empfängt Sie zuerst meine KI-Assistenz. Es ist dieselbe, die
         ich für Betriebe einrichte. Sie erleben also aus der Kundenperspektive,
-        was Ihre eigene Kundschaft erleben würde — statt sich das aus einer
+        was Ihre eigene Kundschaft erleben würde, statt es sich aus einer
         Beschreibung vorstellen zu müssen.
       </p>
 
@@ -70,7 +70,7 @@ const { variant = 'panel', class: className = '' }: Props = Astro.props;
         </svg>
         Auf WhatsApp schreiben
       </a>
-      <span class="opacity-70"> — dort antwortet direkt meine KI-Assistenz.</span>
+      <span class="opacity-70">. Dort antwortet direkt meine KI-Assistenz.</span>
     </p>
   )
 }
