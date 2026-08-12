@@ -28,7 +28,13 @@ interface Props {
 const { label, benefit, intro, title, description, faq = [] }: Props = Astro.props;
 ---
 
-<Base title={title} description={description}>
+<Base
+  title={title}
+  description={description}
+  breadcrumbs={[{ label: 'Leistungen', href: '/leistungen/' }, { label }]}
+  service={{ name: `${label}: ${benefit}`, description: intro }}
+  faq={faq}
+>
   <section class="border-b border-border bg-surface-subtle">
     <div class="container-content py-10 md:py-14">
       <Breadcrumbs trail={[{ label: 'Leistungen', href: '/leistungen/' }, { label }]} />

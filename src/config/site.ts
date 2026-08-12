@@ -17,8 +17,7 @@ export const site = {
 /** Die Person hinter Elvora. */
 export const owner = {
   firstName: 'Luan',
-  // TODO: Nachnamen ergänzen, wird für das Impressum nach § 5 DDG gebraucht
-  lastName: 'TODO Nachname',
+  lastName: 'Qerkini',
   get fullName() {
     return `${this.firstName} ${this.lastName}`;
   },
@@ -314,10 +313,9 @@ export const legal = {
   vatId: null as string | null,
   /**
    * Wirtschafts-Identifikationsnummer nach § 139c AO.
-   * Das Bundeszentralamt für Steuern vergibt sie seit Ende 2024 an alle
-   * wirtschaftlich Tätigen. Sobald sie vorliegt, muss sie nach § 5 DDG hier
-   * eingetragen werden.
-   * TODO: eintragen, sobald zugeteilt.
+   * Noch nicht zugeteilt (Stand August 2026). Sobald das Bundeszentralamt
+   * für Steuern sie vergibt, muss sie nach § 5 DDG hier eingetragen werden;
+   * das Impressum blendet den Abschnitt dann von selbst ein.
    */
   economicId: null as string | null,
   /** true, wenn nach § 19 UStG keine Umsatzsteuer ausgewiesen wird. */

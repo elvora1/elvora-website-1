@@ -1,0 +1,166 @@
+---
+import {
+  site,
+  owner,
+  address,
+  contact,
+  openingHours,
+  serviceArea,
+  reviews,
+} from '~/config/site';
+import type { FaqItem } from '~/types';
+
+/**
+ * Strukturierte Daten als JSON-LD.
+ *
+ * Alles hängt an einem gemeinsamen @graph mit festen Kennungen. Dadurch
+ * weiß eine Suchmaschine, dass die Leistungsseiten und die Startseite
+ * denselben Betrieb meinen, statt fünf Unternehmen zu sehen.
+ *
+ * Grundsatz: Hier steht nichts, was nicht auch sichtbar auf der Seite steht.
+ * Auszeichnungen ohne Entsprechung im Sichtbaren sind ein Verstoß gegen die
+ * Richtlinien und können abgestraft werden.
+ */
+interface Props {
+  breadcrumbs?: Array<{ label: string; href?: string }>;
+  /** Für Leistungsseiten. */
+  service?: { name: string; description: string };
+  faq?: FaqItem[];
+}
+
+const { breadcrumbs = [], service, faq = [] }: Props = Astro.props;
+
+const businessId = `${site.url}/#betrieb`;
+const websiteId = `${site.url}/#website`;
+const pageUrl = new URL(Astro.url.pathname, site.url).href;
+
+/** 'Mo-Fr 08:00-18:00' in die von schema.org erwartete Form bringen. */
+const tage: Record<string, string> = {
+  Mo: 'Monday',
+  Tu: 'Tuesday',
+  We: 'Wednesday',
+  Th: 'Thursday',
+  Fr: 'Friday',
+  Sa: 'Saturday',
+  Su: 'Sunday',
+};
+const reihenfolge = Object.keys(tage);
+
+const oeffnungszeiten = openingHours.schema.map((eintrag) => {
+  const [spanne, zeiten] = eintrag.split(' ');
+  const [von, bis] = zeiten!.split('-');
+  const [start, ende] = spanne!.split('-');
+  const vonIndex = reihenfolge.indexOf(start!);
+  const bisIndex = reihenfolge.indexOf(ende ?? start!);
+
+  return {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: reihenfolge.slice(vonIndex, bisIndex + 1).map((tag) => tage[tag]),
+    opens: von,
+    closes: bis,
+  };
+});
+
+const betrieb: Record<string, unknown> = {
+  '@type': 'ProfessionalService',
+  '@id': businessId,
+  name: site.name,
+  description: site.tagline,
+  url: site.url,
+  telephone: `+${contact.phoneRaw}`,
+  email: contact.email,
+  image: `${site.url}/favicon.svg`,
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: address.street,
+    postalCode: address.postalCode,
+    addressLocality: address.city,
+    addressRegion: address.region,
+    addressCountry: address.country,
+  },
+  areaServed: serviceArea.places.map((ort) => ({ '@type': 'City', name: ort })),
+  openingHoursSpecification: oeffnungszeiten,
+  founder: { '@type': 'Person', name: owner.fullName },
+  knowsLanguage: ['de'],
+};
+
+/* Bewertungen nur auszeichnen, wenn es sie wirklich gibt und sie auch
+   sichtbar auf der Seite stehen. */
+if (reviews.enabled && reviews.count > 0) {
+  betrieb.aggregateRating = {
+    '@type': 'AggregateRating',
+    ratingValue: reviews.rating,
+    reviewCount: reviews.count,
+    bestRating: 5,
+    worstRating: 1,
+  };
+}
+
+const graph: Array<Record<string, unknown>> = [
+  betrieb,
+  {
+    '@type': 'WebSite',
+    '@id': websiteId,
+    url: site.url,
+    name: site.name,
+    inLanguage: 'de-DE',
+    publisher: { '@id': businessId },
+  },
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#seite`,
+    url: pageUrl,
+    isPartOf: { '@id': websiteId },
+    about: { '@id': businessId },
+    inLanguage: 'de-DE',
+  },
+];
+
+if (breadcrumbs.length > 0) {
+  const eintraege = [{ label: 'Start', href: '/' }, ...breadcrumbs];
+  graph.push({
+    '@type': 'BreadcrumbList',
+    '@id': `${pageUrl}#breadcrumb`,
+    itemListElement: eintraege.map((eintrag, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: eintrag.label,
+      ...(eintrag.href ? { item: new URL(eintrag.href, site.url).href } : {}),
+    })),
+  });
+}
+
+if (service) {
+  graph.push({
+    '@type': 'Service',
+    '@id': `${pageUrl}#leistung`,
+    name: service.name,
+    description: service.description,
+    serviceType: service.name,
+    provider: { '@id': businessId },
+    areaServed: serviceArea.places.map((ort) => ({ '@type': 'City', name: ort })),
+    url: pageUrl,
+  });
+}
+
+if (faq.length > 0) {
+  graph.push({
+    '@type': 'FAQPage',
+    '@id': `${pageUrl}#faq`,
+    mainEntity: faq.map((eintrag) => ({
+      '@type': 'Question',
+      name: eintrag.question,
+      acceptedAnswer: { '@type': 'Answer', text: eintrag.answer },
+    })),
+  });
+}
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+---
+
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={JSON.stringify(jsonLd)}
+/>

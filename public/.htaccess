@@ -1,0 +1,88 @@
+# =============================================================================
+# Serverkonfiguration für Apache (Netcup Webhosting)
+#
+# Diese Datei liegt in public/ und landet dadurch beim Bauen unveraendert im
+# Wurzelverzeichnis der ausgelieferten Seite.
+# =============================================================================
+
+# --- HTTPS und einheitliche Adresse ------------------------------------------
+# Genau EINE gueltige Adresse pro Seite. Sonst sieht eine Suchmaschine
+# dieselbe Seite unter vier Adressen und verteilt die Bewertung darauf.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # http -> https
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+  # www -> ohne www
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+</IfModule>
+
+# --- Fehlerseite --------------------------------------------------------------
+ErrorDocument 404 /404.html
+
+# --- Zwischenspeicher ---------------------------------------------------------
+# Dateien unter /_astro/ tragen einen Streuwert im Namen: aendert sich der
+# Inhalt, aendert sich der Name. Sie duerfen deshalb ein Jahr lang
+# zwischengespeichert werden. HTML dagegen muss frisch bleiben, sonst sehen
+# Besucher nach einer Aenderung tagelang die alte Fassung.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault                          "access plus 1 month"
+  ExpiresByType text/html                 "access plus 0 seconds"
+  ExpiresByType application/xml           "access plus 1 hour"
+  ExpiresByType text/plain                "access plus 1 hour"
+  ExpiresByType text/css                  "access plus 1 year"
+  ExpiresByType application/javascript    "access plus 1 year"
+  ExpiresByType font/woff2                "access plus 1 year"
+  ExpiresByType image/svg+xml             "access plus 1 month"
+  ExpiresByType image/webp                "access plus 1 month"
+  ExpiresByType image/avif                "access plus 1 month"
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|woff2|avif)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# --- Kompression --------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+# Bereits vorkomprimierte Dateien ausliefern, statt bei jedem Aufruf neu zu
+# packen, sofern der Browser sie annimmt.
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript
+</IfModule>
+
+# --- Sicherheitskopfzeilen ----------------------------------------------------
+<IfModule mod_headers.c>
+  # Kein Einbetten der Seite in fremde Rahmen (Klickfallen).
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Browser soll Dateitypen nicht selbst erraten.
+  Header always set X-Content-Type-Options "nosniff"
+  # Beim Verlassen der Seite nur die Herkunftsdomain uebergeben.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Zugriff auf Kamera, Mikrofon und Standort wird nicht benoetigt.
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  # HSTS: erst einschalten, wenn HTTPS zuverlaessig laeuft. Ein zu frueh
+  # gesetzter Wert sperrt Besucher fuer die angegebene Dauer aus, falls das
+  # Zertifikat Probleme macht.
+  # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# --- Zeichensatz --------------------------------------------------------------
+AddDefaultCharset UTF-8
+
+# --- Verzeichnisse nicht auflisten -------------------------------------------
+Options -Indexes

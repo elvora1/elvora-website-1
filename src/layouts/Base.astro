@@ -1,23 +1,31 @@
 ---
 import '~/styles/global.css';
 import SeoHead from '~/components/SeoHead.astro';
+import Schema from '~/components/Schema.astro';
 import Header from '~/components/Header.astro';
 import Footer from '~/components/Footer.astro';
+import type { FaqItem } from '~/types';
 
 interface Props {
   title: string;
   description: string;
   noindex?: boolean;
   image?: string;
+  /** Ohne Startseite, die wird im Markup automatisch vorangestellt. */
+  breadcrumbs?: Array<{ label: string; href?: string }>;
+  service?: { name: string; description: string };
+  faq?: FaqItem[];
 }
 
-const { title, description, noindex, image } = Astro.props;
+const { title, description, noindex, image, breadcrumbs, service, faq }: Props =
+  Astro.props;
 ---
 
 <!doctype html>
 <html lang="de">
   <head>
     <SeoHead title={title} description={description} noindex={noindex} image={image} />
+    {!noindex && <Schema breadcrumbs={breadcrumbs} service={service} faq={faq} />}
     <slot name="head" />
   </head>
   <body class="min-h-dvh">

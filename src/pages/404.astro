@@ -1,0 +1,45 @@
+---
+import Base from '~/layouts/Base.astro';
+import Button from '~/components/Button.astro';
+import { nav, services } from '~/config/site';
+
+const ziele = [...services.map((s) => ({ label: s.label, href: s.href })), ...nav];
+---
+
+<Base
+  title="Seite nicht gefunden"
+  description="Diese Seite existiert nicht oder wurde verschoben."
+  noindex
+>
+  <section class="container-content py-20 md:py-28">
+    <div class="mx-auto max-w-xl text-center">
+      <p class="font-display text-sm font-semibold uppercase tracking-wider text-accent">
+        Fehler 404
+      </p>
+      <h1 class="mt-4 text-3xl md:text-4xl">Diese Seite gibt es nicht</h1>
+      <p class="mt-4 text-lg text-ink-muted">
+        Vermutlich wurde sie verschoben oder der Link enthält einen Tippfehler.
+        Hier kommen Sie weiter:
+      </p>
+
+      <ul class="mt-10 flex flex-wrap justify-center gap-2">
+        {
+          ziele.map((ziel) => (
+            <li>
+              <a
+                href={ziel.href}
+                class="inline-flex rounded-button border border-border bg-surface px-3.5 py-2 text-sm text-ink-muted transition-colors hover:border-border-strong hover:text-ink"
+              >
+                {ziel.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="mt-12">
+        <Button href="/">Zur Startseite</Button>
+      </div>
+    </div>
+  </section>
+</Base>
