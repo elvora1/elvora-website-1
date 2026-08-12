@@ -1,0 +1,38 @@
+---
+/** Leistungsumfang als abhakbare Liste. */
+interface Props {
+  items: string[];
+  columns?: 1 | 2;
+  class?: string;
+}
+
+const { items, columns = 2, class: className = '' }: Props = Astro.props;
+---
+
+<ul
+  class:list={[
+    'grid gap-x-8 gap-y-3.5',
+    columns === 2 ? 'sm:grid-cols-2' : '',
+    className,
+  ]}
+>
+  {
+    items.map((item) => (
+      <li class="flex items-start gap-3">
+        <svg
+          viewBox="0 0 20 20"
+          class="mt-1 h-4 w-4 shrink-0 text-accent"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 10.5l4 4 8-9" />
+        </svg>
+        <span class="text-[0.9375rem] text-ink-muted">{item}</span>
+      </li>
+    ))
+  }
+</ul>

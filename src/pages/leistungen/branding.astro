@@ -1,0 +1,145 @@
+---
+import Service from '~/layouts/Service.astro';
+import Section from '~/components/Section.astro';
+import Steps from '~/components/Steps.astro';
+import CheckList from '~/components/CheckList.astro';
+import { serviceArea } from '~/config/site';
+import type { FaqItem } from '~/types';
+
+const faq: FaqItem[] = [
+  {
+    question: 'Ich habe schon ein Logo. Muss das weg?',
+    answer:
+      'Meistens nicht. Oft fehlt nicht das Logo, sondern alles drumherum: feste Farben, eine Schrift, saubere Dateien in den Formaten, die Druckerei und Beschrifter brauchen. Wenn das Logo trägt, bauen wir darauf auf.',
+  },
+  {
+    question: 'Bekomme ich die Dateien, oder hängen die bei Ihnen fest?',
+    answer:
+      'Sie bekommen alles: das Logo in allen gängigen Formaten, die Farbwerte für Bildschirm und Druck, die Schriften und die offenen Druckdaten. Damit kann jede Druckerei und jeder Beschrifter arbeiten, auch ohne mich.',
+  },
+  {
+    question: 'Übernehmen Sie auch den Druck?',
+    answer:
+      'Ich erstelle die Druckdaten und arbeite auf Wunsch direkt mit Ihrer Druckerei oder Ihrem Fahrzeugbeschrifter zusammen. Der Auftrag läuft dabei über Sie — so bleiben Sie unabhängig und zahlen keinen Aufschlag.',
+  },
+  {
+    question: 'Lohnt sich das für einen kleinen Betrieb?',
+    answer:
+      'Der Auftritt entscheidet mit darüber, welche Preise Sie durchsetzen können. Zwei Betriebe mit gleicher Arbeit, aber einer wirkt sortiert und der andere zusammengewürfelt — geglaubt wird dem, der sortiert wirkt. Das ist der ganze Punkt.',
+  },
+];
+
+const included = [
+  'Logo, entweder neu entwickelt oder Ihr vorhandenes sauber aufgearbeitet',
+  'Feste Farben und Schriften, damit alles zusammenpasst',
+  'Alle Dateiformate für Bildschirm, Druck und Fahrzeugbeschriftung',
+  'Geschäftsausstattung: Visitenkarte, Briefbogen, Stempelvorlage',
+  'Fahrzeugbeschriftung als druckfertige Vorlage',
+  'Angebots- und Rechnungsvorlage im gleichen Erscheinungsbild',
+  'Baustellenschild und Aufkleber, wenn Sie sichtbar arbeiten',
+  'Kurze Anleitung, damit auch andere die Vorlagen richtig verwenden',
+];
+
+const steps = [
+  {
+    title: 'Standortbestimmung',
+    text: 'Was gibt es schon, was funktioniert davon, und wofür soll Ihr Betrieb stehen.',
+  },
+  {
+    title: 'Entwurf',
+    text: 'Sie sehen Entwürfe im echten Umfeld — auf dem Transporter, auf dem Angebot, nicht auf weißem Grund.',
+  },
+  {
+    title: 'Ausarbeitung',
+    text: 'Der gewählte Weg wird durchgezogen: alle Formate, alle Vorlagen, alle Anwendungen.',
+  },
+  {
+    title: 'Übergabe',
+    text: 'Sie bekommen sämtliche Dateien und eine Anleitung. Auf Wunsch begleite ich den ersten Druck.',
+  },
+];
+---
+
+<Service
+  label="Branding & Print"
+  benefit="Ein Auftritt, der nach Fachbetrieb aussieht, nicht nach Nebenerwerb"
+  intro="Ihr Transporter steht den ganzen Tag sichtbar in der Straße, Ihr Angebot landet neben zwei anderen auf dem Küchentisch. Beides entscheidet mit, wen man nimmt."
+  title="Branding und Printdesign für Handwerksbetriebe in Essen"
+  description="Logo, Geschäftsausstattung, Fahrzeugbeschriftung und Angebotsvorlagen für Handwerks- und SHK-Betriebe in Essen und im Ruhrgebiet. Alle Dateien gehören Ihnen."
+  faq={faq}
+>
+  {/* ===================== Warum es zählt ===================== */}
+  <Section>
+    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
+      <div>
+        <h2 class="text-3xl md:text-4xl">Ihr Angebot liegt neben zwei anderen</h2>
+        <p class="mt-4 text-ink-muted">
+          Der Kunde kann Ihre Arbeit nicht beurteilen — noch nicht. Er hat drei
+          Angebote vor sich und sucht nach Anhaltspunkten, wem er trauen kann.
+          Also achtet er auf das, was er beurteilen kann: Wirkt das sortiert?
+          Passt das zusammen? Macht das den Eindruck eines Betriebs, der seine
+          Sachen im Griff hat?
+        </p>
+        <p class="mt-4 text-ink-muted">
+          Ein Angebot aus einer Textverarbeitung, ein Fahrzeug mit
+          aufgeklebter Handynummer und eine Visitenkarte in einer anderen Schrift
+          senden dieselbe Botschaft — auch wenn Ihre Arbeit die beste von den
+          dreien ist.
+        </p>
+      </div>
+
+      <div class="rounded-card border border-border bg-surface-subtle p-7 md:p-8">
+        <h3 class="text-lg">Wo Ihr Betrieb täglich gesehen wird</h3>
+        <ul class="mt-5 flex flex-col gap-4 text-[0.9375rem] text-ink-muted">
+          <li class="border-b border-border pb-4">
+            <span class="text-ink">Auf der Straße.</span> Ihr Transporter steht
+            stundenlang vor dem Haus. Das ist Werbung, für die Sie nichts extra
+            zahlen — sofern man lesen kann, was Sie machen.
+          </li>
+          <li class="border-b border-border pb-4">
+            <span class="text-ink">Auf dem Küchentisch.</span> Ihr Angebot wird
+            mit zwei anderen verglichen, oft von jemandem, der nur den Preis
+            beurteilen kann.
+          </li>
+          <li>
+            <span class="text-ink">In der Hand.</span> Die Visitenkarte, die im
+            Sicherungskasten hängen bleibt, wird in zwei Jahren wieder
+            hervorgeholt. Oder eben nicht.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  {/* ===================== Leistungsumfang ===================== */}
+  <Section tone="subtle">
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Was drin ist</h2>
+      <p class="mt-4 text-ink-muted">
+        Nicht nur ein Logo, sondern alles, was Sie im Alltag tatsächlich in die
+        Hand nehmen.
+      </p>
+    </div>
+
+    <CheckList items={included} class="mt-10" />
+  </Section>
+
+  {/* ===================== Ablauf ===================== */}
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">So läuft es ab</h2>
+      <p class="mt-4 text-ink-muted">
+        Sie sehen früh etwas Greifbares und entscheiden anhand von echten
+        Anwendungen, nicht anhand von Entwürfen auf weißem Grund.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      <Steps items={steps} />
+    </div>
+
+    <p class="mt-12 text-sm text-ink-faint">
+      Umgesetzt für Betriebe in {serviceArea.display}.
+    </p>
+  </Section>
+</Service>

@@ -1,0 +1,154 @@
+---
+import Service from '~/layouts/Service.astro';
+import Section from '~/components/Section.astro';
+import Steps from '~/components/Steps.astro';
+import CheckList from '~/components/CheckList.astro';
+import { serviceArea } from '~/config/site';
+import type { FaqItem } from '~/types';
+
+const faq: FaqItem[] = [
+  {
+    question: 'Wie lange dauert es, bis ich weiter oben stehe?',
+    answer:
+      'Beim Google-Unternehmensprofil und in der Kartenansicht zeigt sich oft schon nach wenigen Wochen etwas. Bei den normalen Suchergebnissen sollten Sie mit drei bis sechs Monaten rechnen. Wer Ihnen Platz eins in vier Wochen verspricht, verkauft Ihnen etwas, das er nicht halten kann.',
+  },
+  {
+    question: 'Bringt das etwas, wenn ich nur im Umkreis arbeite?',
+    answer:
+      'Gerade dann. Lokale Suche ist der einzige Bereich, in dem ein Betrieb mit fünf Leuten einen Konzern schlagen kann — weil Google bei „Heizung Notdienst" die Nähe höher gewichtet als die Unternehmensgröße.',
+  },
+  {
+    question: 'Muss ich dafür ständig etwas schreiben?',
+    answer:
+      'Nein. Der größte Hebel im lokalen Bereich sind saubere Grundlagen: ein gepflegtes Unternehmensprofil, eindeutige Angaben zu Ihren Leistungen und Ihrem Gebiet, echte Bewertungen. Regelmäßige Beiträge sind ein Zusatz, keine Voraussetzung.',
+  },
+  {
+    question: 'Was ist mit bezahlten Anzeigen?',
+    answer:
+      'Anzeigen wirken sofort und hören sofort auf zu wirken, wenn Sie nicht mehr zahlen. Sinnvoll, um eine Anlaufphase zu überbrücken oder eine Auslastungslücke zu schließen. Als dauerhafte Grundlage ist die eigene Sichtbarkeit die günstigere Rechnung.',
+  },
+  {
+    question: 'Wie sehe ich, ob es wirkt?',
+    answer:
+      'An den Zahlen, die zählen: Aufrufe Ihres Profils, Klicks auf die Telefonnummer, Wegbeschreibungen, Anfragen über das Formular. Nicht an Platzierungen, die je nach Standort des Suchenden ohnehin unterschiedlich ausfallen.',
+  },
+];
+
+const included = [
+  'Google-Unternehmensprofil vollständig eingerichtet und gepflegt',
+  'Leistungen und Einzugsgebiet so hinterlegt, dass Google sie zuordnen kann',
+  'Eigene Seite je Leistung statt einer Seite für alles',
+  'Technische Grundlagen: Ladezeit, Handytauglichkeit, saubere Struktur',
+  'Auszeichnung für Suchmaschinen, damit Adresse und Zeiten korrekt erscheinen',
+  'Einträge in den Verzeichnissen, die im Handwerk tatsächlich zählen',
+  'Bewertungen systematisch einsammeln statt hoffen',
+  'Auswertung nach Anrufen und Anfragen, nicht nach Platzierungen',
+];
+
+const steps = [
+  {
+    title: 'Bestandsaufnahme',
+    text: 'Wo stehen Sie heute, wonach sucht Ihre Kundschaft wirklich, und wer steht dort gerade vor Ihnen.',
+  },
+  {
+    title: 'Grundlagen',
+    text: 'Unternehmensprofil, Angaben und Technik in Ordnung bringen. Hier liegt der schnellste Gewinn.',
+  },
+  {
+    title: 'Inhalte',
+    text: 'Für jede Leistung eine eigene Seite, die die Frage beantwortet, mit der gesucht wurde.',
+  },
+  {
+    title: 'Nachhalten',
+    text: 'Monatlich prüfen, was Anrufe bringt, und dort nachlegen, wo sich Bewegung zeigt.',
+  },
+];
+---
+
+<Service
+  label="SEO"
+  benefit="Gefunden werden, wenn im Umkreis nach Ihnen gesucht wird"
+  intro="Wer heute eine Heizung braucht, tippt nicht in die Gelben Seiten, sondern ins Handy — und ruft einen der ersten drei Treffer an. Um diese drei Plätze geht es."
+  title="Lokale Suchmaschinenoptimierung für Handwerksbetriebe in Essen"
+  description="Lokale SEO für Handwerks- und SHK-Betriebe in Essen und im Ruhrgebiet: Google-Unternehmensprofil, eigene Leistungsseiten und Bewertungen, gemessen an Anrufen statt an Platzierungen."
+  faq={faq}
+>
+  {/* ===================== Wie lokale Suche funktioniert ===================== */}
+  <Section>
+    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
+      <div>
+        <h2 class="text-3xl md:text-4xl">Die Entscheidung fällt auf dem ersten Bildschirm</h2>
+        <p class="mt-4 text-ink-muted">
+          Bei „Heizung reparieren Essen" zeigt Google zuerst eine Karte mit drei
+          Betrieben. Wer dort steht, bekommt den Großteil der Anrufe. Wer
+          darunter steht, bekommt den Rest — und wer auf Seite zwei steht,
+          bekommt nichts.
+        </p>
+        <p class="mt-4 text-ink-muted">
+          Diese drei Plätze vergibt Google nicht nach Größe oder Werbebudget,
+          sondern nach Nähe, Vollständigkeit der Angaben und Bewertungen. Alles
+          drei ist beeinflussbar, und genau darum geht es hier.
+        </p>
+      </div>
+
+      <div class="rounded-card border border-border bg-surface-subtle p-7 md:p-8">
+        <h3 class="text-lg">Worauf Google im lokalen Umfeld schaut</h3>
+        <dl class="mt-5 flex flex-col gap-5 text-[0.9375rem]">
+          <div>
+            <dt class="font-medium text-ink">Nähe</dt>
+            <dd class="mt-1 text-ink-muted">
+              Wie weit ist Ihr Betrieb vom Suchenden entfernt. Nicht steuerbar,
+              aber es erklärt, warum Platzierungen je nach Standort schwanken.
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium text-ink">Vollständigkeit</dt>
+            <dd class="mt-1 text-ink-muted">
+              Sind Leistungen, Zeiten, Bilder und Einzugsgebiet hinterlegt — und
+              stimmen sie mit Ihrer Website überein.
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium text-ink">Bewertungen</dt>
+            <dd class="mt-1 text-ink-muted">
+              Anzahl, Durchschnitt und wie frisch sie sind. Der Hebel, den fast
+              jeder Betrieb liegen lässt.
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </Section>
+
+  {/* ===================== Leistungsumfang ===================== */}
+  <Section tone="subtle">
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Was drin ist</h2>
+      <p class="mt-4 text-ink-muted">
+        Handfeste Arbeit an den Stellen, die im lokalen Umfeld tatsächlich
+        Anrufe bewegen — keine Berichte voller Kennzahlen, die niemand liest.
+      </p>
+    </div>
+
+    <CheckList items={included} class="mt-10" />
+  </Section>
+
+  {/* ===================== Ablauf ===================== */}
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">So läuft es ab</h2>
+      <p class="mt-4 text-ink-muted">
+        Erst die Grundlagen, weil sie am schnellsten wirken. Danach wird
+        ausgebaut.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      <Steps items={steps} />
+    </div>
+
+    <p class="mt-12 text-sm text-ink-faint">
+      Betreut werden Betriebe in {serviceArea.display}.
+    </p>
+  </Section>
+</Service>

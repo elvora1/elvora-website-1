@@ -1,0 +1,148 @@
+---
+import Service from '~/layouts/Service.astro';
+import Section from '~/components/Section.astro';
+import Steps from '~/components/Steps.astro';
+import CheckList from '~/components/CheckList.astro';
+import { serviceArea } from '~/config/site';
+import type { FaqItem } from '~/types';
+
+const faq: FaqItem[] = [
+  {
+    question: 'Ich habe schon eine Website. Muss die komplett neu?',
+    answer:
+      'Nicht zwingend. Oft liegt es an wenigen Stellen: die Telefonnummer ist nicht anklickbar, auf dem Handy muss man zoomen, und was Sie eigentlich anbieten, steht erst ganz unten. Ich schaue mir Ihre Seite an und sage Ihnen ehrlich, ob eine Überarbeitung reicht.',
+  },
+  {
+    question: 'Muss ich Texte und Bilder liefern?',
+    answer:
+      'Die Texte schreibe ich. Von Ihnen brauche ich das Fachwissen — was Sie machen, für wen, und was Ihre Kundschaft immer wieder fragt. Das klären wir in einem Gespräch, Sie müssen nichts vorformulieren. Fotos aus Ihrem Betrieb sind Gold wert; falls keine da sind, finden wir eine Lösung.',
+  },
+  {
+    question: 'Wie lange dauert das?',
+    answer:
+      'Für eine Website mit den üblichen Seiten rechnen Sie mit etwa drei bis fünf Wochen. Der größte Teil davon ist Abstimmung, nicht Technik — je schneller Sie Rückmeldung geben, desto schneller geht es.',
+  },
+  {
+    question: 'Kann ich später selbst etwas ändern?',
+    answer:
+      'Ja. Sie bekommen einen Zugang, über den sich Texte, Bilder und Referenzen ohne technische Kenntnisse pflegen lassen. Wenn Sie das lieber abgeben, übernehme ich es.',
+  },
+  {
+    question: 'Was passiert nach der Fertigstellung?',
+    answer:
+      'Die Seite läuft, wird technisch aktuell gehalten und gesichert. Wenn sich etwas an Ihrem Angebot ändert, wird die Seite mitgezogen — eine Website, die zwei Jahre unangetastet bleibt, verliert ihre Wirkung.',
+  },
+];
+
+const included = [
+  'Aufbau, der auf Anfragen ausgelegt ist, nicht auf Selbstdarstellung',
+  'Texte, die Ihre Kundschaft versteht — ohne Werbefloskeln',
+  'Auf dem Handy zuerst gedacht, dort kommt der Großteil Ihrer Besucher an',
+  'Telefonnummer und WhatsApp mit einem Fingertipp erreichbar',
+  'Kontaktformular, das auch bei den Anfragen ankommt',
+  'Ladezeiten unter einer Sekunde, auch im Mobilfunknetz',
+  'Rechtssicher mit Impressum und Datenschutzerklärung',
+  'Technische Grundlage, auf der Suchmaschinenoptimierung überhaupt greift',
+];
+
+const steps = [
+  {
+    title: 'Gespräch',
+    text: 'Wir klären, welche Aufträge Sie eigentlich wollen — und welche nicht. Das entscheidet alles Weitere.',
+  },
+  {
+    title: 'Entwurf',
+    text: 'Sie sehen die Startseite als Entwurf, bevor eine einzige Zeile Code entsteht. Änderungen sind hier noch billig.',
+  },
+  {
+    title: 'Umsetzung',
+    text: 'Ich baue die Seite, schreibe die Texte und richte Formular und Rechtstexte ein.',
+  },
+  {
+    title: 'Start',
+    text: 'Die Seite geht live, wird bei Google angemeldet, und Sie bekommen eine Einweisung.',
+  },
+];
+---
+
+<Service
+  label="Webdesign"
+  benefit="Eine Website, die Anfragen bringt statt nur gut auszusehen"
+  intro="Die meisten Handwerker-Websites sind digitale Visitenkarten: hübsch, aber wirkungslos. Ihre wird darauf gebaut, dass am Ende das Telefon klingelt."
+  title="Webdesign für Handwerksbetriebe in Essen"
+  description="Websites für Handwerks- und SHK-Betriebe in Essen und im Ruhrgebiet: auf dem Handy schnell, für Anfragen gebaut, mit Texten, die Ihre Kundschaft versteht."
+  faq={faq}
+>
+  {/* ===================== Das Problem ===================== */}
+  <Section>
+    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
+      <div>
+        <h2 class="text-3xl md:text-4xl">Acht Sekunden, dann ist die Entscheidung gefallen</h2>
+        <p class="mt-4 text-ink-muted">
+          So lange schaut sich jemand Ihre Seite an, bevor er entweder anruft
+          oder zum nächsten Treffer zurückgeht. In diesen acht Sekunden muss
+          klar sein: Was machen Sie, sind Sie in der Nähe, und wie erreicht man
+          Sie jetzt sofort.
+        </p>
+        <p class="mt-4 text-ink-muted">
+          Die meisten Seiten verspielen das an derselben Stelle. Oben steht
+          „Herzlich willkommen", die Telefonnummer versteckt sich im Impressum,
+          und auf dem Handy muss man zoomen, um überhaupt etwas zu lesen.
+        </p>
+      </div>
+
+      <div class="rounded-card border border-border bg-surface-subtle p-7 md:p-8">
+        <h3 class="text-lg">Woran es meistens scheitert</h3>
+        <ul class="mt-5 flex flex-col gap-4 text-[0.9375rem] text-ink-muted">
+          <li class="border-b border-border pb-4">
+            Die Nummer ist nicht anklickbar — wer sie abtippen muss, ruft oft
+            gar nicht erst an.
+          </li>
+          <li class="border-b border-border pb-4">
+            Die Seite braucht auf dem Handy mehrere Sekunden. Jede Sekunde
+            kostet spürbar Anfragen.
+          </li>
+          <li class="border-b border-border pb-4">
+            Es steht nirgends, in welchen Orten Sie arbeiten. Also ruft man
+            lieber jemanden an, bei dem es dabeisteht.
+          </li>
+          <li>
+            Das Kontaktformular schickt Nachrichten an eine Adresse, in die
+            seit Jahren niemand mehr schaut.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  {/* ===================== Leistungsumfang ===================== */}
+  <Section tone="subtle">
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">Was drin ist</h2>
+      <p class="mt-4 text-ink-muted">
+        Kein Baukasten und keine Vorlage, in die Ihr Logo hineingeschoben wird.
+        Aufgebaut auf das, was Ihr Betrieb tatsächlich anbietet.
+      </p>
+    </div>
+
+    <CheckList items={included} class="mt-10" />
+  </Section>
+
+  {/* ===================== Ablauf ===================== */}
+  <Section>
+    <div class="max-w-2xl">
+      <h2 class="text-3xl md:text-4xl">So läuft es ab</h2>
+      <p class="mt-4 text-ink-muted">
+        Vier Schritte, und Sie wissen an jedem Punkt, woran Sie sind.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      <Steps items={steps} />
+    </div>
+
+    <p class="mt-12 text-sm text-ink-faint">
+      Umgesetzt für Betriebe in {serviceArea.display}.
+    </p>
+  </Section>
+</Service>
