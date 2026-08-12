@@ -33,12 +33,11 @@ export const address = {
  *  - `phoneDisplay` ist die menschenlesbare Fassung für die Anzeige.
  */
 export const contact = {
-  // TODO: echte Rufnummer eintragen
-  phoneRaw: '4920100000000',
-  phoneDisplay: '0201 000000',
-  // TODO: echte WhatsApp-Nummer eintragen (häufig identisch mit der Mobilnummer)
-  whatsappRaw: '4917000000000',
-  // TODO: echte E-Mail-Adresse eintragen
+  phoneRaw: '491608524279',
+  phoneDisplay: '0160 8524279',
+  /** Identisch mit der Mobilnummer — dort läuft die KI-Assistenz. */
+  whatsappRaw: '491608524279',
+  // TODO: echte E-Mail-Adresse bestätigen
   email: 'kontakt@elvora.me',
   /** Vorbelegter Text des WhatsApp-Links. */
   whatsappText: 'Guten Tag, ich interessiere mich für Ihre Unterstützung.',
@@ -57,14 +56,23 @@ export const openingHours = {
 } as const;
 
 /**
- * Terminbuchung über cal.com.
- * `link` ist der Pfad hinter cal.com, also Benutzername/Event-Typ.
+ * Terminbuchung über die selbst gehostete cal.com-Instanz.
+ *
+ * Sie läuft unter einer eigenen Subdomain — Besucher sehen also nie
+ * "cal.com", sondern durchgehend elvora.me. Das ist der Grund, warum hier
+ * `origin` konfigurierbar ist und nicht fest auf cal.com zeigt.
  */
 export const booking = {
-  // TODO: echten cal.com-Link eintragen, z. B. 'elvora/erstgespraech'
-  link: 'elvora/erstgespraech',
+  /** Herkunft der Instanz, ohne abschließenden Schrägstrich. */
+  origin: 'https://termine.elvora.me',
+  /** Pfad zum Event-Typ: Benutzername/Termin-Art. */
+  link: 'elvora/beratung',
   get url() {
-    return `https://cal.com/${this.link}`;
+    return `${this.origin}/${this.link}`;
+  },
+  /** Skript für die Einbettung, wird ausschließlich nach einem Klick geladen. */
+  get embedScript() {
+    return `${this.origin}/embed/embed.js`;
   },
   /** Dauer, wie sie im Umfeld des CTA kommuniziert wird. */
   durationLabel: '15 Minuten',
@@ -75,8 +83,7 @@ export const booking = {
  * Der Access Key ist ein öffentlicher Schlüssel und darf im Quelltext stehen.
  */
 export const forms = {
-  // TODO: echten Web3Forms Access Key eintragen
-  accessKey: 'REPLACE_WITH_WEB3FORMS_ACCESS_KEY',
+  accessKey: 'd7a8e08a-7a06-4c3b-bbbf-38b1d9e05745',
   endpoint: 'https://api.web3forms.com/submit',
   subject: 'Neue Anfrage über elvora.me',
   redirectPath: '/kontakt/danke/',
