@@ -1,7 +1,7 @@
 ---
 import Base from '~/layouts/Base.astro';
 import Section from '~/components/Section.astro';
-import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import PanelHero from '~/components/PanelHero.astro';
 import CtaBand from '~/components/CtaBand.astro';
 import { services, automationModules, serviceArea } from '~/config/site';
 ---
@@ -11,21 +11,13 @@ import { services, automationModules, serviceArea } from '~/config/site';
   description="Webdesign, lokale Suchmaschinenoptimierung, Branding und KI-Automatisierung für Handwerks- und SHK-Betriebe in Essen und im Ruhrgebiet."
   breadcrumbs={[{ label: 'Leistungen' }]}
 >
-  <section class="border-b border-border bg-surface-subtle">
-    <div class="container-content py-10 md:py-14">
-      <Breadcrumbs trail={[{ label: 'Leistungen' }]} />
-
-      <div class="mt-8 max-w-3xl">
-        <h1 class="text-3xl md:text-5xl">
-          Vier Bausteine gegen die vier häufigsten Engpässe
-        </h1>
-        <p class="mt-5 text-lg text-ink-muted">
-          Sie müssen nicht alles auf einmal angehen. Meistens beginnen wir dort,
-          wo gerade am meisten Geld liegen bleibt, und bauen von da aus weiter.
-        </p>
-      </div>
-    </div>
-  </section>
+  <PanelHero
+    eyebrow="Leistungen"
+    heading="Vier Bausteine gegen die vier häufigsten Engpässe"
+    intro="Sie müssen nicht alles auf einmal angehen. Meistens beginnen wir dort, wo gerade am meisten Geld liegen bleibt, und bauen von da aus weiter."
+    color="#2b2f7a"
+    breadcrumbs={[{ label: 'Leistungen' }]}
+  />
 
   <Section>
     <ul class="grid gap-5 md:grid-cols-2">

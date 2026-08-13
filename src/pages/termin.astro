@@ -1,7 +1,7 @@
 ---
 import Base from '~/layouts/Base.astro';
 import Section from '~/components/Section.astro';
-import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import PanelHero from '~/components/PanelHero.astro';
 import BookingEmbed from '~/components/BookingEmbed.astro';
 import WhatsappCta from '~/components/WhatsappCta.astro';
 import { booking, contact, contactLinks } from '~/config/site';
@@ -19,20 +19,13 @@ const agenda = [
   description="15 Minuten, unverbindlich und ohne Verkaufsgespräch: Termin bei Elvora aus Essen direkt online buchen."
   breadcrumbs={[{ label: 'Termin' }]}
 >
-  <section class="border-b border-border bg-surface-subtle">
-    <div class="container-content py-10 md:py-14">
-      <Breadcrumbs trail={[{ label: 'Termin' }]} />
-
-      <div class="mt-8 max-w-3xl">
-        <h1 class="text-3xl md:text-5xl">{booking.durationLabel}, die Ihnen Klarheit bringen</h1>
-        <p class="mt-5 text-lg text-ink-muted">
-          Kein Verkaufsgespräch, keine Vorbereitung nötig. Sie erzählen, wo es
-          klemmt, und bekommen eine ehrliche Einschätzung. Auch dann, wenn ich
-          Ihnen nicht helfen kann.
-        </p>
-      </div>
-    </div>
-  </section>
+  <PanelHero
+    eyebrow="Erstgespräch"
+    heading={`${booking.durationLabel}, die Ihnen Klarheit bringen`}
+    intro="Kein Verkaufsgespräch, keine Vorbereitung nötig. Sie erzählen, wo es klemmt, und bekommen eine ehrliche Einschätzung. Auch dann, wenn ich Ihnen nicht helfen kann."
+    color="#5c3491"
+    breadcrumbs={[{ label: 'Termin' }]}
+  />
 
   <Section>
     <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">

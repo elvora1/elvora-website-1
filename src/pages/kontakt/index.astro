@@ -1,7 +1,7 @@
 ---
 import Base from '~/layouts/Base.astro';
 import Section from '~/components/Section.astro';
-import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import PanelHero from '~/components/PanelHero.astro';
 import ContactForm from '~/components/ContactForm.astro';
 import WhatsappCta from '~/components/WhatsappCta.astro';
 import {
@@ -19,19 +19,13 @@ import {
   description="Elvora aus Essen erreichen: über WhatsApp mit KI-Assistenz, telefonisch, per E-Mail oder über das Kontaktformular. Antwort innerhalb von 24 Stunden."
   breadcrumbs={[{ label: 'Kontakt' }]}
 >
-  <section class="border-b border-border bg-surface-subtle">
-    <div class="container-content py-10 md:py-14">
-      <Breadcrumbs trail={[{ label: 'Kontakt' }]} />
-
-      <div class="mt-8 max-w-3xl">
-        <h1 class="text-3xl md:text-5xl">So erreichen Sie mich</h1>
-        <p class="mt-5 text-lg text-ink-muted">
-          Am schnellsten geht es über WhatsApp. Wer es lieber schriftlich und
-          förmlich mag, findet darunter das Formular.
-        </p>
-      </div>
-    </div>
-  </section>
+  <PanelHero
+    eyebrow="Kontakt"
+    heading="So erreichen Sie mich"
+    intro="Am schnellsten geht es über WhatsApp. Wer es lieber schriftlich und förmlich mag, findet darunter das Formular."
+    color="#a63082"
+    breadcrumbs={[{ label: 'Kontakt' }]}
+  />
 
   <Section>
     <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">

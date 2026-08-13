@@ -6,13 +6,15 @@
  *   primary   -- flaechig in der Akzentfarbe. Pro Sichtbereich nur EINMAL.
  *   secondary -- Umriss in Grau, klar untergeordnet, nie in der Akzentfarbe.
  *   quiet     -- reiner Textlink, schwaechste Stufe.
+ *   aufFarbe  -- weiss auf farbiger Flaeche. Die Akzentfarbe wuerde auf den
+ *                Markenfarben untergehen, auf der Magenta-Tafel fast ganz.
  *
  * Damit kann kein zweiter CTA versehentlich mit dem Haupt-CTA konkurrieren.
  */
 interface Props {
   href?: string;
   type?: 'button' | 'submit';
-  variant?: 'primary' | 'secondary' | 'quiet';
+  variant?: 'primary' | 'secondary' | 'quiet' | 'aufFarbe';
   size?: 'md' | 'lg';
   fullWidth?: boolean;
   class?: string;
@@ -40,6 +42,7 @@ const variants: Record<string, string> = {
   secondary:
     'border border-border-strong bg-surface text-ink hover:bg-surface-subtle hover:border-ink-faint',
   quiet: 'text-ink-muted underline underline-offset-4 decoration-border-strong hover:text-ink hover:decoration-ink-faint',
+  aufFarbe: 'bg-white text-ink hover:bg-white/90 shadow-[0_1px_2px_rgb(0_0_0/0.16)]',
 };
 
 const sizes: Record<string, string> = {

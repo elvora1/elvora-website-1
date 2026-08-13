@@ -2,6 +2,7 @@
 import Base from '~/layouts/Base.astro';
 import Section from '~/components/Section.astro';
 import Breadcrumbs from '~/components/Breadcrumbs.astro';
+import Texture from '~/components/Texture.astro';
 import Portrait from '~/components/Portrait.astro';
 import Button from '~/components/Button.astro';
 import CtaBand from '~/components/CtaBand.astro';
@@ -49,29 +50,30 @@ const principles = [
   description="Luan Qerkini von Elvora: gelernter Gas- und Wasserinstallateur, heute zuständig für Sichtbarkeit und Automatisierung bei Betrieben, in denen der Inhaber mitarbeitet."
   breadcrumbs={[{ label: 'Über mich' }]}
 >
-  <section class="border-b border-border bg-surface-subtle">
-    <div class="container-content py-10 md:py-14">
-      <Breadcrumbs trail={[{ label: 'Über mich' }]} />
+  <section class="ueber-tafel">
+    <Texture variant="schraffur" />
 
-      <div class="mt-10 grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
-        <div class="lg:col-span-4">
-          <Portrait
-            alt={`${owner.firstName}, Inhaber von Elvora aus ${address.city}`}
-            class="max-w-sm"
-          />
-        </div>
+    <div class="container-content ueber-inner">
+      <Breadcrumbs trail={[{ label: 'Über mich' }]} tone="inverse" />
 
-        <div class="lg:col-span-8">
-          <p class="text-sm font-medium text-accent">Über mich</p>
-          <h1 class="mt-3 text-3xl md:text-5xl">
+      <div class="ueber-raster">
+        <div class="ueber-text">
+          <p class="ueber-eyebrow">Der Mensch dahinter</p>
+          <hr />
+          <h1 class="ueber-schlag">
             Ich komme aus dem Handwerk. Deshalb muss man mir nichts erklären.
           </h1>
-          <p class="mt-5 text-lg text-ink-muted">
-            Mein Name ist {owner.firstName}. Ich habe Gas- und Wasserinstallateur
-            gelernt und weiß, wie ein Betrieb von innen aussieht: Der Chef
-            arbeitet mit. Das Telefon klingelt, während man unter der Spüle
-            liegt. Und der Papierkram ist das, was abends übrig bleibt.
+          <hr />
+          <p class="ueber-intro">
+            Mein Name ist {owner.fullName}. Ich habe {owner.trade} gelernt und
+            weiß, wie ein Betrieb von innen aussieht: Der Chef arbeitet mit. Das
+            Telefon klingelt, während man unter der Spüle liegt. Und der
+            Papierkram ist das, was abends übrig bleibt.
           </p>
+        </div>
+
+        <div class="ueber-bild">
+          <Portrait alt={`${owner.fullName}, Inhaber von Elvora aus ${address.city}`} />
         </div>
       </div>
     </div>
@@ -188,3 +190,80 @@ const principles = [
     text="Dann lassen Sie uns kurz sprechen. Ohne Vorbereitung, ohne Verpflichtung."
   />
 </Base>
+
+<style>
+  .ueber-tafel {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #1d2140;
+    color: #fff;
+  }
+
+  .ueber-inner {
+    position: relative;
+    z-index: 10;
+    padding-block: clamp(2.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .ueber-raster {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  @media (width >= 64rem) {
+    .ueber-raster {
+      grid-template-columns: 1.35fr 1fr;
+    }
+  }
+
+  .ueber-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .ueber-eyebrow {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .ueber-tafel hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.3);
+  }
+
+  .ueber-schlag {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2.25rem, 5.5vw, 4.25rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .ueber-intro {
+    margin: 0;
+    max-width: 54ch;
+    font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
+    opacity: 0.88;
+  }
+
+  /* Das Portraet bekommt Gewicht statt als kleine Kachel zu verschwinden. */
+  .ueber-bild :global(> div) {
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .ueber-bild :global(img) {
+    aspect-ratio: 4 / 5;
+    width: 100%;
+    object-fit: cover;
+  }
+</style>

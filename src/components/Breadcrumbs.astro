@@ -2,28 +2,31 @@
 interface Props {
   /** Ohne Startseite, die wird automatisch vorangestellt. */
   trail: Array<{ label: string; href?: string }>;
+  /** `inverse` für helle Schrift auf farbigen Tafeln. */
+  tone?: 'default' | 'inverse';
 }
 
-const { trail }: Props = Astro.props;
+const { trail, tone = 'default' }: Props = Astro.props;
+const inv = tone === 'inverse';
 const items = [{ label: 'Start', href: '/' }, ...trail];
 ---
 
 <nav aria-label="Sie befinden sich hier" class="text-sm">
-  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-faint">
+  <ol class:list={["flex flex-wrap items-center gap-x-2 gap-y-1", inv ? "text-white/60" : "text-ink-faint"]}>
     {
       items.map((item, i) => (
         <li class="flex items-center gap-2">
           {i > 0 && (
-            <span aria-hidden="true" class="text-border-strong">
+            <span aria-hidden="true" class:list={[inv ? "text-white/35" : "text-border-strong"]}>
               /
             </span>
           )}
           {item.href && i < items.length - 1 ? (
-            <a href={item.href} class="transition-colors hover:text-ink">
+            <a href={item.href} class:list={["transition-colors", inv ? "hover:text-white" : "hover:text-ink"]}>
               {item.label}
             </a>
           ) : (
-            <span aria-current="page" class="text-ink-muted">
+            <span aria-current="page" class:list={[inv ? "text-white/85" : "text-ink-muted"]}>
               {item.label}
             </span>
           )}

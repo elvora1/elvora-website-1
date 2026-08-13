@@ -167,10 +167,14 @@ export const nav = [
  *
  * `benefit` ist die Nutzenaussage und steht in der Überschrift.
  * `label` ist nur die Fachbezeichnung und tritt untergeordnet auf.
+ * `color` ist die Farbwelt der Leistung, abgeleitet aus dem Markenverlauf.
+ * Dieselbe Farbe trägt die Fläche auf der Startseite und den Kopfbereich
+ * der Detailseite, dadurch gehören beide sichtbar zusammen.
  */
 export const services = [
   {
     slug: 'webdesign',
+    color: '#2b2f7a',
     label: 'Webdesign',
     benefit: 'Eine Website, die Anfragen bringt statt nur gut auszusehen',
     teaser:
@@ -179,6 +183,7 @@ export const services = [
   },
   {
     slug: 'seo',
+    color: '#5c3491',
     label: 'SEO',
     benefit: 'Gefunden werden, wenn im Umkreis nach Ihnen gesucht wird',
     teaser:
@@ -187,6 +192,7 @@ export const services = [
   },
   {
     slug: 'branding',
+    color: '#a63082',
     label: 'Branding & Print',
     benefit: 'Ein Auftritt, der nach Fachbetrieb aussieht, nicht nach Nebenerwerb',
     teaser:
@@ -195,6 +201,7 @@ export const services = [
   },
   {
     slug: 'automatisierung',
+    color: '#c4472f',
     label: 'KI-Prozessautomatisierung',
     benefit: 'Kein verpasster Anruf, kein Angebot, das liegen bleibt',
     teaser:
