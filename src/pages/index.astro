@@ -3,6 +3,7 @@ import Base from '~/layouts/Base.astro';
 import Section from '~/components/Section.astro';
 import Button from '~/components/Button.astro';
 import ReviewBadge from '~/components/ReviewBadge.astro';
+import BrandGlow from '~/components/BrandGlow.astro';
 import CtaBand from '~/components/CtaBand.astro';
 import { cta, services, serviceArea, address, reviews } from '~/config/site';
 
@@ -21,14 +22,11 @@ const trustMarkers = [
 <Base title={title} description={description}>
   {/* ===================== Erster Sichtbereich ===================== */}
   <section class="relative overflow-hidden bg-surface">
-    {/* Ruhiger Farbverlauf statt Bild, kostet null Ladezeit */}
-    <div
-      class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 bg-gradient-to-b from-accent-soft to-transparent"
-      aria-hidden="true"
-    >
-    </div>
+    {/* Markenschleier statt Bild: die Logofarben als weiche Flaechen.
+        Kostet null Ladezeit und kann nie unecht wirken. */}
+    <BrandGlow />
 
-    <div class="container-content py-16 md:py-24">
+    <div class="container-content relative z-10 py-16 md:py-24">
       <div class="mx-auto max-w-3xl text-center">
         <p class="text-sm font-medium text-accent">
           Digitalagentur aus {address.city} · Schwerpunkt SHK

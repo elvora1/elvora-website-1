@@ -1,5 +1,6 @@
 ---
 import Button from './Button.astro';
+import BrandGlow from './BrandGlow.astro';
 import { cta, contactLinks } from '~/config/site';
 
 /**
@@ -17,8 +18,9 @@ const {
 } = Astro.props;
 ---
 
-<section class="bg-surface-ink">
-  <div class="container-content py-16 md:py-20">
+<section class="relative isolate overflow-hidden bg-surface-ink">
+  <BrandGlow tone="dunkel" />
+  <div class="container-content relative z-10 py-16 md:py-20">
     <div class="mx-auto max-w-2xl text-center">
       <h2 class="text-3xl text-white md:text-4xl">{heading}</h2>
       <p class="mt-4 text-white/70">{text}</p>

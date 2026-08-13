@@ -1,0 +1,100 @@
+---
+/**
+ * Markenschleier für den Hintergrund.
+ *
+ * Drei weiche Farbflächen in den Logofarben, stark weichgezeichnet. Reines
+ * CSS: keine Bilddatei, kein zusätzlicher Ladevorgang, auf jedem Bildschirm
+ * gestochen scharf.
+ *
+ * Warum kein Foto: erfundene Bilder von Betrieben oder Menschen würden auf
+ * einer Seite, deren Aufgabe Vertrauensaufbau ist, das Gegenteil bewirken.
+ * Die Marke selbst als Grafik zu nutzen, ist ehrlich und unverwechselbar.
+ *
+ * ACHTUNG bei der Einbindung: Der Abschnitt braucht `relative`, und der
+ * Inhalt darüber braucht `relative z-10`. Mit einem negativen z-Wert läge
+ * der Schleier hinter dem Hintergrund des Abschnitts und wäre unsichtbar.
+ */
+interface Props {
+  /** `hell` für weiße Flächen, `dunkel` für den Anthrazit-Abschluss. */
+  tone?: 'hell' | 'dunkel';
+  class?: string;
+}
+
+const { tone = 'hell', class: className = '' }: Props = Astro.props;
+
+/* Bewusst zurueckhaltend: der Schleier soll den Bildschirm anwaermen, nicht
+   ihn einfaerben. Zu kraeftig gedreht drueckt er den Textkontrast und
+   widerspricht dem hellen, reduzierten Grundton der Seite. */
+const deckkraft = tone === 'hell' ? '0.20' : '0.28';
+---
+
+<div
+  class={`pointer-events-none absolute inset-0 z-0 overflow-hidden ${className}`}
+  aria-hidden="true"
+>
+  <div class="brand-glow" data-tone={tone} style={`--deckkraft:${deckkraft}`}>
+    <span class="fleck fleck-indigo"></span>
+    <span class="fleck fleck-magenta"></span>
+    <span class="fleck fleck-orange"></span>
+  </div>
+</div>
+
+<style>
+  .brand-glow {
+    position: absolute;
+    inset: -24% -10% auto -10%;
+    height: 108%;
+    opacity: var(--deckkraft);
+    filter: blur(110px);
+    /* Nach unten auslaufen lassen, damit der Uebergang zum naechsten
+       Abschnitt nicht als Kante sichtbar wird. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 88%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 88%);
+  }
+
+  .fleck {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+  }
+
+  /* Reihenfolge und Lage folgen dem Verlauf im Logo: Indigo links,
+     Magenta in der Mitte, Orange rechts. */
+  .fleck-indigo {
+    top: -8%;
+    left: 2%;
+    width: 42%;
+    aspect-ratio: 1.4;
+    background: var(--color-brand-start);
+    opacity: 0.4;
+  }
+
+  .fleck-magenta {
+    top: -14%;
+    left: 34%;
+    width: 46%;
+    aspect-ratio: 1.2;
+    background: var(--color-brand-mid);
+    opacity: 0.34;
+  }
+
+  .fleck-orange {
+    top: -6%;
+    right: 0%;
+    width: 38%;
+    aspect-ratio: 1.5;
+    background: var(--color-brand-end);
+    opacity: 0.3;
+  }
+
+  /* Auf dunklem Grund tragen die Farben mehr, deshalb zurückgenommen. */
+  .brand-glow[data-tone='dunkel'] .fleck {
+    opacity: 0.5;
+  }
+
+  @media (width < 48rem) {
+    .brand-glow {
+      filter: blur(60px);
+    }
+  }
+</style>
