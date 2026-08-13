@@ -1,0 +1,125 @@
+---
+/**
+ * Wanderndes Punktraster.
+ *
+ * Übernimmt die Bildidee einer WebGPU-Vorlage: ein feines Punktraster, über
+ * das ein Lichtband läuft und die Punkte auf seinem Weg aufleuchten lässt.
+ *
+ * Die Vorlage löste das mit three.js, React und einem WebGPU-Renderer, also
+ * rund 400 kB JavaScript, dazu Bilder von einem fremden Hoster und ohne
+ * Rückfallebene für Geräte ohne WebGPU. Hier stehen dafür drei
+ * Hintergrundebenen und eine CSS-Animation. Kein JavaScript, keine externe
+ * Verbindung, läuft auf jedem Gerät.
+ *
+ * Bei `prefers-reduced-motion` steht das Band still, das Raster bleibt.
+ */
+interface Props {
+  /** Farbe der aufleuchtenden Punkte. */
+  glow?: string;
+  /** Dauer eines Durchlaufs. */
+  speed?: string;
+  class?: string;
+}
+
+const {
+  glow = 'var(--color-brand-mid)',
+  speed = '14s',
+  class: className = '',
+}: Props = Astro.props;
+---
+
+<div
+  class={`scanfeld ${className}`}
+  style={`--glut:${glow};--dauer:${speed}`}
+  aria-hidden="true"
+>
+  <span class="ebene ebene-raster"></span>
+  <span class="ebene ebene-glut"></span>
+</div>
+
+<style>
+  .scanfeld {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    --abstand: 22px;
+    --punkt: 1.5px;
+  }
+
+  .ebene {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  /* Grundraster: ruhig, kaum sichtbar, gibt der Flaeche Struktur. */
+  .ebene-raster {
+    background-image: radial-gradient(
+      circle at center,
+      currentColor var(--punkt),
+      transparent calc(var(--punkt) + 0.5px)
+    );
+    background-size: var(--abstand) var(--abstand);
+    opacity: 0.14;
+  }
+
+  /* Dieselben Punkte in Markenfarbe, groesser, aber nur dort sichtbar, wo
+     das Band gerade steht. Die Bewegung laeuft ueber die Maske, nicht ueber
+     die Punkte selbst: das bleibt fluessig, weil nur eine Ebene wandert. */
+  .ebene-glut {
+    background-image: radial-gradient(
+      circle at center,
+      var(--glut) calc(var(--punkt) + 1.1px),
+      transparent calc(var(--punkt) + 1.8px)
+    );
+    background-size: var(--abstand) var(--abstand);
+    opacity: 0.85;
+
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 34%,
+      #000 44%,
+      #000 56%,
+      transparent 66%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 34%,
+      #000 44%,
+      #000 56%,
+      transparent 66%,
+      transparent 100%
+    );
+    -webkit-mask-size: 100% 260%;
+    mask-size: 100% 260%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    animation: wandern var(--dauer) ease-in-out infinite alternate;
+  }
+
+  @keyframes wandern {
+    from {
+      -webkit-mask-position: 0 -80%;
+      mask-position: 0 -80%;
+    }
+    to {
+      -webkit-mask-position: 0 180%;
+      mask-position: 0 180%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ebene-glut {
+      animation: none;
+      -webkit-mask-position: 0 50%;
+      mask-position: 0 50%;
+      opacity: 0.5;
+    }
+  }
+</style>
