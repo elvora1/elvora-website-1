@@ -3,7 +3,8 @@ import Base from '~/layouts/Base.astro';
 import Section from '~/components/Section.astro';
 import Button from '~/components/Button.astro';
 import ReviewBadge from '~/components/ReviewBadge.astro';
-import BrandGlow from '~/components/BrandGlow.astro';
+import Texture from '~/components/Texture.astro';
+import mark from '~/assets/mark.svg';
 import CtaBand from '~/components/CtaBand.astro';
 import { cta, services, serviceArea, address, reviews } from '~/config/site';
 
@@ -21,34 +22,47 @@ const trustMarkers = [
 
 <Base title={title} description={description}>
   {/* ===================== Erster Sichtbereich ===================== */}
-  <section class="relative overflow-hidden bg-surface">
-    {/* Markenschleier statt Bild: die Logofarben als weiche Flaechen.
-        Kostet null Ladezeit und kann nie unecht wirken. */}
-    <BrandGlow />
+  <section class="relative isolate overflow-hidden border-b border-border bg-surface">
+    <Texture variant="raster" />
 
-    <div class="container-content relative z-10 py-16 md:py-24">
-      <div class="mx-auto max-w-3xl text-center">
-        <p class="text-sm font-medium text-accent">
+    {/* Bildmarke schneidet von rechts an. Ein Ausschnitt statt eines brav
+        zentrierten Logos: die Marke haelt die Flaeche, ohne dem Text Platz
+        wegzunehmen. Bewusst nur die Marke, kein Schriftzug: ein
+        angeschnittenes Wort waere als Fragment lesbar. */}
+    <img
+      src={mark.src}
+      alt=""
+      aria-hidden="true"
+      class="pointer-events-none absolute -right-40 top-1/2 z-0 hidden w-[38rem] -translate-y-1/2 rotate-[8deg] opacity-[0.09] lg:block xl:-right-28 xl:w-[44rem]"
+    />
+
+    <div class="container-content relative z-10 py-20 md:py-28 lg:py-32">
+      <div class="max-w-4xl">
+        <p
+          class="font-display text-[0.8125rem] font-semibold uppercase tracking-[0.16em] text-accent"
+        >
           Digitalagentur aus {address.city} · Schwerpunkt SHK
         </p>
 
-        <h1 class="mt-5 text-4xl md:text-6xl">
+        <h1 class="mt-7 text-[2.75rem] leading-[1.02] sm:text-6xl lg:text-[4.75rem]">
           Ihr Betrieb wird gefunden, angerufen und beauftragt
         </h1>
 
-        <p class="mx-auto mt-6 max-w-2xl text-lg text-ink-muted">
+        <p class="mt-8 max-w-2xl text-lg text-ink-muted md:text-xl">
           Die meisten Handwerksbetriebe verlieren Aufträge nicht an die Konkurrenz,
           sondern an verpasste Anrufe und eine Website, die niemand findet. Ich
           bringe beides in Ordnung und halte Ihnen den Rücken frei.
         </p>
 
         {/* Genau EIN hervorgehobener CTA. Der zweite bleibt bewusst leise. */}
-        <div class="mt-9 flex flex-col items-center gap-3">
-          <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
-            {cta.primary.label}
-          </Button>
-          <p class="text-sm text-ink-faint">{cta.primary.note}</p>
-          <Button href={cta.secondary.href} variant="quiet" class="mt-1">
+        <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div class="flex flex-col items-start gap-2 max-sm:w-full">
+            <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+              {cta.primary.label}
+            </Button>
+            <p class="text-sm text-ink-faint">{cta.primary.note}</p>
+          </div>
+          <Button href={cta.secondary.href} variant="quiet">
             {cta.secondary.label}
           </Button>
         </div>
@@ -57,7 +71,7 @@ const trustMarkers = [
             solange keine echten Bewertungen hinterlegt sind. */}
         {
           reviews.enabled && reviews.count > 0 && (
-            <div class="mt-10 flex justify-center">
+            <div class="mt-12">
               <ReviewBadge />
             </div>
           )

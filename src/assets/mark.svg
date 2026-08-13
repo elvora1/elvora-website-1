@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140.26 140.31" role="presentation">
+  <!-- Nur die Bildmarke ohne Schriftzug. Wird als grosse, angeschnittene
+       Flaeche im Hintergrund verwendet; ein angeschnittener Schriftzug
+       waere dort als Wortfragment lesbar und wirkte wie ein Versehen. -->
+  <defs>
+    <linearGradient id="mark-a" x1="48.7" y1="8.08" x2="85.52" y2="73.15" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5c67db"/>
+      <stop offset="1" stop-color="#7944d0"/>
+    </linearGradient>
+    <linearGradient id="mark-b" x1="91.59" y1="36.08" x2="86.01" y2="128.67" gradientUnits="userSpaceOnUse">
+      <stop offset=".31" stop-color="#be34ad"/>
+      <stop offset="1" stop-color="#e42b79"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#mark-a)" d="M138.4,0L18.24,117.31C6.91,104.86,0,88.3,0,70.14,0,31.4,31.4,0,70.13,0h68.27Z"/>
+  <path fill="url(#mark-b)" d="M140.26,26.17v43.97c-1.52,40.91-32.33,71.45-70.14,70.13-12.74-.44-24.7-3.41-35.01-9.36L140.26,26.17Z"/>
+</svg>

@@ -1,0 +1,113 @@
+---
+/**
+ * Abstrakte Hintergrundtextur.
+ *
+ * Bewusst harte Geometrie statt weichgezeichneter Farbflecken: Raster,
+ * Rasterpunkte, Schraffur, Korn. Anleihe beim technischen Zeichnen und beim
+ * Druck, nicht beim Verlaufsposter.
+ *
+ * Alles ist CSS und ein winziges SVG. Keine Bilddatei, kein Ladevorgang.
+ *
+ * EINBINDUNG: Der umgebende Abschnitt braucht `relative isolate`, der Inhalt
+ * darüber `relative z-10`. Ein negativer z-Wert läge hinter dem Hintergrund
+ * des Abschnitts und wäre unsichtbar.
+ */
+interface Props {
+  /**
+   * `raster`  Millimeterpapier plus Rasterpunkte, für helle Flächen.
+   * `schraffur`  Diagonale Schraffur, für den dunklen Abschluss.
+   * `punkte`  Nur Rasterpunkte, als ruhige Variante.
+   */
+  variant?: 'raster' | 'schraffur' | 'punkte';
+  class?: string;
+}
+
+const { variant = 'raster', class: className = '' }: Props = Astro.props;
+---
+
+<div
+  class={`textur textur-${variant} pointer-events-none absolute inset-0 z-0 overflow-hidden ${className}`}
+  aria-hidden="true"
+>
+  <span class="lage lage-grund"></span>
+  <span class="lage lage-punkte"></span>
+  <span class="lage lage-korn"></span>
+</div>
+
+<style>
+  .textur {
+    --raster: 32px;
+    --punktabstand: 14px;
+  }
+
+  .lage {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  /* --- Millimeterpapier: feines Liniennetz, kaum sichtbar ---------------- */
+  .textur-raster .lage-grund {
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, var(--color-ink) 7%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--color-ink) 7%, transparent) 1px, transparent 1px);
+    background-size: var(--raster) var(--raster);
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 78%);
+    mask-image: linear-gradient(to bottom, #000, transparent 78%);
+  }
+
+  /* --- Rasterpunkte: Verlauf ueber die Dichte, nicht ueber Weichzeichnung.
+         So entsteht Tiefe mit harten Kanten, wie im Siebdruck. ------------- */
+  .textur-raster .lage-punkte,
+  .textur-punkte .lage-punkte {
+    background-image: radial-gradient(
+      circle at center,
+      var(--color-accent) 1.4px,
+      transparent 1.5px
+    );
+    background-size: var(--punktabstand) var(--punktabstand);
+    opacity: 0.5;
+    -webkit-mask-image: radial-gradient(120% 90% at 88% -10%, #000 0%, transparent 62%);
+    mask-image: radial-gradient(120% 90% at 88% -10%, #000 0%, transparent 62%);
+  }
+
+  /* --- Schraffur fuer dunkle Flaechen ------------------------------------ */
+  .textur-schraffur .lage-grund {
+    background-image: repeating-linear-gradient(
+      -38deg,
+      color-mix(in srgb, var(--color-brand-mid) 26%, transparent) 0 1px,
+      transparent 1px 9px
+    );
+    -webkit-mask-image: radial-gradient(90% 120% at 12% 0%, #000 0%, transparent 70%);
+    mask-image: radial-gradient(90% 120% at 12% 0%, #000 0%, transparent 70%);
+  }
+
+  .textur-schraffur .lage-punkte {
+    background-image: repeating-linear-gradient(
+      38deg,
+      color-mix(in srgb, var(--color-brand-end) 22%, transparent) 0 1px,
+      transparent 1px 14px
+    );
+    -webkit-mask-image: radial-gradient(80% 120% at 92% 100%, #000 0%, transparent 68%);
+    mask-image: radial-gradient(80% 120% at 92% 100%, #000 0%, transparent 68%);
+  }
+
+  /* --- Korn: gibt der Flaeche Griff, nimmt ihr das Sterile --------------- */
+  .lage-korn {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    opacity: 0.16;
+    mix-blend-mode: multiply;
+  }
+
+  .textur-schraffur .lage-korn {
+    opacity: 0.3;
+    mix-blend-mode: overlay;
+  }
+
+  @media (width < 48rem) {
+    .textur {
+      --raster: 24px;
+      --punktabstand: 12px;
+    }
+  }
+</style>

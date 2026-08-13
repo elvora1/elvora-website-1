@@ -21,10 +21,15 @@ export default defineConfig({
 
   // Schriften werden beim Build heruntergeladen und selbst ausgeliefert.
   // Es entsteht keine Verbindung zu Google Fonts o. ae.
+  //
+  // Archivo als Display: breit laufende, industrielle Grotesk. Nimmt die
+  // Proportionen des Logo-Schriftzugs auf, statt sie zu ignorieren.
+  // IBM Plex Sans fuer Fliesstext: technisch, ruhig, sehr gut lesbar im
+  // Deutschen. Bewusst nicht Inter, das greift jeder als Standard.
   fonts: [
     {
       provider: fontProviders.fontsource(),
-      name: 'Inter',
+      name: 'IBM Plex Sans',
       cssVariable: '--font-body',
       weights: [400, 500, 600],
       styles: ['normal'],
@@ -34,9 +39,9 @@ export default defineConfig({
     },
     {
       provider: fontProviders.fontsource(),
-      name: 'Inter Tight',
+      name: 'Archivo',
       cssVariable: '--font-heading',
-      weights: [500, 600, 700],
+      weights: [600, 700],
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['system-ui', 'sans-serif'],

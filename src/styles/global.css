@@ -83,8 +83,10 @@
     background-color: var(--color-surface);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: 1.0625rem;
-    line-height: 1.65;
+    /* IBM Plex Sans laeuft etwas kleiner als Inter, deshalb einen Tick
+       groesser gesetzt. */
+    font-size: 1.09375rem;
+    line-height: 1.62;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -95,10 +97,19 @@
   h4 {
     font-family: var(--font-display);
     color: var(--color-ink);
+    font-weight: 700;
+    /* Archivo ist breit gebaut. Eng gestellt wirkt sie kompakt und
+       plakativ statt luftig, das traegt die Ueberschriften. */
+    letter-spacing: -0.035em;
+    line-height: 1.06;
+    text-wrap: balance;
+  }
+
+  h3,
+  h4 {
     font-weight: 600;
     letter-spacing: -0.02em;
-    line-height: 1.15;
-    text-wrap: balance;
+    line-height: 1.2;
   }
 
   p {
