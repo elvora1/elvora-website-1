@@ -1,5 +1,6 @@
 ---
 import Button from './Button.astro';
+import GradientField from './GradientField.astro';
 import Texture from './Texture.astro';
 import { cta, contactLinks } from '~/config/site';
 
@@ -19,26 +20,29 @@ const {
 ---
 
 <section class="relative isolate overflow-hidden bg-surface-ink">
+  {/* Reihenfolge zaehlt: das Verlaufsfeld traegt die Tiefe, Schraffur und
+      Korn liegen darueber und nehmen ihm das Glatte. */}
+  <GradientField />
   <Texture variant="schraffur" />
   <div class="container-content relative z-10 py-16 md:py-20">
     <div class="mx-auto max-w-2xl text-center">
       <h2 class="text-3xl text-white md:text-4xl">{heading}</h2>
-      <p class="mt-4 text-white/70">{text}</p>
+      <p class="mt-4 text-white/85">{text}</p>
 
       <div class="mt-8 flex flex-col items-center gap-4">
         <Button href={cta.primary.href} size="lg">{cta.primary.label}</Button>
-        <p class="text-sm text-white/50">{cta.primary.note}</p>
+        <p class="text-sm text-white/70">{cta.primary.note}</p>
       </div>
 
       {/* Sekundaerer Weg, bewusst untergeordnet und zugleich eine
           Vorfuehrung: wer schreibt, erlebt die KI-Assistenz selbst. */}
-      <p class="mt-6 text-sm text-white/50">
+      <p class="mt-6 text-sm text-white/70">
         Lieber schreiben?{' '}
         <a
           href={contactLinks.whatsapp}
           target="_blank"
           rel="noopener noreferrer"
-          class="text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+          class="text-white underline underline-offset-4 transition-colors hover:text-white"
         >
           Auf WhatsApp antwortet sofort meine KI-Assistenz
         </a>. Sie sehen sie also gleich in Aktion.

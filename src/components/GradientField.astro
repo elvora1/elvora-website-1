@@ -1,0 +1,63 @@
+---
+/**
+ * Tiefes Verlaufsfeld für dunkle Flächen.
+ *
+ * Bauplan übernommen aus einem Gradient-Builder-Export ("Violet Nocturne"),
+ * portiert von React nach Astro und auf die Elvora-Farben umgestellt.
+ * Von der Vorlage bleiben Aufbau und Technik: vier weich auslaufende
+ * Radialverläufe auf einer Grundfarbe, ein leichter Weichzeichner darüber,
+ * Maßeinheiten in cqmin, damit die Verläufe mit der Fläche mitwachsen statt
+ * am Rand abzureißen.
+ *
+ * Warum React nicht nötig war: Die Vorlage ist eine Komponente ohne Zustand,
+ * ohne Ereignisse und ohne Eigenschaften außer einer Klasse. Sie erzeugt ein
+ * einziges div mit Inline-Stilen. Dafür ein Framework samt Laufzeit zu laden
+ * wäre reine Verschwendung.
+ *
+ * NUR für dunkle Flächen. Auf Weiß wirkt derselbe Effekt pastellig und
+ * beliebig; auf Anthrazit wirkt er tief. Text steht nie direkt darauf ohne
+ * geprüften Kontrast.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' }: Props = Astro.props;
+---
+
+<div class={`verlaufsfeld ${className}`} aria-hidden="true">
+  <div class="flaeche"></div>
+</div>
+
+<style>
+  .verlaufsfeld {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    /* Bezugsgroesse fuer die cqmin-Einheiten weiter unten. */
+    container-type: size;
+  }
+
+  .flaeche {
+    position: absolute;
+    /* Ueber den Rand hinaus, damit der Weichzeichner keine helle Kante
+       am Abschnittsrand stehen laesst. */
+    inset: -0.8cqmin;
+    filter: blur(0.4cqmin);
+
+    /* Grundton: sehr dunkles Indigo, aus dem Anfang des Markenverlaufs
+       abgeleitet statt neutral schwarz. */
+    background-color: #171334;
+
+    /* Reihenfolge wie in der Vorlage: der dunkelste Verlauf zuerst, damit
+       er die helleren nach hinten drueckt. Farben durchgaengig aus dem
+       Logo: Indigo, Violett, Magenta, Orange als warmer Ausklang. */
+    background-image:
+      radial-gradient(circle at 65.49% 45.47%, rgb(11 12 32 / 1) 0%, rgb(11 12 32 / 0) 46.7%),
+      radial-gradient(circle at 24.26% 76.62%, rgb(45 48 122 / 1) 0%, rgb(45 48 122 / 0) 58.25%),
+      radial-gradient(circle at 52.54% 18.97%, rgb(92 52 145 / 1) 0%, rgb(92 52 145 / 0) 70.15%),
+      radial-gradient(circle at 84.65% 82.42%, rgb(166 48 130 / 1) 0%, rgb(166 48 130 / 0) 74%),
+      radial-gradient(circle at 96% 8%, rgb(196 71 47 / 0.85) 0%, rgb(196 71 47 / 0) 42%);
+  }
+</style>
