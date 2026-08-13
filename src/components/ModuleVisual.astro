@@ -24,15 +24,15 @@ type Chat = { from: 'them' | 'us'; text: string };
 
 const chats: Record<string, Chat[]> = {
   'whatsapp-assistenz': [
-    { from: 'them', text: 'Guten Tag, unsere Therme macht komische Geräusche. Was kostet eine Wartung?' },
-    { from: 'us', text: 'Guten Tag! Eine Wartung dauert bei uns etwa eine Stunde. Darf ich kurz fragen, welches Modell bei Ihnen verbaut ist?' },
-    { from: 'them', text: 'Vaillant, Baujahr 2016 glaube ich' },
+    { from: 'them', text: 'Guten Tag, ich hätte gern einen Termin. Was kostet das ungefähr?' },
+    { from: 'us', text: 'Guten Tag! Das hängt vom Umfang ab. Darf ich kurz fragen, worum es genau geht?' },
+    { from: 'them', text: 'Eine Beratung, am liebsten noch diese Woche' },
     { from: 'us', text: 'Danke. Ich gebe das an Herrn Meyer weiter, er meldet sich heute noch mit einem Termin bei Ihnen.' },
   ],
   'anruf-retter': [
     { from: 'us', text: 'Guten Tag, Sie haben uns gerade angerufen und wir konnten leider nicht abnehmen. Worum geht es? Ich helfe direkt hier weiter.' },
-    { from: 'them', text: 'Heizung ausgefallen, kein Warmwasser' },
-    { from: 'us', text: 'Verstanden, das ist dringend. Wie lautet Ihre Adresse? Ich melde den Notfall sofort weiter.' },
+    { from: 'them', text: 'Ich brauche kurzfristig einen Termin' },
+    { from: 'us', text: 'Verstanden, das ist dringend. Wie erreiche ich Sie am besten? Ich gebe das sofort weiter.' },
   ],
   'terminbuchung': [
     { from: 'them', text: 'Passt bei Ihnen nächste Woche was?' },
@@ -46,7 +46,7 @@ const chats: Record<string, Chat[]> = {
 const callNote = [
   { label: 'Anrufer', value: 'Frau Kern' },
   { label: 'Rufnummer', value: '0201 ••• ••••' },
-  { label: 'Anliegen', value: 'Bad-Sanierung, möchte Angebot' },
+  { label: 'Anliegen', value: 'Erstberatung, möchte Angebot' },
   { label: 'Rückruf', value: 'ab 16 Uhr erreichbar' },
 ];
 
@@ -60,7 +60,7 @@ const stats = [
 
 /** Bewerbungs-Vorqualifizierung. */
 const applicant = [
-  { text: 'Gesellenbrief SHK', ok: true },
+  { text: 'Abgeschlossene Ausbildung', ok: true },
   { text: 'Führerschein Klasse B', ok: true },
   { text: 'Berufserfahrung 4 Jahre', ok: true },
   { text: 'Verfügbar ab sofort', ok: false },
@@ -154,7 +154,7 @@ const chat = chats[slug];
         slug === 'bewerber-assistenz' && (
           <div>
             <p class="text-[0.8125rem] font-medium text-ink">
-              Bewerbung · Anlagenmechaniker/in
+              Bewerbung · offene Stelle
             </p>
             <ul class="mt-4 flex flex-col gap-2.5">
               {applicant.map((row) => (

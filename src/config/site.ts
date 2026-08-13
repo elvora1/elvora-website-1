@@ -11,7 +11,7 @@ export const site = {
   domain: 'elvora.me',
   url: 'https://elvora.me',
   /** Kurzbeschreibung, u. a. für OpenGraph-Fallback und JSON-LD. */
-  tagline: 'Digitalagentur für Handwerks- und Dienstleistungsbetriebe in Essen',
+  tagline: 'Digitalagentur für Betriebe und Selbstständige in Essen',
 } as const;
 
 /** Die Person hinter Elvora. */
@@ -187,7 +187,7 @@ export const services = [
     label: 'SEO',
     benefit: 'Gefunden werden, wenn im Umkreis nach Ihnen gesucht wird',
     teaser:
-      'Wer heute eine Heizung braucht, sucht bei Google und ruft einen der ersten Treffer an. Genau dort gehören Sie hin.',
+      'Wer heute etwas sucht, tippt es ins Handy und ruft einen der ersten Treffer an. Genau dort gehören Sie hin.',
     href: '/leistungen/seo/',
   },
   {
@@ -196,7 +196,7 @@ export const services = [
     label: 'Branding & Print',
     benefit: 'Ein Auftritt, der nach Fachbetrieb aussieht, nicht nach Nebenerwerb',
     teaser:
-      'Vom Fahrzeug über den Briefkopf bis zum Angebot: ein einheitliches Bild, das Ihre Preise rechtfertigt.',
+      'Vom Logo über den Briefkopf bis zum Angebot: ein einheitliches Bild, das Ihre Preise rechtfertigt.',
     href: '/leistungen/branding/',
   },
   {
@@ -205,7 +205,7 @@ export const services = [
     label: 'KI-Prozessautomatisierung',
     benefit: 'Kein verpasster Anruf, kein Angebot, das liegen bleibt',
     teaser:
-      'Anfragen werden erfasst, beantwortet und nachgefasst, während Sie auf der Baustelle stehen.',
+      'Anfragen werden erfasst, beantwortet und nachgefasst, während Sie bei Ihren Kunden sind.',
     href: '/leistungen/automatisierung/',
   },
 ] as const;
@@ -239,7 +239,7 @@ export const automationModules: AutomationModule[] = [
   {
     slug: 'whatsapp-assistenz',
     name: 'WhatsApp-Assistenz',
-    benefit: 'Anfragen werden beantwortet, auch wenn Sie auf dem Dach stehen',
+    benefit: 'Anfragen werden beantwortet, auch wenn Sie gerade keine Hand frei haben',
     text: 'Die KI beantwortet Anfragen auf Ihrer Geschäftsnummer und übergibt an Sie, sobald es persönlich wird.',
     screenshotAlt:
       'WhatsApp-Verlauf: die Assistenz beantwortet eine Kundenanfrage und übergibt anschließend an den Betrieb',

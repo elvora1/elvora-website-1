@@ -1,0 +1,188 @@
+---
+import Texture from './Texture.astro';
+
+/**
+ * Eine Vollbildfläche der Story.
+ *
+ * Aufbau nach dem Vorbild: Kennzeichnung oben, Trennlinie, sehr große
+ * Überschrift, Trennlinie, Inhalt, und was unten stehen soll, wird nach
+ * unten gedrückt. Die Flächen bleiben beim Scrollen stehen, die nächste
+ * kippt von unten herein.
+ *
+ * Die Bewegung läuft über `position: sticky` und `animation-timeline: view()`,
+ * nicht über GSAP: kein JavaScript, kein Nachrechnen bei jedem Scrollschritt.
+ */
+interface Props {
+  /** Laufende Nummer, wird zweistellig ausgegeben. */
+  index: number;
+  /** Kennzeichnung neben der Nummer. */
+  label: string;
+  /** Die große Überschrift. */
+  heading: string;
+  /** Hintergrundfarbe der Fläche. */
+  color: string;
+  /** Schriftfarbe. Standard ist Weiß. */
+  ink?: string;
+  /** Überschriftsebene. Genau eine Fläche trägt die h1. */
+  as?: 'h1' | 'h2';
+  /** Feinere Schraffur auf hellen Flächen. */
+  texture?: 'schraffur' | 'punkte' | 'keine';
+}
+
+const {
+  index,
+  label,
+  heading,
+  color,
+  ink = '#ffffff',
+  as: Tag = 'h2',
+  texture = 'schraffur',
+}: Props = Astro.props;
+
+const nummer = String(index).padStart(2, '0');
+---
+
+<section
+  class="platte"
+  style={`--grund:${color};--tinte:${ink};z-index:${index}`}
+  aria-label={label}
+>
+  <div class="platte-inner">
+    {texture !== 'keine' && <Texture variant={texture} />}
+
+    <div class="platte-kopf">
+      <p class="kennung">
+        {nummer} <span aria-hidden="true">—</span> {label}
+      </p>
+
+      <hr />
+
+      <Tag class="schlag">{heading}</Tag>
+
+      <hr />
+    </div>
+
+    <div class="platte-koerper">
+      <slot />
+    </div>
+
+    <div class="platte-fuss">
+      <slot name="fuss" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .platte {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: var(--grund);
+    color: var(--tinte);
+  }
+
+  .platte-inner {
+    position: relative;
+    display: flex;
+    min-height: 100svh;
+    width: 100%;
+    flex-direction: column;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+    padding: clamp(4.5rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2.5rem, 4vw, 4rem);
+    transform-origin: bottom left;
+    will-change: transform;
+  }
+
+  .platte-kopf,
+  .platte-koerper,
+  .platte-fuss {
+    position: relative;
+    z-index: 10;
+  }
+
+  .platte-kopf {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 2vw, 1.75rem);
+  }
+
+  .kennung {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(0.75rem, 1vw, 0.875rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .platte hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.32;
+  }
+
+  /* Bewusst keine Grossbuchstaben: im Deutschen laufen die Woerter zu lang
+     und werden in Versalien schwerer lesbar. Die Wirkung kommt hier aus
+     Groesse und enger Stellung. */
+  .schlag {
+    margin: 0;
+    color: var(--tinte);
+    font-size: clamp(2.5rem, 8vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+
+  .platte-koerper {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  /* Drueckt den Abschluss ans untere Ende der Flaeche. */
+  .platte-fuss {
+    margin-top: auto;
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .platte-fuss:empty {
+    display: none;
+  }
+
+  /* --- Der Stapel, erst ab Tablet -------------------------------------
+     Bewusst einfach gehalten: die Flaeche selbst klebt oben und ist genau
+     bildschirmhoch. Ein Versuch mit ueberhohem Fluss und klebendem Inhalt
+     brachte laengere Verweildauer, hinterliess aber leeren Raum unter der
+     Flaeche. Kurz und sauber schlaegt lang und kaputt. */
+  @media (width >= 48rem) and (prefers-reduced-motion: no-preference) {
+    .platte {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+    }
+
+    .platte-inner {
+      height: 100%;
+      min-height: 0;
+    }
+
+    @supports (animation-timeline: view()) {
+      .platte:not(:first-of-type) .platte-inner {
+        animation: hereinkippen linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 92%;
+      }
+    }
+  }
+
+  @keyframes hereinkippen {
+    from {
+      transform: rotate(20deg);
+    }
+    to {
+      transform: rotate(0deg);
+    }
+  }
+</style>
