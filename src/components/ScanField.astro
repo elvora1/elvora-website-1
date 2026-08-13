@@ -34,6 +34,7 @@ const {
   aria-hidden="true"
 >
   <span class="ebene ebene-raster"></span>
+  <span class="ebene ebene-glut ebene-schein"></span>
   <span class="ebene ebene-glut"></span>
 </div>
 
@@ -62,7 +63,14 @@ const {
       transparent calc(var(--punkt) + 0.5px)
     );
     background-size: var(--abstand) var(--abstand);
-    opacity: 0.14;
+    opacity: 0.16;
+  }
+
+  /* Weicher Schein unter dem Band: gibt der Bewegung Volumen, ohne dass
+     man einzelne Punkte erkennt. Liegt unter der scharfen Glutebene. */
+  .ebene-schein {
+    filter: blur(9px);
+    opacity: 0.5;
   }
 
   /* Dieselben Punkte in Markenfarbe, groesser, aber nur dort sichtbar, wo
@@ -71,28 +79,30 @@ const {
   .ebene-glut {
     background-image: radial-gradient(
       circle at center,
-      var(--glut) calc(var(--punkt) + 1.1px),
-      transparent calc(var(--punkt) + 1.8px)
+      var(--glut) calc(var(--punkt) + 1.6px),
+      transparent calc(var(--punkt) + 2.3px)
     );
     background-size: var(--abstand) var(--abstand);
-    opacity: 0.85;
+    opacity: 0.95;
 
+    /* Schraege statt waagerecht: ein waagerechtes Band sieht aus wie ein
+       Bildfehler, ein schraeges wie Absicht. */
     -webkit-mask-image: linear-gradient(
-      to bottom,
+      163deg,
       transparent 0%,
-      transparent 34%,
-      #000 44%,
-      #000 56%,
-      transparent 66%,
+      transparent 28%,
+      #000 41%,
+      #000 59%,
+      transparent 72%,
       transparent 100%
     );
     mask-image: linear-gradient(
-      to bottom,
+      163deg,
       transparent 0%,
-      transparent 34%,
-      #000 44%,
-      #000 56%,
-      transparent 66%,
+      transparent 28%,
+      #000 41%,
+      #000 59%,
+      transparent 72%,
       transparent 100%
     );
     -webkit-mask-size: 100% 260%;
