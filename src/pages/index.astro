@@ -4,9 +4,10 @@ import Section from '~/components/Section.astro';
 import Button from '~/components/Button.astro';
 import ReviewBadge from '~/components/ReviewBadge.astro';
 import Texture from '~/components/Texture.astro';
+import StackPanels from '~/components/StackPanels.astro';
 import mark from '~/assets/mark.svg';
 import CtaBand from '~/components/CtaBand.astro';
-import { cta, services, serviceArea, address, reviews } from '~/config/site';
+import { cta, serviceArea, address, reviews } from '~/config/site';
 
 const title = 'Elvora: Mehr Anfragen für Handwerksbetriebe in Essen';
 const description =
@@ -110,7 +111,7 @@ const trustMarkers = [
   </div>
 
   {/* ===================== Leistungen ===================== */}
-  <Section>
+  <Section space="md">
     <div class="max-w-2xl">
       <h2 class="text-3xl md:text-4xl">Was sich für Sie dadurch ändert</h2>
       <p class="mt-4 text-ink-muted">
@@ -118,39 +119,11 @@ const trustMarkers = [
         angehen. Meistens beginnen wir dort, wo gerade am meisten liegen bleibt.
       </p>
     </div>
-
-    <ul class="mt-12 grid gap-5 md:grid-cols-2">
-      {
-        services.map((service) => (
-          <li>
-            <a
-              href={service.href}
-              class="group flex h-full flex-col rounded-card border border-border bg-surface p-7 transition-all hover:border-border-strong hover:shadow-card"
-            >
-              <span class="text-sm font-medium text-accent">{service.label}</span>
-              <h3 class="mt-2.5 text-xl">{service.benefit}</h3>
-              <p class="mt-3 text-[0.9375rem] text-ink-muted">{service.teaser}</p>
-              <span class="mt-5 inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-ink">
-                Mehr dazu
-                <svg
-                  viewBox="0 0 20 20"
-                  class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M4 10h11M11 6l4 4-4 4" />
-                </svg>
-              </span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
   </Section>
+
+  {/* Gestapelte Vollbildflaechen. Traegt die vier Leistungen deutlich
+      kraeftiger als eine Kachelreihe. */}
+  <StackPanels />
 
   <CtaBand />
 </Base>
