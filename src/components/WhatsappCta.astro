@@ -1,6 +1,25 @@
 ---
 import Button from './Button.astro';
+import Geraet from './Geraet.astro';
+import Tippend from './Tippend.astro';
 import { contactLinks } from '~/config/site';
+
+/**
+ * Der Empfang, den man dort tatsächlich bekommt. Die letzte Zeile schreibt
+ * sich selbst, damit der Block die Assistenz zeigt statt sie zu behaupten.
+ */
+const empfang = [
+  { von: 'sie' as const, text: 'Hallo, ich hätte Interesse an einer Website.' },
+  {
+    von: 'wir' as const,
+    text: 'Hallo! Ich bin die digitale Assistenz von Elvora. Worum geht es genau?',
+  },
+  { von: 'sie' as const, text: 'Wir sind ein Betrieb mit acht Leuten.' },
+  {
+    von: 'wir' as const,
+    text: 'Danke, ich gebe das an Luan weiter. Er meldet sich heute noch bei Ihnen.',
+  },
+];
 
 /**
  * WhatsApp als bevorzugter Kontaktweg.
@@ -44,6 +63,20 @@ const { variant = 'panel', class: className = '' }: Props = Astro.props;
         auch laufen.
       </p>
 
+      {/* Die Vorfuehrung selbst. Der Rahmen sagt: das laeuft auf dem
+          Telefon. Die Beschriftung sagt, dass es nachgebaut ist. */}
+      <div class="wa-vorfuehrung">
+        <Geraet art="handy" bildunterschrift="Schematische Darstellung">
+          <ul class="wa-chat">
+            {empfang.map((n, i) => (
+              <li class:list={['wa-blase', n.von === 'wir' && 'wa-blase-wir']}>
+                {i === empfang.length - 1 ? <Tippend text={n.text} dauer={2.4} /> : n.text}
+              </li>
+            ))}
+          </ul>
+        </Geraet>
+      </div>
+
       <div class="mt-7 flex flex-col items-start gap-2">
         <Button
           href={contactLinks.whatsapp}
@@ -74,3 +107,37 @@ const { variant = 'panel', class: className = '' }: Props = Astro.props;
     </p>
   )
 }
+
+<style>
+  .wa-vorfuehrung {
+    margin-top: 1.75rem;
+    max-width: 17rem;
+  }
+
+  .wa-chat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 3.25rem 0.75rem 1rem;
+    list-style: none;
+  }
+
+  .wa-blase {
+    max-width: 88%;
+    align-self: flex-start;
+    border-radius: 0.875rem 0.875rem 0.875rem 0.25rem;
+    background: var(--color-surface-subtle);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+
+  .wa-blase-wir {
+    align-self: flex-end;
+    border-radius: 0.875rem 0.875rem 0.25rem;
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+</style>

@@ -5,6 +5,7 @@ import StoryPanel from '~/components/StoryPanel.astro';
 import Button from '~/components/Button.astro';
 import Portrait from '~/components/Portrait.astro';
 import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
+import Kanalkreise from '~/components/Kanalkreise.astro';
 import {
   cta,
   services,
@@ -54,6 +55,14 @@ const eingang = [
     zeit: '11:37',
     text: 'Anfrage über die Website. Bereits beantwortet, Rückruf für 16 Uhr vereinbart.',
   },
+];
+
+/** Die vier Wege, auf denen man hier ankommt. */
+const wege = [
+  { label: 'WhatsApp', href: contactLinks.whatsapp, symbol: 'chat' as const, extern: true },
+  { label: 'Telefon', href: contactLinks.tel, symbol: 'telefon' as const },
+  { label: 'E-Mail', href: contactLinks.mail, symbol: 'brief' as const },
+  { label: 'Termin', href: cta.primary.href, symbol: 'kalender' as const },
 ];
 
 /** Belegzeile am Fuß des Auftakts, bis Google-Bewertungen vorliegen. */
@@ -198,6 +207,11 @@ const belege = [
         <p class="notiz">{cta.primary.note}</p>
       </div>
 
+      <div class="wege">
+        <p class="wege-titel kennung">Alle Wege zu mir</p>
+        <Kanalkreise kanaele={wege} tone="inverse" />
+      </div>
+
       <p class="notiz">
         Lieber schreiben?{' '}
         <a
@@ -240,6 +254,17 @@ const belege = [
     max-width: 46ch;
     font-size: 0.9375rem;
     opacity: 0.72;
+  }
+
+  .wege {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .wege-titel {
+    margin: 0;
+    opacity: 0.6;
   }
 
   .unterstrichen {

@@ -2,6 +2,7 @@
 import Service from '~/layouts/Service.astro';
 import Band from '~/components/Band.astro';
 import Liste from '~/components/Liste.astro';
+import Sterne from '~/components/Sterne.astro';
 import CheckList from '~/components/CheckList.astro';
 import { serviceArea } from '~/config/site';
 import type { FaqItem } from '~/types';
@@ -90,6 +91,16 @@ const steps = [
       </div>
 
       <div class="lage-liste">
+        {/* Der Hebel, den fast jeder Betrieb liegen laesst. Die Sterne
+            fuellen sich beim Erscheinen nacheinander auf. */}
+        <div class="lage-sterne">
+          <Sterne wert={4.8} groesse={1.75} />
+          <p class="lage-sterne-text">
+            <strong>4,8</strong> ist der Schnitt, ab dem angerufen wird. Darunter
+            wird verglichen.
+          </p>
+        </div>
+
         <h3 class="lage-titel">Worauf Google im lokalen Umfeld schaut</h3>
         <Liste eintraege={lagepunkte} anordnung="reihen" ziffern={false} />
       </div>
@@ -139,6 +150,28 @@ const steps = [
     margin: 0;
     line-height: 1.65;
     opacity: 0.9;
+  }
+
+  .lage-sterne {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2rem);
+    border-bottom: 1px solid rgb(255 255 255 / 0.18);
+  }
+
+  .lage-sterne-text {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    opacity: 0.82;
+  }
+
+  /* Bewusst NICHT in Schreibmaschinenschrift: dort bekommt das Komma eine
+     eigene Zelle und aus "4,8" wird "4 , 8". */
+  .lage-sterne-text strong {
+    font-weight: 600;
   }
 
   .lage-titel {
