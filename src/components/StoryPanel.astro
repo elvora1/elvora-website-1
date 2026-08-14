@@ -1,5 +1,6 @@
 ---
 import Texture from './Texture.astro';
+import Scramble from './Scramble.astro';
 
 /**
  * Eine Vollbildfläche der Story.
@@ -52,7 +53,7 @@ const nummer = String(index).padStart(2, '0');
 
     <div class="platte-kopf">
       <p class="platte-kennung kennung">
-        {nummer} <span aria-hidden="true">—</span> {label}
+        <Scramble text={`${nummer} — ${label}`} />
       </p>
 
       {/* Genau EINE Linie, direkt unter der Kennung, als Kapitelmarke.

@@ -1,6 +1,7 @@
 ---
 import Texture from './Texture.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
+import Scramble from './Scramble.astro';
 import mark from '~/assets/mark.svg';
 
 /**
@@ -53,7 +54,7 @@ const {
   <div class="container-content tafel-inner">
     {breadcrumbs.length > 0 && <Breadcrumbs trail={breadcrumbs} tone="inverse" />}
 
-    <p class="tafel-eyebrow kennung">{eyebrow}</p>
+    <p class="tafel-eyebrow kennung"><Scramble text={eyebrow} /></p>
 
     {/* Genau eine Linie, unter der Kennung. Eine zweite unter der
         Schlagzeile rahmte die Aussage ein wie ein Formularfeld. */}
