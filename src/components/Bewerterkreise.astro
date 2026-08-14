@@ -1,0 +1,138 @@
+---
+import { reviews } from '~/config/site';
+
+/**
+ * Überlappende Kreise der Bewertenden.
+ *
+ * ABWEICHUNG VON DER VORLAGE: Die Vorlage zeigt Portraitfotos. Das geht hier
+ * aus zwei Gründen nicht.
+ *
+ * Erstens rechtlich: Profilbilder aus Google-Bewertungen sind
+ * personenbezogene Daten Dritter. Sie auf die eigene Website zu übernehmen
+ * braucht eine Einwilligung der abgebildeten Person, und die hat man in
+ * aller Regel nicht.
+ *
+ * Zweitens inhaltlich: erfundene Gesichter aus einem Stock-Verzeichnis wären
+ * auf einer Seite, die Vertrauen aufbauen soll, ein gefälschter Beleg.
+ *
+ * Deshalb Initialen statt Fotos. Sie kommen aus den echten Namen der echten
+ * Bewertungen und behaupten nichts, was nicht stimmt.
+ *
+ * Rendert nichts, solange keine Bewertungen hinterlegt sind.
+ */
+interface Props {
+  /** Wie viele Kreise gezeigt werden, bevor die Zählmarke kommt. */
+  max?: number;
+  /** `inverse` für farbige Flächen. */
+  tone?: 'light' | 'inverse';
+  class?: string;
+}
+
+const { max = 4, tone = 'light', class: className = '' }: Props = Astro.props;
+
+const zeigen = reviews.enabled && reviews.items.length > 0;
+
+const sichtbar = reviews.items.slice(0, max);
+const rest = reviews.count - sichtbar.length;
+
+/** Erste Buchstaben von Vor- und Nachname, sonst nur der erste. */
+const initialen = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((teil) => teil[0]?.toUpperCase() ?? '')
+    .join('');
+---
+
+{
+  zeigen && (
+    <span
+      class={`kreise ${tone === 'inverse' ? 'kreise-invers' : ''} ${className}`}
+      aria-label={`${reviews.count} Bewertungen`}
+    >
+      {sichtbar.map((stimme, i) => (
+        <span class="kreis" style={`--rang:${i}`} aria-hidden="true">
+          {initialen(stimme.author)}
+        </span>
+      ))}
+
+      {rest > 0 && (
+        <span class="kreis kreis-rest" style={`--rang:${sichtbar.length}`} aria-hidden="true">
+          +{rest}
+        </span>
+      )}
+    </span>
+  )
+}
+
+<style>
+  .kreise {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .kreis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 2px solid var(--color-surface);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Ueberlappung. Der erste Kreis bleibt stehen, die weiteren ruecken auf. */
+  .kreis + .kreis {
+    margin-inline-start: -0.625rem;
+  }
+
+  /* Der vordere Kreis liegt oben, sonst verdeckt der letzte den ersten. */
+  .kreis {
+    z-index: calc(10 - var(--rang));
+  }
+
+  .kreis-rest {
+    background: var(--color-ink);
+    color: var(--color-ink-inverse);
+  }
+
+  .kreise-invers .kreis {
+    border-color: rgb(255 255 255 / 0.25);
+    background: rgb(255 255 255 / 0.14);
+    color: #fff;
+  }
+
+  .kreise-invers .kreis-rest {
+    background: #fff;
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .kreis {
+        animation: aufrucken linear both;
+        animation-timeline: view();
+        animation-range: entry calc(15% + var(--rang) * 8%) entry
+          calc(50% + var(--rang) * 8%);
+      }
+    }
+  }
+
+  @keyframes aufrucken {
+    from {
+      opacity: 0;
+      transform: translateX(0.75rem) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

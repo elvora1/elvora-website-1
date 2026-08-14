@@ -1,0 +1,117 @@
+---
+/**
+ * Sternebewertung als ANZEIGE.
+ *
+ * Die Vorlage ist ein Eingabefeld: anklickbar, mit Zustand, mit
+ * Rückmeldefunktion. Auf einer statischen Seite gibt es nichts, wohin eine
+ * abgegebene Bewertung gehen könnte, und ein Bedienelement, das auf Klick
+ * nichts tut, ist schlechter als gar keines. Hier steht deshalb die
+ * Anzeige: was andere bewertet haben, nicht was der Besucher bewerten soll.
+ *
+ * Halbe Sterne sind möglich: der Schnitt bei Google ist selten glatt, und
+ * 4,8 auf fünf gefüllte Sterne aufzurunden wäre eine kleine Lüge an genau
+ * der Stelle, an der es um Glaubwürdigkeit geht.
+ *
+ * Das Auffüllen läuft gestaffelt beim Erscheinen, gebunden an die
+ * Scrollposition. Ohne Unterstützung dafür stehen die Sterne einfach da.
+ */
+interface Props {
+  /** Zum Beispiel 4.8. */
+  wert: number;
+  /** Kantenlänge eines Sterns in rem. */
+  groesse?: number;
+  class?: string;
+}
+
+const { wert, groesse = 1.25, class: className = '' }: Props = Astro.props;
+
+const sterne = [1, 2, 3, 4, 5];
+
+/** Füllgrad eines einzelnen Sterns in Prozent. */
+const anteil = (n: number) => Math.max(0, Math.min(1, wert - (n - 1))) * 100;
+
+const stern =
+  'M10 1.6l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.21l-4.94 2.6.94-5.5-4-3.9 5.53-.8L10 1.6z';
+---
+
+<span
+  class={`sterne ${className}`}
+  style={`--kante:${groesse}rem`}
+  role="img"
+  aria-label={`${wert.toString().replace('.', ',')} von 5 Sternen`}
+>
+  {
+    sterne.map((n) => (
+      <span class="stern" style={`--anteil:${anteil(n)}%;--rang:${n - 1}`} aria-hidden="true">
+        <svg class="stern-leer" viewBox="0 0 20 20" fill="currentColor">
+          <path d={stern} />
+        </svg>
+        <span class="stern-voll">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path d={stern} />
+          </svg>
+        </span>
+      </span>
+    ))
+  }
+</span>
+
+<style>
+  .sterne {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .stern {
+    position: relative;
+    display: block;
+    width: var(--kante);
+    height: var(--kante);
+  }
+
+  .stern svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .stern-leer {
+    opacity: 0.22;
+  }
+
+  /* Der gefuellte Stern liegt deckungsgleich darueber und wird auf den
+     Bruchteil beschnitten. Kein zweites Symbol, keine Halbstern-Grafik. */
+  .stern-voll {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    width: var(--anteil);
+    color: var(--color-star);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      /* Gestaffelt ueber den Bereich, nicht ueber `animation-delay`: bei
+         einer scrollgebundenen Zeitachse gibt es keine Uhr, auf die eine
+         Verzoegerung sich beziehen koennte. */
+      .stern-voll {
+        animation: fuellen linear both;
+        animation-timeline: view();
+        animation-range: entry calc(20% + var(--rang) * 7%) entry
+          calc(48% + var(--rang) * 7%);
+      }
+    }
+  }
+
+  @keyframes fuellen {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

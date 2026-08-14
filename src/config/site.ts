@@ -201,7 +201,7 @@ export const services = [
   },
   {
     slug: 'automatisierung',
-    color: '#c4472f',
+    color: '#a93d28',
     label: 'KI-Prozessautomatisierung',
     benefit: 'Kein verpasster Anruf, kein Angebot, das liegen bleibt',
     teaser:

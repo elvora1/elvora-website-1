@@ -1,0 +1,59 @@
+---
+/**
+ * Text, der sich selbst schreibt.
+ *
+ * Die Vorlage löst das mit React-Zustand und einem Intervall, das den Text
+ * vierzig Mal in der Sekunde neu setzt. Hier macht es der Browser.
+ *
+ * WARUM `clip-path` UND NICHT `width`
+ * Der verbreitete Trick ist `width: 0` bis `100%` mit `overflow: hidden`.
+ * Der beißt sich: die Breite des umgebenden Elements ergibt sich aus seinem
+ * Inhalt, und der ist in diesem Moment null breit. Man braucht dann feste
+ * `ch`-Breiten, und die stimmen nur bei Schreibmaschinenschrift. `clip-path`
+ * lässt das Element in seiner natürlichen Breite stehen und legt es
+ * schrittweise frei. Funktioniert mit jeder Schrift.
+ *
+ * `steps()` mit der Zeichenzahl sorgt dafür, dass Buchstaben ganz erscheinen
+ * statt angeschnitten zu werden.
+ *
+ * Der Text steht von Anfang an vollständig im Dokument. Vorlesesoftware
+ * bekommt ihn also einmal und richtig, nicht Zeichen für Zeichen.
+ */
+interface Props {
+  text: string;
+  /** Sekunden für den ganzen Durchlauf. */
+  dauer?: number;
+  class?: string;
+}
+
+const { text, dauer = 1.6, class: className = '' }: Props = Astro.props;
+---
+
+<span
+  class={`tippend ${className}`}
+  style={`--zeichen:${text.length};--dauer:${dauer}s`}>{text}</span>
+
+<style>
+  .tippend {
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .tippend {
+        animation: schreiben var(--dauer) steps(var(--zeichen), end) both;
+        animation-timeline: view();
+        animation-range: entry 30% entry 80%;
+      }
+    }
+  }
+
+  @keyframes schreiben {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>

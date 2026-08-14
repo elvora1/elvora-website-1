@@ -4,6 +4,7 @@ import Service from '~/layouts/Service.astro';
 import Section from '~/components/Section.astro';
 import Button from '~/components/Button.astro';
 import ModuleVisual from '~/components/ModuleVisual.astro';
+import Geraet from '~/components/Geraet.astro';
 import { automationModules, cta, serviceArea } from '~/config/site';
 import type { FaqItem } from '~/types';
 
@@ -23,6 +24,13 @@ const shotFor = (slug: string) => {
   );
   return key ? shots[key]!.default : null;
 };
+
+/**
+ * Welcher Geräterahmen zu einem Modul passt. Die Übersichtsseite läuft am
+ * Rechner, alles andere spielt sich auf dem Telefon ab.
+ */
+const rahmenArt = (slug: string): 'handy' | 'rechner' =>
+  slug === 'dashboard' ? 'rechner' : 'handy';
 
 const faq: FaqItem[] = [
   {
@@ -126,9 +134,9 @@ const painPoints = [
 
           return (
             <li id={module.slug} class="grid items-center gap-8 md:grid-cols-2 md:gap-12">
-              <div class:list={[flip ? 'md:order-2' : '']}>
+              <div class:list={['einblenden', flip ? 'md:order-2' : '']}>
                 <span class="inline-flex items-center gap-2.5 text-sm font-medium text-accent">
-                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-accent-soft text-xs">
+                  <span class="ziffern flex h-6 w-6 items-center justify-center rounded-full bg-accent-soft text-xs">
                     {index + 1}
                   </span>
                   {module.name}
@@ -137,19 +145,30 @@ const painPoints = [
                 <p class="mt-3 max-w-xl text-ink-muted">{module.text}</p>
               </div>
 
+              {/* Echte Aufnahmen kommen in einen Geraeterahmen: sie SIND
+                  Bildschirmaufnahmen, der Rahmen sagt also die Wahrheit.
+                  Die schematischen Darstellungen bleiben ohne Rahmen und
+                  behalten ihre Beschriftung -- ein Rahmen liesse eine
+                  Zeichnung wie eine Aufnahme aussehen, und das waere ein
+                  erfundener Beleg. */}
               {shot ? (
-                <div class:list={['min-w-0', flip ? 'md:order-1' : '']}>
-                  <Image
-                    src={shot}
-                    alt={module.screenshotAlt}
-                    widths={[400, 800]}
-                    sizes="(min-width: 768px) 40vw, 90vw"
-                    loading="lazy"
-                    class="w-full rounded-card border border-border bg-surface shadow-card"
-                  />
+                <div class:list={['min-w-0 hereinziehen', flip ? 'md:order-1' : '']}>
+                  <Geraet art={rahmenArt(module.slug)} bildunterschrift="Aus dem laufenden Betrieb">
+                    <Image
+                      src={shot}
+                      alt={module.screenshotAlt}
+                      widths={[400, 800]}
+                      sizes="(min-width: 768px) 40vw, 90vw"
+                      loading="lazy"
+                      class="w-full"
+                    />
+                  </Geraet>
                 </div>
               ) : (
-                <ModuleVisual slug={module.slug} class={flip ? 'md:order-1' : ''} />
+                <ModuleVisual
+                  slug={module.slug}
+                  class={`hereinziehen ${flip ? 'md:order-1' : ''}`}
+                />
               )}
             </li>
           );

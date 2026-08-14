@@ -1,0 +1,124 @@
+---
+/**
+ * Geräterahmen für echte Bildschirmaufnahmen.
+ *
+ * Die Vorlagen waren reines SVG ohne jede Logik, die Übernahme also
+ * unkritisch. Zwei Dinge sind hier anders:
+ *
+ * 1. Statt eines `src` auf ein fremdes Bild nimmt der Rahmen einen Bereich
+ *    auf. Damit kann darin echtes HTML stehen, das mitwächst und lesbar
+ *    bleibt, statt einer Rastergrafik, die auf dem Handy zu Brei wird.
+ * 2. Beide Vorlagen führten eine Kennung `roundedCorners` mit sich. Stehen
+ *    zwei Rahmen auf einer Seite, gibt es diese Kennung zweimal, und der
+ *    Browser nimmt für beide die erste. Hier braucht es die Kennung gar
+ *    nicht mehr, weil der Ausschnitt über CSS läuft.
+ *
+ * WICHTIG: Ein Rahmen lässt alles darin wie eine echte Aufnahme aussehen.
+ * Steht darin eine schematische Darstellung, gehört die Beschriftung
+ * dazu -- sonst wird aus einer Zeichnung ein erfundener Beleg.
+ */
+interface Props {
+  /** `handy` oder `rechner`. */
+  art?: 'handy' | 'rechner';
+  /** Beschriftung unter dem Rahmen. */
+  bildunterschrift?: string;
+  class?: string;
+}
+
+const { art = 'handy', bildunterschrift, class: className = '' }: Props = Astro.props;
+---
+
+<figure class={`geraet geraet-${art} ${className}`}>
+  <div class="geraet-korpus">
+    {art === 'handy' && <span class="geraet-insel" aria-hidden="true" />}
+    <div class="geraet-schirm">
+      <slot />
+    </div>
+  </div>
+
+  {art === 'rechner' && <span class="geraet-fuss" aria-hidden="true" />}
+
+  {bildunterschrift && <figcaption class="geraet-schrift">{bildunterschrift}</figcaption>}
+</figure>
+
+<style>
+  .geraet {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .geraet-korpus {
+    position: relative;
+    width: 100%;
+    background: #1b1b1f;
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.5),
+      0 24px 48px -24px rgb(0 0 0 / 0.5);
+  }
+
+  .geraet-schirm {
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+
+  /* --- Handy ------------------------------------------------------------ */
+  .geraet-handy .geraet-korpus {
+    max-width: 20rem;
+    border-radius: 2.5rem;
+    padding: 0.6rem;
+  }
+
+  .geraet-handy .geraet-schirm {
+    border-radius: 2rem;
+    min-height: 26rem;
+  }
+
+  /* Die Aussparung fuer Kamera und Sensoren. Liegt ueber dem Schirm, nicht
+     darin: sonst wuerde sie mitscrollen. */
+  .geraet-insel {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    z-index: 2;
+    width: 5.5rem;
+    height: 1.35rem;
+    translate: -50% 0;
+    border-radius: 999px;
+    background: #000;
+  }
+
+  /* --- Rechner ---------------------------------------------------------- */
+  .geraet-rechner .geraet-korpus {
+    border-radius: 0.75rem;
+    padding: 0.55rem 0.55rem 0.9rem;
+  }
+
+  .geraet-rechner .geraet-schirm {
+    border-radius: 0.25rem;
+    min-height: 20rem;
+  }
+
+  /* Der Standfuss. Reine Andeutung, bewusst ohne Scharnier und Verlaeufe:
+     der Rahmen soll den Inhalt tragen, nicht mit ihm um Aufmerksamkeit
+     ringen. */
+  .geraet-fuss {
+    display: block;
+    width: min(100%, 118%);
+    height: 0.7rem;
+    border-radius: 0 0 0.6rem 0.6rem;
+    background: linear-gradient(to bottom, #2a2a2f, #17171a);
+    box-shadow: 0 6px 12px -6px rgb(0 0 0 / 0.5);
+  }
+
+  .geraet-schrift {
+    margin-top: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    text-align: center;
+  }
+</style>

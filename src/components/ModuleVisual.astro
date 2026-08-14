@@ -13,6 +13,9 @@
  * Alles hier ist reines HTML und CSS: keine Bilddatei, keine Ladezeit,
  * gestochen scharf auf jedem Bildschirm.
  */
+import Tippend from './Tippend.astro';
+import Sterne from './Sterne.astro';
+
 interface Props {
   slug: string;
   class?: string;
@@ -67,6 +70,13 @@ const applicant = [
 ];
 
 const chat = chats[slug];
+
+/**
+ * Die letzte Antwort der Assistenz schreibt sich selbst. Nur die letzte:
+ * liefe der ganze Verlauf nacheinander ein, wartet man beim Lesen, und der
+ * Effekt steht der Aussage im Weg statt sie zu tragen.
+ */
+const letzteAntwort = chat ? chat.length - 1 : -1;
 ---
 
 <figure class={`min-w-0 ${className}`}>
@@ -83,12 +93,13 @@ const chat = chats[slug];
       {
         chat && (
           <ul class="flex flex-col gap-2.5">
-            {chat.map((message) => (
+            {chat.map((message, i) => (
               <li
                 class:list={[
-                  'flex',
+                  'flex einblenden',
                   message.from === 'us' ? 'justify-end' : 'justify-start',
                 ]}
+                style={`--verzug:${i}`}
               >
                 <span
                   class:list={[
@@ -98,7 +109,11 @@ const chat = chats[slug];
                       : 'bg-surface-subtle text-ink rounded-bl-sm',
                   ]}
                 >
-                  {message.text}
+                  {i === letzteAntwort && message.from === 'us' ? (
+                    <Tippend text={message.text} dauer={2.2} />
+                  ) : (
+                    message.text
+                  )}
                 </span>
               </li>
             ))}
@@ -138,12 +153,8 @@ const chat = chats[slug];
                 Bei Google bewerten
               </span>
             </div>
-            <div class="mt-4 flex items-center gap-1" aria-hidden="true">
-              {Array.from({ length: 5 }).map(() => (
-                <svg viewBox="0 0 20 20" class="h-5 w-5 text-star" fill="currentColor">
-                  <path d="M10 1.6l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.21l-4.94 2.6.94-5.5-4-3.9 5.53-.8L10 1.6z" />
-                </svg>
-              ))}
+            <div class="mt-4 text-ink">
+              <Sterne wert={5} groesse={1.25} />
             </div>
           </div>
         )

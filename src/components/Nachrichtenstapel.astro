@@ -1,0 +1,194 @@
+---
+/**
+ * Gestaffelte Nachrichtenkarten.
+ *
+ * Übernimmt eine React-Vorlage, in der allerdings kein React-Verhalten
+ * steckt: die ganze Wirkung sind Transformationen und Übergänge. Übrig
+ * bleibt also CSS. Das Symbol kam dort aus einer Icon-Bibliothek, hier
+ * steht es als Pfad direkt in der Datei.
+ *
+ * ZWECK: zeigt, was die WhatsApp-Assistenz tatsächlich tut, statt es zu
+ * behaupten. Drei Anfragen, die parallel hereinkommen, während der Betrieb
+ * auf der Baustelle, in der Praxis oder beim Kunden ist.
+ *
+ * ABWEICHUNG VON DER VORLAGE: Dort liegen die Karten so weit übereinander,
+ * dass sich Text auf Text schiebt, und sie fächern erst beim Zeigen mit der
+ * Maus auf. Das ist zweimal falsch. Auf dem Handy gibt es kein Hover, der
+ * Stapel bliebe dauerhaft unlesbar. Und wer nicht darauf zeigt, sieht nie,
+ * was dort steht -- der Inhalt ist hier aber die Aussage, nicht die
+ * Bewegung.
+ *
+ * Deshalb: die Karten stehen lesbar untereinander, leicht gegeneinander
+ * gekippt wie ein aufgefächerter Stapel Papier. Wer mit der Maus darüber
+ * geht, bekommt die einzelne Karte gerade gerückt und angehoben. Das ist
+ * eine Zugabe, keine Voraussetzung.
+ */
+interface Props {
+  nachrichten: Array<{ zeit: string; text: string; kanal: string }>;
+  class?: string;
+}
+
+const { nachrichten, class: className = '' }: Props = Astro.props;
+---
+
+<ul class={`stapel ${className}`}>
+  {
+    nachrichten.map((n, i) => (
+      <li class="stapel-karte" style={`--rang:${i}`}>
+        <p class="stapel-kopf">
+          <span class="stapel-symbol" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a8 8 0 0 0-6.9 12.03L2 18l4.07-1.06A8 8 0 1 0 10 2zm0 1.6a6.4 6.4 0 1 1-3.3 11.88l-.28-.17-2.1.55.56-2.04-.18-.29A6.4 6.4 0 0 1 10 3.6z" />
+            </svg>
+          </span>
+          <span class="stapel-kanal kennung">{n.kanal}</span>
+          <span class="stapel-zeit kennung">{n.zeit}</span>
+        </p>
+        <p class="stapel-text">{n.text}</p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .stapel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stapel-karte {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid rgb(255 255 255 / 0.26);
+    border-radius: 0.875rem;
+    /* Dunkler statt heller: auf den kraeftigen Tafelfarben hebt sich eine
+       abgedunkelte Karte besser ab als eine aufgehellte, und der weisse
+       Text darauf bleibt kontrastreich. */
+    background: rgb(0 0 0 / 0.16);
+    padding: 0.875rem 1rem;
+  }
+
+  .stapel-kopf {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+
+  .stapel-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.16);
+  }
+
+  .stapel-symbol svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .stapel-kanal {
+    opacity: 0.85;
+  }
+
+  .stapel-zeit {
+    margin-inline-start: auto;
+    opacity: 0.78;
+  }
+
+  .stapel-text {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    opacity: 1;
+  }
+
+  /* --- Der Faecher, erst ab Tablet -------------------------------------
+     Leichte Kippung und ein kleiner seitlicher Versatz je Karte. Sie
+     ueberlappen NICHT: der Text bleibt jederzeit lesbar, ohne dass man
+     etwas tun muss. */
+  @media (width >= 48rem) {
+    .stapel {
+      gap: 0.875rem;
+    }
+
+    .stapel-karte {
+      transform-origin: left center;
+      transform: rotate(calc((var(--rang) - 1) * 1.1deg))
+        translateX(calc(var(--rang) * 0.5rem));
+      transition:
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.25s,
+        border-color 0.25s;
+    }
+  }
+
+  @media (hover: hover) {
+    .stapel-karte:hover {
+      transform: rotate(0deg) translateX(0) translateY(-2px);
+      background: rgb(0 0 0 / 0.26);
+      border-color: rgb(255 255 255 / 0.45);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stapel-karte {
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* --- Auftritt -------------------------------------------------------
+     Bewusst NICHT ueber die Utility `einblenden`: die endet auf
+     `transform: none` und wuerde die Kippung des Faechers wieder
+     plattmachen. Die Endstellung hier ist die Faecherstellung.
+
+     Gestaffelt ueber `animation-range`, nicht ueber `animation-delay` --
+     bei einer scrollgebundenen Zeitachse gibt es keine Uhr, auf die eine
+     Verzoegerung sich beziehen koennte. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .stapel-karte {
+        animation: karte-herein linear both;
+        animation-timeline: view();
+        animation-range: entry calc(12% + var(--rang) * 9%) entry
+          calc(58% + var(--rang) * 9%);
+      }
+    }
+  }
+
+  @keyframes karte-herein {
+    from {
+      opacity: 0;
+      transform: translateY(1.5rem) rotate(0deg);
+    }
+    to {
+      opacity: 1;
+      transform: rotate(calc((var(--rang) - 1) * 1.1deg))
+        translateX(calc(var(--rang) * 0.5rem));
+    }
+  }
+
+  /* Unterhalb der Faechergroesse steht der Stapel gerade. */
+  @media (width < 48rem) {
+    @keyframes karte-herein {
+      from {
+        opacity: 0;
+        transform: translateY(1.5rem);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+</style>
