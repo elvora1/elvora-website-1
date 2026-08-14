@@ -13,9 +13,11 @@ interface Props {
    * bewusst kein og:image gesetzt, statt auf eine fehlende Datei zu zeigen.
    */
   image?: string;
+  /** Farbe der Kopftafel. Faerbt die Systemleiste auf dem Handy mit. */
+  kopfFarbe?: string;
 }
 
-const { title, description, noindex = false, image } = Astro.props;
+const { title, description, noindex = false, image, kopfFarbe } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const imageUrl = image ? new URL(image, site.url).href : null;
@@ -32,9 +34,13 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 <link rel="canonical" href={canonical} />
 {noindex && <meta name="robots" content="noindex, follow" />}
 
-<!-- Schriften: beim Build heruntergeladen, selbst ausgeliefert, vorgeladen -->
+<!-- Schriften: beim Build heruntergeladen und selbst ausgeliefert.
+     Vorgeladen werden nur Fliesstext und Aussagen. Die Kennungen sind ein
+     paar Dutzend Zeichen und duerfen kurz in der Ausweichschrift stehen;
+     ein dritter Vorlademarker wuerde die beiden wichtigen ausbremsen. -->
 <Font cssVariable="--font-body" preload />
 <Font cssVariable="--font-heading" preload />
+<Font cssVariable="--font-label" />
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />
@@ -49,6 +55,8 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 <meta name="twitter:description" content={description} />
 {imageUrl && <meta name="twitter:image" content={imageUrl} />}
 
-<meta name="theme-color" content="#ffffff" />
+<!-- Faerbt die Systemleiste auf dem Handy in der Farbe der Kopftafel, damit
+     die Seite nicht unter einem fremdfarbigen Streifen beginnt. -->
+<meta name="theme-color" content={kopfFarbe ?? '#ffffff'} />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="sitemap" href="/sitemap-index.xml" />

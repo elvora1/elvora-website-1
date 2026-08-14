@@ -15,16 +15,36 @@ interface Props {
   breadcrumbs?: Array<{ label: string; href?: string }>;
   service?: { name: string; description: string };
   faq?: FaqItem[];
+  /**
+   * Farbe der Kopftafel dieser Seite. Die Kopfleiste übernimmt sie, damit die
+   * Seite nicht mit einem weißen Streifen über der Tafel beginnt. Seiten ohne
+   * farbige Tafel lassen die Angabe weg.
+   */
+  kopfFarbe?: string;
 }
 
-const { title, description, noindex, image, breadcrumbs, service, faq }: Props =
-  Astro.props;
+const {
+  title,
+  description,
+  noindex,
+  image,
+  breadcrumbs,
+  service,
+  faq,
+  kopfFarbe,
+}: Props = Astro.props;
 ---
 
 <!doctype html>
 <html lang="de">
   <head>
-    <SeoHead title={title} description={description} noindex={noindex} image={image} />
+    <SeoHead
+      title={title}
+      description={description}
+      noindex={noindex}
+      image={image}
+      kopfFarbe={kopfFarbe}
+    />
     {!noindex && <Schema breadcrumbs={breadcrumbs} service={service} faq={faq} />}
     <slot name="head" />
   </head>
@@ -36,7 +56,7 @@ const { title, description, noindex, image, breadcrumbs, service, faq }: Props =
       Zum Inhalt springen
     </a>
 
-    <Header />
+    <Header kopfFarbe={kopfFarbe} />
 
     <main id="inhalt">
       <slot />

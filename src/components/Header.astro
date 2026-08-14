@@ -9,16 +9,36 @@ import { nav, cta } from '~/config/site';
  * Klebt oben -- damit bleibt der Haupt-CTA auf dem Handy beim Scrollen
  * jederzeit erreichbar. Das mobile Menue laeuft ueber <details>, also ganz
  * ohne JavaScript.
+ *
+ * FARBE: Jede Seite beginnt mit einer farbigen Tafel. Stand die Leiste in
+ * Weiss darueber, fing die Seite mit einem Streifen an statt mit einem
+ * Eindruck. Sie uebernimmt deshalb die Farbe der jeweiligen Tafel und laeuft
+ * nahtlos in sie hinein.
+ *
+ * Bewusst ohne Umschlagen auf Weiss beim Weiterscrollen: das ginge nur mit
+ * einem Scroll-Beobachter, und dafuer lohnt kein Skript.
  */
+interface Props {
+  /** Farbe der Kopftafel dieser Seite. Ohne Angabe bleibt die Leiste weiss. */
+  kopfFarbe?: string;
+}
+
+const { kopfFarbe }: Props = Astro.props;
+const dunkel = Boolean(kopfFarbe);
+
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || path.startsWith(href);
 ---
 
-<header class="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur-sm">
+<header
+  class="kopf sticky top-0 z-50 border-b"
+  data-ton={dunkel ? 'dunkel' : 'hell'}
+  style={kopfFarbe ? `--kopf-grund:${kopfFarbe}` : undefined}
+>
   <div class="container-content">
     <div class="flex h-16 items-center justify-between gap-4 md:h-18">
       <a href="/" class="shrink-0" aria-label="Elvora, zur Startseite">
-        <Logo />
+        <Logo ton={dunkel ? 'hell' : 'dunkel'} />
       </a>
 
       <nav aria-label="Hauptnavigation" class="hidden md:block">
@@ -30,8 +50,8 @@ const isActive = (href: string) => path === href || path.startsWith(href);
                   href={item.href}
                   aria-current={isActive(item.href) ? 'page' : undefined}
                   class:list={[
-                    'text-[0.9375rem] transition-colors hover:text-ink',
-                    isActive(item.href) ? 'text-ink font-medium' : 'text-ink-muted',
+                    'kopf-link text-[0.9375rem] transition-colors',
+                    isActive(item.href) && 'ist-hier font-medium',
                   ]}
                 >
                   {item.label}
@@ -43,8 +63,14 @@ const isActive = (href: string) => path === href || path.startsWith(href);
       </nav>
 
       <div class="flex items-center gap-2">
-        <!-- Der eine Haupt-CTA. Auf Mobil verkuerzt, aber immer sichtbar. -->
-        <Button href={cta.primary.href} class="max-md:h-10 max-md:px-4 max-md:text-sm">
+        <!-- Der eine Haupt-CTA. Auf Mobil verkuerzt, aber immer sichtbar.
+             Auf farbiger Leiste weiss: die Akzentfarbe geht auf der
+             Magenta-Tafel sonst unter. -->
+        <Button
+          href={cta.primary.href}
+          variant={dunkel ? 'aufFarbe' : 'primary'}
+          class="max-md:h-10 max-md:px-4 max-md:text-sm"
+        >
           <span class="md:hidden">{cta.primary.labelShort}</span>
           <span class="max-md:hidden">{cta.primary.label}</span>
         </Button>
@@ -52,7 +78,7 @@ const isActive = (href: string) => path === href || path.startsWith(href);
         <!-- Mobiles Menue ohne JavaScript -->
         <details class="group relative md:hidden">
           <summary
-            class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-button border border-border text-ink-muted transition-colors hover:text-ink [&::-webkit-details-marker]:hidden"
+            class="kopf-knopf flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-button border transition-colors [&::-webkit-details-marker]:hidden"
             aria-label="Menü öffnen"
           >
             <svg
@@ -96,3 +122,62 @@ const isActive = (href: string) => path === href || path.startsWith(href);
     </div>
   </div>
 </header>
+
+<style>
+  .kopf {
+    background: var(--kopf-grund, var(--color-surface));
+    border-bottom-color: var(--color-border);
+  }
+
+  .kopf-link {
+    color: var(--color-ink-muted);
+  }
+
+  .kopf-link:hover,
+  .kopf-link.ist-hier {
+    color: var(--color-ink);
+  }
+
+  .kopf-knopf {
+    border-color: var(--color-border);
+    color: var(--color-ink-muted);
+  }
+
+  .kopf-knopf:hover {
+    color: var(--color-ink);
+  }
+
+  /* --- Auf farbiger Tafel ---------------------------------------------
+     Kein Weichzeichner im Hintergrund: die Leiste steht auf einer
+     deckenden Flaeche derselben Farbe, da gaebe es nichts zu zeichnen,
+     und `backdrop-filter` kostet auf schwachen Geraeten spuerbar Leistung. */
+  .kopf[data-ton='dunkel'] {
+    border-bottom-color: rgb(255 255 255 / 0.14);
+  }
+
+  .kopf[data-ton='dunkel'] .kopf-link {
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  .kopf[data-ton='dunkel'] .kopf-link:hover,
+  .kopf[data-ton='dunkel'] .kopf-link.ist-hier {
+    color: #fff;
+  }
+
+  .kopf[data-ton='dunkel'] .kopf-knopf {
+    border-color: rgb(255 255 255 / 0.28);
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  .kopf[data-ton='dunkel'] .kopf-knopf:hover {
+    color: #fff;
+  }
+
+  /* Die aufgeklappte Liste bleibt hell: dort steht Text auf Weiss, und ein
+     zweites Farbschema fuer ein Menue mit drei Eintraegen waere Aufwand
+     ohne Gewinn. */
+  .kopf[data-ton='hell'] {
+    background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+    backdrop-filter: blur(4px);
+  }
+</style>

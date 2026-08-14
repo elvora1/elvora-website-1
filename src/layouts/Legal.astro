@@ -13,7 +13,12 @@ interface Props {
 const { title, description, heading }: Props = Astro.props;
 ---
 
-<Base title={title} description={description} breadcrumbs={[{ label: heading }]}>
+<Base
+  title={title}
+  description={description}
+  breadcrumbs={[{ label: heading }]}
+  kopfFarbe="#1d2140"
+>
   <PanelHero
     eyebrow={`Stand: ${legal.lastUpdated}`}
     heading={heading}

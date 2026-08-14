@@ -1,0 +1,309 @@
+---
+import Texture from './Texture.astro';
+import Button from './Button.astro';
+import Scramble from './Scramble.astro';
+
+/**
+ * Die erste Fläche der Startseite.
+ *
+ * Bewusst KEIN Kapitel: sie trägt keine Nummer und keine Rahmenlinien. Ein
+ * Buchdeckel ist nicht Kapitel eins. Die nummerierten Flächen beginnen
+ * darunter.
+ *
+ * Der Aufbau ist auf einen einzigen Blickfang gerechnet. Vorher standen hier
+ * sieben Elemente nebeneinander: Kennung, Linie, Schlagzeile, Linie, Text,
+ * Knopf, Notiz und eine rechtsbündige Liste. Jetzt sind es vier Gruppen mit
+ * klarer Reihenfolge, und die Vertrauensangaben stehen als eine Zeile unten
+ * statt als verwaiste Spalte rechts.
+ *
+ * Die Fläche klebt wie die Kapitel oben, kippt aber nicht ein: das erste
+ * Kapitel schiebt sich darüber.
+ */
+interface Props {
+  /** Kleine Kennung ganz oben. Läuft sich ein. */
+  kennung: string;
+  /** Die Schlagzeile, je Zeile ein Eintrag. */
+  zeilen: string[];
+  /** Ein Satz darunter. */
+  intro: string;
+  /** Hauptknopf. */
+  cta: { href: string; label: string };
+  /** Untergeordneter Textlink daneben. */
+  neben: { href: string; label: string; extern?: boolean };
+  /**
+   * Die Zeile ganz unten, durch Mittelpunkte getrennt. Ersatzbelege, solange
+   * keine Google-Bewertungen vorliegen. Sobald sie da sind, überschreibt der
+   * Bereich `unten` diese Zeile.
+   */
+  belege: string[];
+  /** Hintergrundfarbe. */
+  color?: string;
+}
+
+const hatEigenenFuss = Astro.slots.has('unten');
+
+const {
+  kennung,
+  zeilen,
+  intro,
+  cta,
+  neben,
+  belege,
+  color = '#16193a',
+}: Props = Astro.props;
+---
+
+<section class="auftakt" style={`--grund:${color}`} aria-label="Elvora">
+  <div class="auftakt-inner">
+    <Texture variant="schraffur" />
+
+    <div class="auftakt-oben">
+      <p class="auftakt-kennung kennung">
+        <Scramble text={kennung} />
+      </p>
+    </div>
+
+    <div class="auftakt-mitte">
+      <h1 class="auftakt-schlag">
+        {zeilen.map((zeile) => <span class="auftakt-zeile">{zeile}</span>)}
+      </h1>
+
+      <p class="auftakt-intro">{intro}</p>
+
+      <div class="auftakt-handlung">
+        <Button href={cta.href} size="lg" variant="aufFarbe" class="max-sm:w-full">
+          {cta.label}
+        </Button>
+
+        <a
+          class="auftakt-neben"
+          href={neben.href}
+          {...neben.extern ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+        >
+          {neben.label}
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 10h11M11 6l4 4-4 4" />
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="auftakt-unten">
+      {
+        hatEigenenFuss ? (
+          <slot name="unten" />
+        ) : (
+          <ul class="auftakt-belege kennung">
+            {belege.map((beleg) => (
+              <li>{beleg}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .auftakt {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    overflow: hidden;
+    background: var(--grund);
+    color: #fff;
+  }
+
+  /* Bildschirmhoch MINUS Kopfleiste: die Flaeche beginnt unter der Leiste,
+     volle 100svh wuerden ihren Fuss um genau deren Hoehe unter die Falz
+     schieben. Genau das hatte die Belegzeile unsichtbar gemacht. */
+  .auftakt-inner {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    min-height: calc(100svh - var(--kopf-hoehe));
+    flex-direction: column;
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 4rem) clamp(1.5rem, 2.5vw, 2.25rem);
+  }
+
+  .auftakt-oben,
+  .auftakt-mitte,
+  .auftakt-unten {
+    position: relative;
+    z-index: 10;
+  }
+
+  .auftakt-kennung {
+    margin: 0;
+    opacity: 0.62;
+  }
+
+  /* Die Schlagzeile sitzt in der Mitte der Flaeche, nicht oben angeklebt.
+     `auto` oben und unten verteilt den Rest gleichmaessig. */
+  .auftakt-mitte {
+    margin-block: auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    padding-block: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  /* Zeilenumbruch von Hand: bei einer Schlagzeile aus drei kurzen Saetzen
+     soll jeder Satz seine eigene Zeile bekommen, und zwar in jeder
+     Fenstergroesse. Der Umbruch bleibt trotzdem erlaubt -- feste
+     Nichtumbrueche wuerden auf schmalen Geraeten seitlich herauslaufen. */
+  .auftakt-schlag {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    font-weight: 400;
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    text-wrap: initial;
+  }
+
+  .auftakt-zeile {
+    display: block;
+  }
+
+  .auftakt-intro {
+    margin: 0;
+    max-width: 44ch;
+    font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
+    line-height: 1.55;
+    opacity: 0.78;
+  }
+
+  .auftakt-handlung {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+  }
+
+  /* Der zweite Weg ist bewusst nur ein Textlink: fluechig waere er ein
+     zweiter Haupt-CTA und wuerde dem ersten die Wirkung nehmen. */
+  .auftakt-neben {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: inherit;
+    font-size: 0.9375rem;
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / 0.35);
+    text-underline-offset: 5px;
+    transition: text-decoration-color 0.15s;
+  }
+
+  .auftakt-neben:hover {
+    text-decoration-color: rgb(255 255 255 / 0.9);
+  }
+
+  .auftakt-neben svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+
+  .auftakt-neben:hover svg {
+    transform: translateX(3px);
+  }
+
+  /* Die einzige Linie auf der Flaeche. Sie verankert den Fuss und deutet an,
+     dass darunter weitergeht. */
+  .auftakt-unten {
+    border-top: 1px solid rgb(255 255 255 / 0.18);
+    padding-top: clamp(0.875rem, 1.5vw, 1.125rem);
+  }
+
+  .auftakt-belege {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    opacity: 0.55;
+  }
+
+  /* Trenner als Mittelpunkt, aber nur zwischen den Angaben. */
+  .auftakt-belege li + li::before {
+    content: '·';
+    margin-inline-end: 1.25rem;
+  }
+
+  @media (width >= 48rem) and (prefers-reduced-motion: no-preference) {
+    .auftakt {
+      position: sticky;
+      top: var(--kopf-hoehe);
+      height: calc(100svh - var(--kopf-hoehe));
+    }
+
+    .auftakt-inner {
+      height: 100%;
+      min-height: 0;
+    }
+  }
+
+  /* --- Auftritt beim Laden ---------------------------------------------
+     Hier bewusst NICHT ueber `animation-timeline: view()`: die Flaeche ist
+     beim Laden schon zu sehen, eine scrollgebundene Animation waere also
+     sofort am Ende. Der Auftritt laeuft deshalb einmal auf der Uhr.
+
+     `backwards` haelt den Anfangszustand waehrend der Verzoegerung. Ohne das
+     blitzt der fertige Text kurz auf, bevor er verschwindet und wiederkommt. */
+  @media (prefers-reduced-motion: no-preference) {
+    .auftakt-kennung,
+    .auftakt-zeile,
+    .auftakt-intro,
+    .auftakt-handlung,
+    .auftakt-unten {
+      animation: aufsteigen 0.85s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .auftakt-kennung {
+      animation-delay: 0.05s;
+    }
+    .auftakt-zeile:nth-child(1) {
+      animation-delay: 0.16s;
+    }
+    .auftakt-zeile:nth-child(2) {
+      animation-delay: 0.24s;
+    }
+    .auftakt-zeile:nth-child(3) {
+      animation-delay: 0.32s;
+    }
+    .auftakt-zeile:nth-child(n + 4) {
+      animation-delay: 0.4s;
+    }
+    .auftakt-intro {
+      animation-delay: 0.46s;
+    }
+    .auftakt-handlung {
+      animation-delay: 0.56s;
+    }
+    .auftakt-unten {
+      animation-delay: 0.66s;
+    }
+  }
+
+  @keyframes aufsteigen {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

@@ -1,5 +1,6 @@
 ---
-import logo from '~/assets/logo.svg';
+import logoDunkel from '~/assets/logo.svg';
+import logoHell from '~/assets/logo-hell.svg';
 
 /**
  * Wortmarke aus der Original-SVG.
@@ -9,15 +10,21 @@ import logo from '~/assets/logo.svg';
  * und Fußbereich) käme es sonst zu doppelten Kennungen im Dokument.
  * Die Datei ist rund 3 kB groß und wird vom Browser einmal geladen und
  * danach zwischengespeichert.
+ *
+ * Zwei Fassungen: auf farbigen Flächen läuft der Originalschriftzug im
+ * ersten Drittel gegen zu wenig Kontrast, dort steht er deshalb in Weiß.
  */
 interface Props {
   /** Höhe in Pixeln. Die Breite ergibt sich aus dem Seitenverhältnis. */
   height?: number;
+  /** `hell` für farbige und dunkle Flächen. */
+  ton?: 'dunkel' | 'hell';
   class?: string;
 }
 
-const { height = 28, class: className = '' }: Props = Astro.props;
+const { height = 28, ton = 'dunkel', class: className = '' }: Props = Astro.props;
 
+const logo = ton === 'hell' ? logoHell : logoDunkel;
 const ratio = logo.width / logo.height;
 ---
 

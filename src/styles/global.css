@@ -7,11 +7,20 @@
    ========================================================================== */
 
 @theme {
-  /* --- Schrift ---------------------------------------------------------- */
-  /* Die Variablen --font-body / --font-heading liefert die Astro-Fonts-API.
-     Die Dateien werden beim Build heruntergeladen und selbst ausgeliefert. */
+  /* --- Schrift ----------------------------------------------------------
+     --font-body / --font-heading / --font-label liefert die Astro-Fonts-API.
+     Die Dateien werden beim Build heruntergeladen und selbst ausgeliefert.
+
+     Drei Familien, drei Aufgaben:
+       display  Aussagen. Instrument Serif, nur Schnitt 400.
+       sans     Fliesstext und Bedienelemente. IBM Plex Sans.
+       mono     Kennungen, Nummern, Kennzahlen. IBM Plex Mono.
+
+     Die Ausweichschrift muss zur Gattung passen, sonst springt die Seite
+     beim Nachladen sichtbar um. */
   --font-sans: var(--font-body), system-ui, sans-serif;
-  --font-display: var(--font-heading), system-ui, sans-serif;
+  --font-display: var(--font-heading), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--font-label), ui-monospace, SFMono-Regular, monospace;
 
   /* --- Flaechen und Text ------------------------------------------------ */
   --color-surface: #ffffff;
@@ -59,6 +68,11 @@
   /* --- Layout ------------------------------------------------------------ */
   --container-content: 72rem;
   --container-prose: 42rem;
+
+  /* Hoehe der oben klebenden Kopfleiste. Die bildschirmhohen Flaechen
+     rechnen sie ab, sonst liegt ihr unteres Ende genau um diesen Betrag
+     unter der Falz und der Fuss ist nie zu sehen. */
+  --kopf-hoehe: 4rem;
 }
 
 /* ==========================================================================
@@ -71,6 +85,13 @@
     /* Verhindert, dass der oben klebende Header Sprungziele verdeckt. */
     scroll-padding-top: 5.5rem;
     -webkit-text-size-adjust: 100%;
+  }
+
+  /* Ab Tablet ist die Kopfleiste h-18. */
+  @media (width >= 48rem) {
+    :root {
+      --kopf-hoehe: 4.5rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -91,25 +112,34 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Aussagen. Instrument Serif hat NUR den Schnitt 400 -- ein groesserer
+     Wert liesse den Browser eine Fettung errechnen, die die Formen
+     verschmiert. Deshalb steht die 400 hier ausdruecklich.
+
+     Zeilenhoehe bewusst ueber 1.0: Ae, Oe und Ue tragen ihre Punkte
+     oberhalb der Versalhoehe. Enger gesetzt stossen sie in die Zeile
+     darueber, und deutsche Ueberschriften bestehen nun mal aus deutschen
+     Woertern. */
   h1,
-  h2,
-  h3,
-  h4 {
+  h2 {
     font-family: var(--font-display);
     color: var(--color-ink);
-    font-weight: 700;
-    /* Archivo ist breit gebaut. Eng gestellt wirkt sie kompakt und
-       plakativ statt luftig, das traegt die Ueberschriften. */
-    letter-spacing: -0.035em;
-    line-height: 1.06;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
     text-wrap: balance;
   }
 
+  /* Gliederung innerhalb von Karten und Abschnitten. Ein Serif auf 17 px
+     in einer Karte wirkt zaghaft, ein halbfetter Grotesk traegt dort. */
   h3,
   h4 {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
     font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    text-wrap: balance;
   }
 
   p {
@@ -147,6 +177,92 @@
   @media (width >= 48rem) {
     padding-inline: 2rem;
   }
+}
+
+/* ==========================================================================
+   Bewegung beim Erscheinen
+
+   Loest dasselbe wie die verbreitete React-Fassung mit Framer Motion, aber
+   ueber `animation-timeline: view()`. Der Browser bindet die Animation an
+   die Scrollposition des Elements. Kein Beobachter, kein Skript, kein
+   Nachrechnen bei jedem Scrollschritt -- und es laeuft im Compositor, also
+   auch auf aelteren Handys fluessig.
+
+   ANWENDUNG
+     <div class="einblenden">                      einfach
+     <li class="einblenden" style="--verzug: 2">   gestaffelt, Faktor 2
+
+   Ohne Unterstuetzung fuer `view()` (aeltere Safari-Fassungen) ist der
+   Inhalt schlicht sichtbar. Der Effekt ist eine Zugabe, nie Voraussetzung
+   dafuer, dass man etwas lesen kann.
+   ========================================================================== */
+
+@utility einblenden {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: auftauchen linear both;
+      animation-timeline: view();
+      /* Beginnt, sobald das Element von unten hereinkommt, und ist fertig,
+         bevor es die Mitte erreicht. Sonst zappelt beim Zurueckscrollen. */
+      animation-range: entry 10% entry 65%;
+      animation-delay: calc(var(--verzug, 0) * -0.06s);
+    }
+  }
+}
+
+/* Wie `einblenden`, aber die Bewegung kommt von der Seite. Fuer Elemente,
+   die neben einer Ueberschrift stehen statt darunter. */
+@utility hereinziehen {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: heranruecken linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+      animation-delay: calc(var(--verzug, 0) * -0.06s);
+    }
+  }
+}
+
+@keyframes auftauchen {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes heranruecken {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Kleine Kennung ueber einer Ueberschrift, Schrittnummern, Kennzahlen.
+   Stand bisher als dieselben fuenf Deklarationen in sechs Dateien. */
+@utility kennung {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* Ziffern in gleicher Breite. Fuer Kennzahlen und Schrittnummern, damit
+   nichts springt, wenn sich ein Wert aendert. */
+@utility ziffern {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Fliesstext fuer Rechtstexte und laengere Passagen. */

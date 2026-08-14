@@ -53,20 +53,15 @@ const {
   <div class="container-content tafel-inner">
     {breadcrumbs.length > 0 && <Breadcrumbs trail={breadcrumbs} tone="inverse" />}
 
-    <p class="tafel-eyebrow">{eyebrow}</p>
+    <p class="tafel-eyebrow kennung">{eyebrow}</p>
 
+    {/* Genau eine Linie, unter der Kennung. Eine zweite unter der
+        Schlagzeile rahmte die Aussage ein wie ein Formularfeld. */}
     <hr />
 
     <h1 class="tafel-schlag">{heading}</h1>
 
-    {
-      intro && (
-        <>
-          <hr />
-          <p class="tafel-intro">{intro}</p>
-        </>
-      )
-    }
+    {intro && <p class="tafel-intro">{intro}</p>}
 
     <slot />
   </div>
@@ -96,37 +91,37 @@ const {
 
   .tafel-eyebrow {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    opacity: 0.7;
   }
 
   .tafel hr {
     margin: 0;
     border: 0;
-    border-top: 1px solid rgb(255 255 255 / 0.3);
+    border-top: 1px solid rgb(255 255 255 / 0.24);
   }
 
+  /* Zeilenhoehe ueber 1.0, sonst stossen die Punkte von Ae, Oe und Ue in
+     die Zeile darueber. Betrifft hier zum Beispiel "Ueber mich". */
   .tafel-schlag {
     margin: 0;
     color: #fff;
-    font-size: clamp(2.25rem, 6.5vw, 5.25rem);
-    line-height: 0.95;
-    letter-spacing: -0.04em;
-    max-width: 22ch;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    max-width: 20ch;
   }
 
   .tafel-kompakt .tafel-schlag {
-    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-size: clamp(1.875rem, 3.8vw, 2.75rem);
   }
 
   .tafel-intro {
     margin: 0;
     max-width: 52ch;
-    font-size: clamp(1.0625rem, 1.7vw, 1.375rem);
-    opacity: 0.88;
+    font-size: clamp(1.0625rem, 1.6vw, 1.3125rem);
+    line-height: 1.55;
+    opacity: 0.82;
   }
 
   /* Bildmarke als angeschnittene Flaeche. Nur die Marke, kein Schriftzug:

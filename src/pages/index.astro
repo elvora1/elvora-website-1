@@ -1,18 +1,16 @@
 ---
 import Base from '~/layouts/Base.astro';
+import Auftakt from '~/components/Auftakt.astro';
 import StoryPanel from '~/components/StoryPanel.astro';
 import Button from '~/components/Button.astro';
 import Portrait from '~/components/Portrait.astro';
-import ReviewBadge from '~/components/ReviewBadge.astro';
 import {
   cta,
   services,
   automationModules,
-  serviceArea,
   address,
   owner,
   contactLinks,
-  reviews,
 } from '~/config/site';
 
 const title = 'Elvora: Mehr Anfragen für Betriebe in Essen';
@@ -35,54 +33,29 @@ const verluste = [
   },
 ];
 
-const versprechen = [
-  `Aus ${address.city}, für ${serviceArea.display}`,
-  'Ein fester Ansprechpartner, keine Hotline',
-  'Antwort auf Anfragen binnen 24 Stunden',
+/** Belegzeile am Fuß des Auftakts, bis Google-Bewertungen vorliegen. */
+const belege = [
+  `Aus ${address.city}`,
+  'Ein fester Ansprechpartner',
+  'Antwort binnen 24 Stunden',
 ];
 ---
 
-<Base title={title} description={description}>
-  {/* ========== 01 Aufschlag ========== */}
+<Base title={title} description={description} kopfFarbe="#16193a">
+  {/* ========== Auftakt: kein Kapitel, kein Zaehler ========== */}
+  <Auftakt
+    kennung={`Digitalagentur aus ${address.city}`}
+    zeilen={['Gefunden.', 'Angerufen.', 'Beauftragt.']}
+    intro="Die meisten Betriebe verlieren Aufträge nicht an die Konkurrenz, sondern an verpasste Anrufe und eine Website, die niemand findet. Ich bringe beides in Ordnung."
+    cta={{ href: cta.primary.href, label: cta.primary.label }}
+    neben={{ href: contactLinks.whatsapp, label: 'Oder direkt auf WhatsApp schreiben', extern: true }}
+    belege={belege}
+    color="#16193a"
+  />
+
+  {/* ========== 01 Das Problem ========== */}
   <StoryPanel
     index={1}
-    label={`Digitalagentur aus ${address.city}`}
-    heading="Ihr Betrieb wird gefunden, angerufen und beauftragt"
-    color="#16193a"
-    as="h1"
-    scan
-  >
-    <p class="fliess">
-      Die meisten Betriebe verlieren Aufträge nicht an die Konkurrenz, sondern
-      an verpasste Anrufe und eine Website, die niemand findet. Ich bringe
-      beides in Ordnung und halte Ihnen den Rücken frei.
-    </p>
-
-    <div slot="fuss" class="abschluss">
-      <div class="knopfgruppe">
-        <Button href={cta.primary.href} size="lg" variant="aufFarbe" class="max-sm:w-full">
-          {cta.primary.label}
-        </Button>
-        <p class="notiz">{cta.primary.note}</p>
-      </div>
-
-      {
-        reviews.enabled && reviews.count > 0 ? (
-          <ReviewBadge tone="inverse" />
-        ) : (
-          <ul class="versprechen">
-            {versprechen.map((v) => (
-              <li>{v}</li>
-            ))}
-          </ul>
-        )
-      }
-    </div>
-  </StoryPanel>
-
-  {/* ========== 02 Das Problem ========== */}
-  <StoryPanel
-    index={2}
     label="Wo es klemmt"
     heading="Der Auftrag geht an den, der zuerst erreichbar war"
     color="#0f1124"
@@ -94,9 +67,9 @@ const versprechen = [
 
     <div slot="fuss" class="spalten">
       {
-        verluste.map((v) => (
-          <div class="spalte">
-            <p class="spalte-titel">{v.titel}</p>
+        verluste.map((v, i) => (
+          <div class="spalte einblenden" style={`--verzug:${i}`}>
+            <p class="spalte-titel kennung">{v.titel}</p>
             <p class="spalte-text">{v.text}</p>
           </div>
         ))
@@ -104,11 +77,11 @@ const versprechen = [
     </div>
   </StoryPanel>
 
-  {/* ========== 03 bis 06 Die vier Leistungen ========== */}
+  {/* ========== 02 bis 05 Die vier Leistungen ========== */}
   {
     services.map((service, i) => (
       <StoryPanel
-        index={i + 3}
+        index={i + 2}
         label={service.label}
         heading={service.benefit}
         color={service.color}
@@ -117,8 +90,10 @@ const versprechen = [
 
         {service.slug === 'automatisierung' && (
           <ul class="module">
-            {automationModules.map((m) => (
-              <li>{m.name}</li>
+            {automationModules.map((m, j) => (
+              <li class="einblenden" style={`--verzug:${j}`}>
+                {m.name}
+              </li>
             ))}
           </ul>
         )}
@@ -145,9 +120,9 @@ const versprechen = [
     ))
   }
 
-  {/* ========== 07 Der Mensch dahinter ========== */}
+  {/* ========== 06 Der Mensch dahinter ========== */}
   <StoryPanel
-    index={7}
+    index={6}
     label="Der Mensch dahinter"
     heading="Ich komme aus dem Handwerk"
     color="#f1ece6"
@@ -162,7 +137,7 @@ const versprechen = [
     </p>
 
     <div slot="fuss" class="portraet-zeile">
-      <div class="portraet">
+      <div class="portraet hereinziehen">
         <Portrait alt={`${owner.fullName}, Inhaber von Elvora aus ${address.city}`} />
       </div>
       <a class="weiter" href="/ueber-mich/">
@@ -182,13 +157,12 @@ const versprechen = [
     </div>
   </StoryPanel>
 
-  {/* ========== 08 Abschluss ========== */}
+  {/* ========== 07 Abschluss ========== */}
   <StoryPanel
-    index={8}
+    index={7}
     label="Loslegen"
     heading="Klingt das nach Ihrem Betrieb?"
     color="#16193a"
-    scan
   >
     <p class="fliess">
       In einem kurzen Gespräch schauen wir, wo bei Ihnen gerade Anfragen verloren
@@ -254,23 +228,6 @@ const versprechen = [
     text-underline-offset: 4px;
   }
 
-  .versprechen {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.9375rem;
-    opacity: 0.75;
-  }
-
-  @media (width >= 48rem) {
-    .versprechen {
-      text-align: right;
-    }
-  }
-
   /* Spalten wie im Vorbild: umbrechend, gleichmaessig, mit Mindestbreite. */
   .spalten {
     display: flex;
@@ -283,13 +240,9 @@ const versprechen = [
     flex: 1;
   }
 
+  /* Groesse und Sperrung kommen aus der Utility `kennung`. */
   .spalte-titel {
-    margin: 0 0 0.5rem;
-    font-family: var(--font-display);
-    font-size: 0.875rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    margin: 0 0 0.625rem;
   }
 
   .spalte-text {
@@ -316,6 +269,8 @@ const versprechen = [
     opacity: 0.85;
   }
 
+  /* Ein Navigationsziel, kein Etikett und keine Aussage: bleibt deshalb im
+     Fliesstextschnitt, nur halbfett. */
   .weiter {
     display: inline-flex;
     align-items: center;
@@ -323,8 +278,8 @@ const versprechen = [
     padding-bottom: 0.25rem;
     border-bottom: 1px solid currentColor;
     color: inherit;
-    font-family: var(--font-display);
-    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-family: var(--font-sans);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
     font-weight: 600;
     text-decoration: none;
   }

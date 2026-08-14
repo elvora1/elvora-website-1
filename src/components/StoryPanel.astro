@@ -1,6 +1,5 @@
 ---
 import Texture from './Texture.astro';
-import ScanField from './ScanField.astro';
 
 /**
  * Eine Vollbildfläche der Story.
@@ -28,8 +27,6 @@ interface Props {
   as?: 'h1' | 'h2';
   /** Feinere Schraffur auf hellen Flächen. */
   texture?: 'schraffur' | 'punkte' | 'keine';
-  /** Wanderndes Punktraster darüber. Nur für einzelne Flächen gedacht. */
-  scan?: boolean;
 }
 
 const {
@@ -40,7 +37,6 @@ const {
   ink = '#ffffff',
   as: Tag = 'h2',
   texture = 'schraffur',
-  scan = false,
 }: Props = Astro.props;
 
 const nummer = String(index).padStart(2, '0');
@@ -53,21 +49,21 @@ const nummer = String(index).padStart(2, '0');
 >
   <div class="platte-inner">
     {texture !== 'keine' && <Texture variant={texture} />}
-    {scan && <ScanField />}
 
     <div class="platte-kopf">
-      <p class="kennung">
+      <p class="platte-kennung kennung">
         {nummer} <span aria-hidden="true">—</span> {label}
       </p>
 
+      {/* Genau EINE Linie, direkt unter der Kennung, als Kapitelmarke.
+          Eine zweite unter der Schlagzeile rahmte die Aussage ein wie ein
+          Formularfeld. */}
       <hr />
 
-      <Tag class="schlag">{heading}</Tag>
-
-      <hr />
+      <Tag class="schlag einblenden">{heading}</Tag>
     </div>
 
-    <div class="platte-koerper">
+    <div class="platte-koerper einblenden" style="--verzug:1">
       <slot />
     </div>
 
@@ -86,14 +82,16 @@ const nummer = String(index).padStart(2, '0');
     color: var(--tinte);
   }
 
+  /* Bildschirmhoch MINUS Kopfleiste, sonst rutscht der Fuss der Flaeche um
+     genau deren Hoehe unter die Falz. */
   .platte-inner {
     position: relative;
     display: flex;
-    min-height: 100svh;
+    min-height: calc(100svh - var(--kopf-hoehe));
     width: 100%;
     flex-direction: column;
     gap: clamp(1.25rem, 2.5vw, 2rem);
-    padding: clamp(4.5rem, 8vw, 6rem) clamp(1.25rem, 4vw, 4rem) clamp(2.5rem, 4vw, 4rem);
+    padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 4rem) clamp(2rem, 3.5vw, 3.25rem);
     transform-origin: bottom left;
     will-change: transform;
   }
@@ -111,13 +109,9 @@ const nummer = String(index).padStart(2, '0');
     gap: clamp(1rem, 2vw, 1.75rem);
   }
 
-  .kennung {
+  .platte-kennung {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(0.75rem, 1vw, 0.875rem);
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    opacity: 0.7;
   }
 
   .platte hr {
@@ -128,15 +122,20 @@ const nummer = String(index).padStart(2, '0');
   }
 
   /* Bewusst keine Grossbuchstaben: im Deutschen laufen die Woerter zu lang
-     und werden in Versalien schwerer lesbar. Die Wirkung kommt hier aus
-     Groesse und enger Stellung. */
+     und werden in Versalien schwerer lesbar.
+
+     Zeilenhoehe 1.04 statt 0.9: Ae, Oe und Ue tragen ihre Punkte oberhalb
+     der Versalhoehe, und Unterlaengen wie in "gefunden" brauchen Platz.
+     Enger gesetzt stossen die Zeilen ineinander. Die Wirkung kommt aus der
+     Groesse und aus der Schrift, nicht aus dem Zusammenquetschen. */
   .schlag {
     margin: 0;
     color: var(--tinte);
-    font-size: clamp(2.5rem, 8vw, 7.5rem);
-    line-height: 0.9;
-    letter-spacing: -0.045em;
-    max-width: 18ch;
+    font-size: clamp(2.25rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    max-width: 16ch;
     text-wrap: balance;
   }
 
@@ -164,8 +163,8 @@ const nummer = String(index).padStart(2, '0');
   @media (width >= 48rem) and (prefers-reduced-motion: no-preference) {
     .platte {
       position: sticky;
-      top: 0;
-      height: 100svh;
+      top: var(--kopf-hoehe);
+      height: calc(100svh - var(--kopf-hoehe));
     }
 
     .platte-inner {
@@ -173,8 +172,12 @@ const nummer = String(index).padStart(2, '0');
       min-height: 0;
     }
 
+    /* Jede Kapitelflaeche folgt auf etwas -- die erste auf den Auftakt --
+       und kippt deshalb ein. Der fruehere Ausschluss ueber `:first-of-type`
+       ist entfallen: der zaehlt nach Elementtyp, nicht nach Klasse, und
+       haette hier die falsche Flaeche erwischt. */
     @supports (animation-timeline: view()) {
-      .platte:not(:first-of-type) .platte-inner {
+      .platte .platte-inner {
         animation: hereinkippen linear both;
         animation-timeline: view();
         animation-range: entry 0% entry 92%;

@@ -49,6 +49,7 @@ const principles = [
   title="Über mich"
   description="Luan Qerkini von Elvora aus Essen: zuständig für Sichtbarkeit und Automatisierung bei Betrieben, in denen der Inhaber mitarbeitet."
   breadcrumbs={[{ label: 'Über mich' }]}
+  kopfFarbe="#1d2140"
 >
   <section class="ueber-tafel">
     <Texture variant="schraffur" />
@@ -58,12 +59,11 @@ const principles = [
 
       <div class="ueber-raster">
         <div class="ueber-text">
-          <p class="ueber-eyebrow">Der Mensch dahinter</p>
+          <p class="ueber-eyebrow kennung">Der Mensch dahinter</p>
           <hr />
           <h1 class="ueber-schlag">
             Ich komme aus dem Handwerk. Deshalb muss man mir nichts erklären.
           </h1>
-          <hr />
           <p class="ueber-intro">
             Mein Name ist {owner.fullName}, gelernter {owner.trade}. Deshalb
             weiß ich, wie ein Betrieb von innen aussieht: Der Inhaber arbeitet
@@ -225,32 +225,33 @@ const principles = [
 
   .ueber-eyebrow {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    opacity: 0.7;
   }
 
   .ueber-tafel hr {
     margin: 0;
     border: 0;
-    border-top: 1px solid rgb(255 255 255 / 0.3);
+    border-top: 1px solid rgb(255 255 255 / 0.24);
   }
 
+  /* "Ich komme aus dem Handwerk" traegt kein Ae, Oe oder Ue, aber
+     "erklaeren" hat eines, und der Titel der Seite ebenso. Deshalb hier
+     dieselbe Zeilenhoehe wie auf allen anderen Tafeln. */
   .ueber-schlag {
     margin: 0;
     color: #fff;
-    font-size: clamp(2.25rem, 5.5vw, 4.25rem);
-    line-height: 0.98;
-    letter-spacing: -0.04em;
+    font-size: clamp(2rem, 4.6vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
   }
 
   .ueber-intro {
     margin: 0;
     max-width: 54ch;
     font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
-    opacity: 0.88;
+    line-height: 1.55;
+    opacity: 0.82;
   }
 
   /* Das Portraet bekommt Gewicht statt als kleine Kachel zu verschwinden. */
