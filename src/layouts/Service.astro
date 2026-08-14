@@ -1,6 +1,6 @@
 ---
 import Base from './Base.astro';
-import Section from '~/components/Section.astro';
+import Band from '~/components/Band.astro';
 import Button from '~/components/Button.astro';
 import PanelHero from '~/components/PanelHero.astro';
 import { services } from '~/config/site';
@@ -62,11 +62,11 @@ const nummer = String(index + 1).padStart(2, '0');
 
   {
     faq.length > 0 && (
-      <Section tone="default">
+      <Band ton="hell" kennung="Häufige Fragen">
         <div class="max-w-3xl">
-          <Faq items={faq} />
+          <Faq items={faq} heading="Was Betriebe vorher wissen wollen" />
         </div>
-      </Section>
+      </Band>
     )
   }
 

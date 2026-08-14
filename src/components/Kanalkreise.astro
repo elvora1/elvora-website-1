@@ -1,0 +1,186 @@
+---
+/**
+ * Überlappende Kreise für die Kontaktwege.
+ *
+ * Übernimmt die Anordnung einer Vorlage, die dort Portraitfotos zeigt und
+ * daneben eine Zählmarke „+99". Fotos gehen hier aus zwei Gründen nicht:
+ *
+ * Rechtlich sind Profilbilder aus Google-Bewertungen personenbezogene Daten
+ * Dritter, deren Übernahme auf die eigene Website eine Einwilligung der
+ * abgebildeten Person braucht. Inhaltlich wären erfundene Gesichter aus einem
+ * Stock-Verzeichnis auf einer Seite, die Vertrauen aufbauen soll, ein
+ * gefälschter Beleg.
+ *
+ * Dieselbe Anordnung trägt aber sofort etwas Echtes: die vier Wege, auf denen
+ * man hier ankommt. Jeder Kreis ist ein Link, nicht nur ein Bild, und wer mit
+ * der Maus darüber geht, bekommt den Fächer aufgezogen.
+ *
+ * Die Fassung mit Bewertenden steht in `Bewerterkreise.astro` und springt an,
+ * sobald echte Bewertungen vorliegen.
+ */
+type Symbolname = 'chat' | 'telefon' | 'brief' | 'kalender';
+
+/**
+ * Symbole statt Buchstabenkürzel: die Kreise überlappen einander, und ein
+ * vierstelliges Kürzel wurde vom Nachbarkreis angeschnitten. Ein zentriertes
+ * Symbol bleibt auch überlappt erkennbar.
+ */
+const symbole: Record<Symbolname, string> = {
+  chat: 'M10 2a8 8 0 0 0-6.9 12.03L2 18l4.07-1.06A8 8 0 1 0 10 2z',
+  telefon:
+    'M6.6 3.2 4.3 4.4a1.6 1.6 0 0 0-.8 1.9c.9 3 2.4 5.3 4.5 7 2 1.7 4 2.6 6 2.7a1.6 1.6 0 0 0 1.6-1.1l.7-2.4-3.4-1.5-1.3 1.6a11 11 0 0 1-4-3.9l1.7-1.2-2.7-4.3z',
+  brief: 'M2.5 5.5h15v9h-15zM2.5 6l7.5 5 7.5-5',
+  kalender: 'M3.5 5.5h13v11h-13zM3.5 9h13M7 3.5v3M13 3.5v3',
+};
+
+interface Props {
+  kanaele: Array<{ label: string; href: string; symbol: Symbolname; extern?: boolean }>;
+  /** `inverse` für farbige Flächen. */
+  tone?: 'light' | 'inverse';
+  class?: string;
+}
+
+const { kanaele, tone = 'light', class: className = '' }: Props = Astro.props;
+---
+
+<ul class:list={['kreise', tone === 'inverse' && 'kreise-invers', className]}>
+  {
+    kanaele.map((kanal, i) => (
+      <li class="kreis-platz" style={`--rang:${i}`}>
+        <a
+          class="kreis"
+          href={kanal.href}
+          {...kanal.extern ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+        >
+          <svg
+            class="kreis-symbol"
+            viewBox="0 0 20 20"
+            fill={kanal.symbol === 'chat' ? 'currentColor' : 'none'}
+            stroke={kanal.symbol === 'chat' ? 'none' : 'currentColor'}
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d={symbole[kanal.symbol]} />
+          </svg>
+          <span class="sr-only">{kanal.label}</span>
+        </a>
+        <span class="kreis-name kennung" aria-hidden="true">
+          {kanal.label}
+        </span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .kreise {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kreis-platz {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+    /* Der vordere Kreis liegt oben, sonst verdeckt der letzte den ersten. */
+    z-index: calc(10 - var(--rang));
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .kreis-platz + .kreis-platz {
+    margin-inline-start: -0.875rem;
+  }
+
+  .kreis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    border: 2px solid var(--color-surface);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .kreis-symbol {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* Die Beschriftung erscheint erst, wenn der Faecher aufgezogen ist:
+     zusammengeschoben haetten sich die Woerter ueberlappt. */
+  .kreis-name {
+    font-size: 0.625rem;
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.25s;
+    color: var(--color-ink-muted);
+  }
+
+  .kreise-invers .kreis {
+    border-color: rgb(255 255 255 / 0.25);
+    background: rgb(255 255 255 / 0.14);
+    color: #fff;
+  }
+
+  .kreise-invers .kreis-name {
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  .kreis:hover,
+  .kreis:focus-visible {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+
+  .kreise-invers .kreis:hover,
+  .kreise-invers .kreis:focus-visible {
+    background: #fff;
+    color: var(--color-ink);
+  }
+
+  /* --- Der Faecher ------------------------------------------------------
+     Zieht sich auf, sobald die Gruppe angesteuert wird -- mit der Maus,
+     mit der Tastatur, oder per Fingertipp auf einen der Kreise.
+     `:focus-within` ist hier der wichtige Teil: ohne ihn waeren die
+     Beschriftungen fuer Tastaturbedienung unsichtbar. */
+  .kreise:hover .kreis-platz,
+  .kreise:focus-within .kreis-platz {
+    transform: translateX(calc(var(--rang) * 0.875rem));
+  }
+
+  .kreise:hover .kreis-name,
+  .kreise:focus-within .kreis-name {
+    opacity: 1;
+  }
+
+  /* Ohne Zeigegeraet bleibt der Faecher offen: dort gibt es kein Hover,
+     und die Wege sollen auch dann benannt sein. */
+  @media (hover: none) {
+    .kreis-platz {
+      transform: translateX(calc(var(--rang) * 0.875rem));
+    }
+
+    .kreis-name {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kreis-platz {
+      transition: none;
+    }
+  }
+</style>

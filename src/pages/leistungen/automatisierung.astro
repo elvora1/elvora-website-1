@@ -1,9 +1,11 @@
 ---
 import { Image } from 'astro:assets';
 import Service from '~/layouts/Service.astro';
-import Section from '~/components/Section.astro';
 import Button from '~/components/Button.astro';
 import ModuleVisual from '~/components/ModuleVisual.astro';
+import Band from '~/components/Band.astro';
+import Liste from '~/components/Liste.astro';
+import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
 import Geraet from '~/components/Geraet.astro';
 import { automationModules, cta, serviceArea } from '~/config/site';
 import type { FaqItem } from '~/types';
@@ -31,6 +33,28 @@ const shotFor = (slug: string) => {
  */
 const rahmenArt = (slug: string): 'handy' | 'rechner' =>
   slug === 'dashboard' ? 'rechner' : 'handy';
+
+/**
+ * Was hereinkommt, während der Betrieb arbeitet. Gattungsneutral formuliert:
+ * dieselbe Lage in der Werkstatt, in der Praxis und im Büro.
+ */
+const eingang = [
+  {
+    kanal: 'WhatsApp',
+    zeit: '08:14',
+    text: 'Guten Tag, ich bräuchte kurzfristig einen Termin. Geht diese Woche noch was?',
+  },
+  {
+    kanal: 'Verpasster Anruf',
+    zeit: '09:02',
+    text: 'Angerufen, niemand erreicht. Die Assistenz hat nachgefasst und die Nummer notiert.',
+  },
+  {
+    kanal: 'Kontaktformular',
+    zeit: '11:37',
+    text: 'Anfrage über die Website. Bereits beantwortet, Rückruf für 16 Uhr vereinbart.',
+  },
+];
 
 const faq: FaqItem[] = [
   {
@@ -92,39 +116,33 @@ const painPoints = [
   faq={faq}
 >
   {/* ===================== Das Problem ===================== */}
-  <Section tone="default">
-    <div class="max-w-2xl">
-      <h2 class="text-3xl md:text-4xl">Der Auftrag geht selten an den Besseren</h2>
-      <p class="mt-4 text-ink-muted">
-        Er geht an den, der zuerst erreichbar war. Für einen Betrieb, in dem der
-        Inhaber mitarbeitet, ist das eine unfaire Ausgangslage, und genau die
-        lässt sich abstellen.
-      </p>
-    </div>
+  <Band
+    ton="tief"
+    kennung="Wo es klemmt"
+    heading="Der Auftrag geht selten an den Besseren"
+    intro="Er geht an den, der zuerst erreichbar war. Für einen Betrieb, in dem der Inhaber mitarbeitet, ist das eine unfaire Ausgangslage, und genau die lässt sich abstellen."
+  >
+    <div class="problem">
+      <Liste
+        eintraege={painPoints.map((p) => ({ titel: p.problem, text: p.result }))}
+        anordnung="reihen"
+        geordnet
+        class="problem-liste"
+      />
 
-    <ul class="mt-12 grid gap-5 md:grid-cols-3">
-      {
-        painPoints.map((point) => (
-          <li class="rounded-card border border-border bg-surface p-6">
-            <p class="font-medium text-ink">{point.problem}</p>
-            <p class="mt-3 text-[0.9375rem] text-ink-muted">{point.result}</p>
-          </li>
-        ))
-      }
-    </ul>
-  </Section>
+      {/* Was stattdessen hereinkommt. Der Stapel faechert beim Scrollen auf. */}
+      <Nachrichtenstapel nachrichten={eingang} class="problem-stapel" />
+    </div>
+  </Band>
 
   {/* ===================== Die Module ===================== */}
-  <Section tone="subtle">
-    <div class="max-w-2xl">
-      <h2 class="text-3xl md:text-4xl">Sieben Module, die bereits laufen</h2>
-      <p class="mt-4 text-ink-muted">
-        Nichts davon ist ein Konzept oder eine Absichtserklärung. Alles hier ist
-        im Einsatz und lässt sich für Ihren Betrieb einrichten.
-      </p>
-    </div>
-
-    <ol class="mt-14 flex flex-col gap-16 md:gap-20">
+  <Band
+    ton="gedaempft"
+    kennung="Die Module"
+    heading="Sieben Module, die bereits laufen"
+    intro="Nichts davon ist ein Konzept oder eine Absichtserklärung. Alles hier ist im Einsatz und lässt sich für Ihren Betrieb einrichten."
+  >
+    <ol class="module-liste">
       {
         automationModules.map((module, index) => {
           const shot = shotFor(module.slug);
@@ -133,27 +151,27 @@ const painPoints = [
           const flip = index % 2 === 1;
 
           return (
-            <li id={module.slug} class="grid items-center gap-8 md:grid-cols-2 md:gap-12">
-              <div class:list={['einblenden', flip ? 'md:order-2' : '']}>
-                <span class="inline-flex items-center gap-2.5 text-sm font-medium text-accent">
-                  <span class="ziffern flex h-6 w-6 items-center justify-center rounded-full bg-accent-soft text-xs">
-                    {index + 1}
-                  </span>
+            <li id={module.slug} class="modul" style={`--rang:${index}`}>
+              <div class:list={['modul-text', flip && 'modul-text-rechts']}>
+                <p class="modul-kennung kennung">
+                  <span class="modul-ziffer ziffern">{String(index + 1).padStart(2, '0')}</span>
                   {module.name}
-                </span>
-                <h3 class="mt-3 text-2xl">{module.benefit}</h3>
-                <p class="mt-3 max-w-xl text-ink-muted">{module.text}</p>
+                </p>
+                <h3 class="modul-schlag">{module.benefit}</h3>
+                <p class="modul-satz">{module.text}</p>
               </div>
 
-              {/* Echte Aufnahmen kommen in einen Geraeterahmen: sie SIND
-                  Bildschirmaufnahmen, der Rahmen sagt also die Wahrheit.
-                  Die schematischen Darstellungen bleiben ohne Rahmen und
-                  behalten ihre Beschriftung -- ein Rahmen liesse eine
-                  Zeichnung wie eine Aufnahme aussehen, und das waere ein
-                  erfundener Beleg. */}
-              {shot ? (
-                <div class:list={['min-w-0 hereinziehen', flip ? 'md:order-1' : '']}>
-                  <Geraet art={rahmenArt(module.slug)} bildunterschrift="Aus dem laufenden Betrieb">
+              {/* Der Rahmen sagt: das laeuft auf einem Geraet. Was DARIN
+                  steht, sagt die Beschriftung darunter. Eine echte Aufnahme
+                  traegt "Aus dem laufenden Betrieb", eine Zeichnung traegt
+                  "Schematische Darstellung" -- damit wird aus der Zeichnung
+                  kein erfundener Beleg. */}
+              <div class:list={['modul-bild', flip && 'modul-bild-links']}>
+                <Geraet
+                  art={rahmenArt(module.slug)}
+                  bildunterschrift={shot ? 'Aus dem laufenden Betrieb' : 'Schematische Darstellung'}
+                >
+                  {shot ? (
                     <Image
                       src={shot}
                       alt={module.screenshotAlt}
@@ -162,46 +180,191 @@ const painPoints = [
                       loading="lazy"
                       class="w-full"
                     />
-                  </Geraet>
-                </div>
-              ) : (
-                <ModuleVisual
-                  slug={module.slug}
-                  class={`hereinziehen ${flip ? 'md:order-1' : ''}`}
-                />
-              )}
+                  ) : (
+                    <ModuleVisual slug={module.slug} />
+                  )}
+                </Geraet>
+              </div>
             </li>
           );
         })
       }
     </ol>
-  </Section>
+  </Band>
 
   {/* ===================== Individuelle Automatisierung ===================== */}
-  <Section tone="default">
-    <div class="mx-auto max-w-3xl rounded-card border border-border bg-surface p-8 md:p-12">
-      <h2 class="text-2xl md:text-3xl">Und wenn Ihr Zeitfresser nicht dabei ist?</h2>
-      <p class="mt-4 text-ink-muted">
-        Die sieben Module sind die, die fertig stehen. Vieles andere lässt sich
-        genauso automatisieren: Angebote und Rechnungen, Materialbestellungen,
-        Erinnerungen an Kunden, die Anbindung an Ihre vorhandene Software.
-      </p>
-      <p class="mt-4 text-ink-muted">
-        Beschreiben Sie einfach, was in Ihrem Betrieb gerade die meiste Zeit
-        frisst. Wir prüfen gemeinsam, ob es sich lösen lässt. Wenn nicht, sage
-        ich Ihnen das auch.
-      </p>
+  <Band
+    ton="farbe"
+    farbe="#a93d28"
+    kennung="Alles andere"
+    heading="Und wenn Ihr Zeitfresser nicht dabei ist?"
+  >
+    <div class="individuell">
+      <div class="individuell-text">
+        <p>
+          Die sieben Module sind die, die fertig stehen. Vieles andere lässt sich
+          genauso automatisieren: Angebote und Rechnungen, Materialbestellungen,
+          Erinnerungen an Kunden, die Anbindung an Ihre vorhandene Software.
+        </p>
+        <p>
+          Beschreiben Sie einfach, was in Ihrem Betrieb gerade die meiste Zeit
+          frisst. Wir prüfen gemeinsam, ob es sich lösen lässt. Wenn nicht, sage
+          ich Ihnen das auch.
+        </p>
+      </div>
 
-      <div class="mt-8 flex flex-col items-start gap-2">
-        <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+      <div class="individuell-handlung">
+        <Button href={cta.primary.href} size="lg" variant="aufFarbe" class="max-sm:w-full">
           {cta.primary.label}
         </Button>
-        <p class="text-sm text-ink-faint">{cta.primary.note}</p>
+        <p class="individuell-notiz">{cta.primary.note}</p>
+        <p class="individuell-notiz">
+          Eingerichtet für Betriebe in {serviceArea.display}.
+        </p>
       </div>
     </div>
+  </Band>
 
-    <p class="mt-10 text-center text-sm text-ink-faint">
-      Eingerichtet für Betriebe in {serviceArea.display}.
-    </p>
-  </Section>
 </Service>
+
+<style>
+  /* --- Problemabschnitt -------------------------------------------------- */
+  .problem {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  @media (width >= 64rem) {
+    .problem {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    }
+  }
+
+  /* --- Die Modulliste ---------------------------------------------------- */
+  .module-liste {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4rem, 9vw, 7rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .modul {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+    align-items: center;
+  }
+
+  @media (width >= 48rem) {
+    .modul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(2.5rem, 5vw, 4.5rem);
+    }
+
+    /* Bild und Text wechseln die Seite, damit die Liste nicht monoton wird. */
+    .modul-text-rechts {
+      order: 2;
+    }
+
+    .modul-bild-links {
+      order: 1;
+    }
+  }
+
+  .modul-kennung {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    color: var(--color-accent);
+  }
+
+  .modul-ziffer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: var(--color-accent-soft);
+    font-size: 0.6875rem;
+    letter-spacing: 0;
+  }
+
+  .modul-schlag {
+    margin: 0.875rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+
+  .modul-satz {
+    margin: 0.875rem 0 0;
+    max-width: 40ch;
+    line-height: 1.65;
+    color: var(--color-ink-muted);
+  }
+
+  .modul-bild {
+    min-width: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .modul-text {
+        animation: auftauchen linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 55%;
+      }
+
+      .modul-bild {
+        animation: heranruecken linear both;
+        animation-timeline: view();
+        animation-range: entry 12% entry 62%;
+      }
+    }
+  }
+
+  /* --- Individuelle Automatisierung -------------------------------------- */
+  .individuell {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+  }
+
+  @media (width >= 64rem) {
+    .individuell {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  .individuell-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 54ch;
+  }
+
+  .individuell-text p {
+    margin: 0;
+    line-height: 1.65;
+    opacity: 0.92;
+  }
+
+  .individuell-handlung {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+
+  .individuell-notiz {
+    margin: 0;
+    font-size: 0.875rem;
+    opacity: 0.82;
+  }
+</style>

@@ -1,6 +1,18 @@
 ---
 import type { FaqItem } from '~/types';
 
+/**
+ * Häufige Fragen.
+ *
+ * Bleibt `<details>`, also weiterhin ohne JavaScript aufklappbar und auch
+ * ohne CSS bedienbar. Neu ist die Gestaltung: Mono-Ziffer, Haarlinien, ein
+ * Pluszeichen, das sich beim Öffnen dreht, und ein weicher Auftritt der
+ * Antwort.
+ *
+ * Kein `max-height`-Trick für die Höhenanimation: der braucht einen festen
+ * Höchstwert, den man raten muss, und schneidet lange Antworten ab. Die
+ * Antwort blendet stattdessen auf und rückt hoch, das kommt ohne Raten aus.
+ */
 interface Props {
   items: FaqItem[];
   heading?: string;
@@ -11,34 +23,139 @@ const { items, heading = 'Häufige Fragen' }: Props = Astro.props;
 
 {
   items.length > 0 && (
-    <div>
-      <h2 class="text-2xl md:text-3xl">{heading}</h2>
+    <div class="fragen">
+      <h2 class="fragen-schlag">{heading}</h2>
 
-      <div class="mt-8 divide-y divide-border border-y border-border">
-        {items.map((item) => (
-          <details class="group">
-            <summary class="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-left font-medium text-ink [&::-webkit-details-marker]:hidden">
-              {item.question}
-              <span
-                class="mt-1 shrink-0 text-ink-faint transition-transform group-open:rotate-45"
-                aria-hidden="true"
-              >
+      <div class="fragen-liste">
+        {items.map((item, i) => (
+          <details class="frage">
+            <summary class="frage-kopf">
+              <span class="frage-ziffer ziffern" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span class="frage-text">{item.question}</span>
+              <span class="frage-zeichen" aria-hidden="true">
                 <svg
                   viewBox="0 0 20 20"
-                  class="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="1.6"
+                  stroke-width="1.5"
                   stroke-linecap="round"
                 >
                   <path d="M10 4v12M4 10h12" />
                 </svg>
               </span>
             </summary>
-            <p class="pb-5 pr-10 text-ink-muted">{item.answer}</p>
+            <p class="frage-antwort">{item.answer}</p>
           </details>
         ))}
       </div>
     </div>
   )
 }
+
+<style>
+  .fragen-schlag {
+    margin: 0;
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+  }
+
+  .fragen-liste {
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .frage {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .frage:last-child {
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .frage-kopf {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr) 1.5rem;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-block: clamp(1.125rem, 2vw, 1.5rem);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .frage-kopf::-webkit-details-marker {
+    display: none;
+  }
+
+  .frage-ziffer {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-faint);
+  }
+
+  .frage-text {
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .frage-zeichen {
+    justify-self: end;
+    color: var(--color-ink-faint);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.2s;
+  }
+
+  .frage-zeichen svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .frage[open] .frage-zeichen {
+    transform: rotate(135deg);
+    color: var(--color-accent);
+  }
+
+  .frage-kopf:hover .frage-text {
+    color: var(--color-accent);
+  }
+
+  .frage-antwort {
+    margin: 0;
+    padding-inline-start: 2.75rem;
+    padding-block-end: clamp(1.25rem, 2.5vw, 1.75rem);
+    max-width: 60ch;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--color-ink-muted);
+  }
+
+  @media (width < 32rem) {
+    .frage-kopf {
+      grid-template-columns: 2rem minmax(0, 1fr) 1.25rem;
+    }
+
+    .frage-antwort {
+      padding-inline-start: 2rem;
+    }
+  }
+
+  /* Weicher Auftritt der Antwort, ohne geratenen Hoechstwert. */
+  @media (prefers-reduced-motion: no-preference) {
+    .frage[open] .frage-antwort {
+      animation: antwort-auf 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  }
+
+  @keyframes antwort-auf {
+    from {
+      opacity: 0;
+      transform: translateY(-0.4rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

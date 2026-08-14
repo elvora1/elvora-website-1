@@ -11,17 +11,21 @@
  * behaupten. Drei Anfragen, die parallel hereinkommen, während der Betrieb
  * auf der Baustelle, in der Praxis oder beim Kunden ist.
  *
- * ABWEICHUNG VON DER VORLAGE: Dort liegen die Karten so weit übereinander,
- * dass sich Text auf Text schiebt, und sie fächern erst beim Zeigen mit der
- * Maus auf. Das ist zweimal falsch. Auf dem Handy gibt es kein Hover, der
- * Stapel bliebe dauerhaft unlesbar. Und wer nicht darauf zeigt, sieht nie,
- * was dort steht -- der Inhalt ist hier aber die Aussage, nicht die
- * Bewegung.
+ * DER FÄCHER LÄUFT ÜBER DIE SCROLLPOSITION, NICHT ÜBER DIE MAUS.
  *
- * Deshalb: die Karten stehen lesbar untereinander, leicht gegeneinander
- * gekippt wie ein aufgefächerter Stapel Papier. Wer mit der Maus darüber
- * geht, bekommt die einzelne Karte gerade gerückt und angehoben. Das ist
- * eine Zugabe, keine Voraussetzung.
+ * In der Vorlage liegen die Karten übereinander und fächern erst beim Zeigen
+ * mit der Maus auf. Auf dem Handy gibt es kein Hover: dort bliebe der Stapel
+ * dauerhaft zusammengeschoben und der Text unlesbar. Und wer nicht darauf
+ * zeigt, sieht nie, was dort steht.
+ *
+ * Hier bindet `animation-timeline: view()` das Auffächern an die
+ * Scrollposition. Die Karten liegen erst gestapelt und schräg übereinander
+ * und rücken beim Vorbeiscrollen auseinander. Damit sieht jeder den Effekt,
+ * auf jedem Gerät, ohne etwas tun zu müssen.
+ *
+ * Ohne Unterstützung dafür stehen die Karten von vornherein aufgefächert.
+ * Der Effekt ist eine Zugabe, nie die Voraussetzung dafür, den Inhalt zu
+ * lesen.
  */
 interface Props {
   nachrichten: Array<{ zeit: string; text: string; kanal: string }>;
@@ -112,24 +116,16 @@ const { nachrichten, class: className = '' }: Props = Astro.props;
     opacity: 1;
   }
 
-  /* --- Der Faecher, erst ab Tablet -------------------------------------
-     Leichte Kippung und ein kleiner seitlicher Versatz je Karte. Sie
-     ueberlappen NICHT: der Text bleibt jederzeit lesbar, ohne dass man
-     etwas tun muss. */
-  @media (width >= 48rem) {
-    .stapel {
-      gap: 0.875rem;
-    }
-
-    .stapel-karte {
-      transform-origin: left center;
-      transform: rotate(calc((var(--rang) - 1) * 1.1deg))
-        translateX(calc(var(--rang) * 0.5rem));
-      transition:
-        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-        background-color 0.25s,
-        border-color 0.25s;
-    }
+  /* Ruhestellung: aufgefaechert. Wer keine scrollgebundenen Animationen
+     unterstuetzt, sieht genau das, und der Text ist lesbar. */
+  .stapel-karte {
+    transform-origin: left center;
+    transform: rotate(calc((var(--rang) - 1) * 1.2deg))
+      translateX(calc(var(--rang) * 0.5rem));
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.25s,
+      border-color 0.25s;
   }
 
   @media (hover: hover) {
@@ -140,55 +136,45 @@ const { nachrichten, class: className = '' }: Props = Astro.props;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .stapel-karte {
-      transform: none;
-      transition: none;
-    }
-  }
+  /* --- Das Auffaechern -------------------------------------------------
+     Ausgangsstellung: die Karten liegen uebereinander, gestapelt und
+     schraeg. Endstellung: aufgefaechert und lesbar. Dazwischen entscheidet
+     die Scrollposition, nicht der Mauszeiger.
 
-  /* --- Auftritt -------------------------------------------------------
+     `--hoehe` ist die Ueberlappung im gestapelten Zustand. Negativ, damit
+     die Karten aufeinander rutschen.
+
      Bewusst NICHT ueber die Utility `einblenden`: die endet auf
-     `transform: none` und wuerde die Kippung des Faechers wieder
-     plattmachen. Die Endstellung hier ist die Faecherstellung.
-
-     Gestaffelt ueber `animation-range`, nicht ueber `animation-delay` --
-     bei einer scrollgebundenen Zeitachse gibt es keine Uhr, auf die eine
-     Verzoegerung sich beziehen koennte. */
+     `transform: none` und wuerde die Faecherstellung plattmachen. */
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .stapel-karte {
-        animation: karte-herein linear both;
+        animation: auffaechern linear both;
         animation-timeline: view();
-        animation-range: entry calc(12% + var(--rang) * 9%) entry
-          calc(58% + var(--rang) * 9%);
+        /* Alle Karten teilen sich denselben Bereich: der Stapel oeffnet
+           sich als Ganzes, statt Karte fuer Karte nachzuklappern. */
+        animation-range: entry 12% entry 70%;
       }
     }
   }
 
-  @keyframes karte-herein {
+  @keyframes auffaechern {
     from {
-      opacity: 0;
-      transform: translateY(1.5rem) rotate(0deg);
+      opacity: 0.35;
+      transform: translateY(calc(var(--rang) * -3.6rem))
+        translateX(calc(var(--rang) * 1.25rem)) rotate(-5deg) scale(0.96);
     }
     to {
       opacity: 1;
-      transform: rotate(calc((var(--rang) - 1) * 1.1deg))
+      transform: rotate(calc((var(--rang) - 1) * 1.2deg))
         translateX(calc(var(--rang) * 0.5rem));
     }
   }
 
-  /* Unterhalb der Faechergroesse steht der Stapel gerade. */
-  @media (width < 48rem) {
-    @keyframes karte-herein {
-      from {
-        opacity: 0;
-        transform: translateY(1.5rem);
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
+  @media (prefers-reduced-motion: reduce) {
+    .stapel-karte {
+      transform: none;
+      transition: none;
     }
   }
 </style>

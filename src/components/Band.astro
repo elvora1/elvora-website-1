@@ -1,0 +1,257 @@
+---
+import Texture from './Texture.astro';
+import Scramble from './Scramble.astro';
+
+/**
+ * Ein Abschnitt der Seite.
+ *
+ * Ersetzt `Section.astro`. Das konnte genau zwei Dinge: weiß oder hellgrau,
+ * mit einem Container darin. Alles Weitere musste jede Seite selbst
+ * erfinden, und herausgekommen ist überall dasselbe graue Kartenraster.
+ *
+ * Das Band kann stattdessen, was die Kapitelflächen der Startseite können:
+ * eine Kennung, die sich einläuft, eine Haarlinie, eine Serif-Überschrift,
+ * eine Textur und eine Farbfläche über die volle Breite. Damit sprechen
+ * Startseite und Unterseiten dieselbe Sprache.
+ *
+ * Die Bewegung ist eingebaut: der Inhalt blendet sich beim Erscheinen ein,
+ * ohne dass es an jeder Verwendungsstelle angeschrieben werden muss.
+ */
+interface Props {
+  /**
+   * `hell`      weiße Fläche
+   * `gedaempft` sehr helles Grau, für den ruhigen Wechsel
+   * `farbe`     Vollfläche in `farbe`, Text in Weiß
+   * `tief`      die dunkle Grundfarbe der Marke
+   */
+  ton?: 'hell' | 'gedaempft' | 'farbe' | 'tief';
+  /** Grundfarbe bei `ton="farbe"`. */
+  farbe?: string;
+  /** Kleine Kennung über der Überschrift. Läuft sich ein. */
+  kennung?: string;
+  /** Die Überschrift. */
+  heading?: string;
+  /** Überschriftsebene. */
+  as?: 'h1' | 'h2' | 'h3';
+  /** Ein bis zwei Sätze unter der Überschrift. */
+  intro?: string;
+  /** Hintergrundtextur. */
+  textur?: 'raster' | 'schraffur' | 'punkte' | 'keine';
+  /** Breite des Inhalts. */
+  breite?: 'inhalt' | 'weit' | 'voll';
+  /** Vertikaler Raum. */
+  raum?: 'md' | 'lg';
+  id?: string;
+  class?: string;
+}
+
+const {
+  ton = 'hell',
+  farbe,
+  kennung,
+  heading,
+  as: Tag = 'h2',
+  intro,
+  textur,
+  breite = 'inhalt',
+  raum = 'lg',
+  id,
+  class: className = '',
+}: Props = Astro.props;
+
+/** Auf farbigen Flächen ist Schraffur die richtige Textur, auf hellen Raster. */
+const texturWahl =
+  textur ?? (ton === 'farbe' || ton === 'tief' ? 'schraffur' : 'keine');
+
+const grund =
+  ton === 'farbe' ? (farbe ?? '#1d2140') : ton === 'tief' ? '#16193a' : undefined;
+
+const hatKopf = Boolean(kennung || heading || intro);
+---
+
+<section
+  id={id}
+  class:list={['band', `band-${ton}`, `band-${raum}`, className]}
+  style={grund ? `--grund:${grund}` : undefined}
+>
+  {texturWahl !== 'keine' && <Texture variant={texturWahl} />}
+
+  <div class:list={['band-inner', `band-${breite}`]}>
+    {
+      hatKopf && (
+        <header class="band-kopf">
+          {kennung && (
+            <p class="band-kennung kennung">
+              <Scramble text={kennung} />
+            </p>
+          )}
+
+          {/* Genau eine Linie, unter der Kennung. Dieselbe Regel wie auf den
+              Kapitelflaechen: eine zweite unter der Ueberschrift rahmte die
+              Aussage ein wie ein Formularfeld. */}
+          {kennung && heading && <hr />}
+
+          {heading && <Tag class="band-schlag">{heading}</Tag>}
+
+          {intro && <p class="band-intro">{intro}</p>}
+        </header>
+      )
+    }
+
+    <div class:list={['band-koerper', hatKopf && 'band-koerper-abstand']}>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .band-hell {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .band-gedaempft {
+    background: var(--color-surface-subtle);
+    color: var(--color-ink);
+  }
+
+  .band-farbe,
+  .band-tief {
+    background: var(--grund);
+    color: #fff;
+  }
+
+  /* Die Grundregel setzt h2 bis h4 auf Anthrazit. Auf einer farbigen Flaeche
+     waere das dunkel auf dunkel, also praktisch unsichtbar. Hier erben alle
+     Ueberschriften die Textfarbe des Bandes. */
+  .band-farbe :global(h2),
+  .band-farbe :global(h3),
+  .band-farbe :global(h4),
+  .band-tief :global(h2),
+  .band-tief :global(h3),
+  .band-tief :global(h4) {
+    color: inherit;
+  }
+
+  .band-md {
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .band-lg {
+    padding-block: clamp(4rem, 9vw, 7rem);
+  }
+
+  .band-inner {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (width >= 48rem) {
+    .band-inner {
+      padding-inline: 2rem;
+    }
+  }
+
+  .band-inhalt {
+    max-width: var(--container-content);
+  }
+
+  .band-weit {
+    max-width: 90rem;
+  }
+
+  .band-voll {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  /* --- Kopf ------------------------------------------------------------- */
+  .band-kopf {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.875rem, 1.8vw, 1.5rem);
+    max-width: 46rem;
+  }
+
+  .band-kennung {
+    margin: 0;
+    opacity: 0.72;
+  }
+
+  .band-farbe .band-kennung,
+  .band-tief .band-kennung {
+    opacity: 0.85;
+  }
+
+  .band hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.22;
+  }
+
+  .band-farbe hr,
+  .band-tief hr {
+    opacity: 0.28;
+  }
+
+  .band-schlag {
+    margin: 0;
+    color: currentColor;
+    font-size: clamp(1.875rem, 4vw, 3rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+  }
+
+  .band-intro {
+    margin: 0;
+    max-width: 52ch;
+    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+    line-height: 1.6;
+    opacity: 0.82;
+  }
+
+  .band-farbe .band-intro,
+  .band-tief .band-intro {
+    opacity: 0.92;
+  }
+
+  .band-koerper-abstand {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .band-koerper:empty {
+    display: none;
+  }
+
+  /* --- Bewegung ---------------------------------------------------------
+     Eingebaut statt an jeder Verwendungsstelle angeschrieben. Kopf und
+     Koerper kommen nacheinander, damit die Ueberschrift zuerst steht. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .band-kopf,
+      .band-koerper-abstand {
+        animation: auftauchen linear both;
+        animation-timeline: view();
+      }
+
+      .band-kopf {
+        animation-range: entry 8% entry 52%;
+      }
+
+      .band-koerper-abstand {
+        animation-range: entry 14% entry 62%;
+      }
+    }
+  }
+</style>

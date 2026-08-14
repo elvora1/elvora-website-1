@@ -63,5 +63,79 @@ const {
     </main>
 
     <Footer />
+
+    {/*
+      Das eigene Element für die einlaufenden Kennungen. Steht bewusst HIER
+      und nicht in `Scramble.astro`: die Kennungen kommen auf manchen Seiten
+      ein Dutzend Mal vor, und ein `is:inline`-Skript in der Komponente wäre
+      genauso oft im Dokument gelandet.
+
+      Bewusst eingebettet statt als eigene Datei: so bleibt der Build ohne
+      eine einzige JavaScript-Datei und ohne zusätzliche Anfrage.
+    */}
+    <script is:inline>
+      customElements.define(
+        'text-scramble',
+        class extends HTMLElement {
+          connectedCallback() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const sicht = this.querySelector('.scramble-sicht');
+            if (!sicht) return;
+
+            const ziel = sicht.textContent;
+            const takt = Number(this.dataset.tempo) || 32;
+            const vorrat = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&/=+*';
+            // Breite der Zone, in der noch gewuerfelt wird, bevor der echte
+            // Buchstabe stehen bleibt.
+            const zone = 5;
+
+            const lauf = () => {
+              let schritt = 0;
+              const takte = ziel.length + zone;
+
+              const uhr = setInterval(() => {
+                let aus = '';
+                for (let i = 0; i < ziel.length; i++) {
+                  const z = ziel[i];
+                  // Leerzeichen und Trenner bleiben stehen, sonst verliert
+                  // die Zeile ihre Gliederung und wird zu einem Block.
+                  if (z === ' ' || z === '·' || z === '—' || z === '&') {
+                    aus += z;
+                  } else if (i < schritt - zone) {
+                    aus += z;
+                  } else {
+                    aus += vorrat[(Math.random() * vorrat.length) | 0];
+                  }
+                }
+                sicht.textContent = aus;
+
+                if (++schritt > takte) {
+                  clearInterval(uhr);
+                  sicht.textContent = ziel;
+                }
+              }, takt);
+            };
+
+            // Erst laufen lassen, wenn das Element zu sehen ist. Sonst ist
+            // der Effekt bei allem unterhalb des ersten Bildschirms schon
+            // vorbei, bevor jemand hinschaut.
+            if (!('IntersectionObserver' in window)) return lauf();
+
+            const wache = new IntersectionObserver(
+              (eintraege) => {
+                for (const e of eintraege) {
+                  if (!e.isIntersecting) continue;
+                  wache.disconnect();
+                  lauf();
+                }
+              },
+              { threshold: 0.6 },
+            );
+            wache.observe(this);
+          }
+        },
+      );
+    </script>
   </body>
 </html>

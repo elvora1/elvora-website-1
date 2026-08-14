@@ -1,10 +1,17 @@
 ---
 import Service from '~/layouts/Service.astro';
-import Section from '~/components/Section.astro';
-import Steps from '~/components/Steps.astro';
+import Band from '~/components/Band.astro';
+import Liste from '~/components/Liste.astro';
 import CheckList from '~/components/CheckList.astro';
 import { serviceArea } from '~/config/site';
 import type { FaqItem } from '~/types';
+
+/** Die Punkte neben dem Fliesstext im ersten Abschnitt. */
+const lagepunkte = [
+  { titel: "Auf der Straße", text: "Ihr Transporter steht stundenlang vor dem Haus. Werbung, für die Sie nichts extra zahlen, sofern man lesen kann, was Sie machen." },
+  { titel: "Auf dem Küchentisch", text: "Ihr Angebot wird mit zwei anderen verglichen, oft von jemandem, der nur den Preis beurteilen kann." },
+  { titel: "In der Hand", text: "Die Visitenkarte, die im Sicherungskasten hängen bleibt, wird in zwei Jahren wieder hervorgeholt. Oder eben nicht." },
+];
 
 const faq: FaqItem[] = [
   {
@@ -70,77 +77,75 @@ const steps = [
   faq={faq}
 >
   {/* ===================== Warum es zählt ===================== */}
-  <Section>
-    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
-      <div>
-        <h2 class="text-3xl md:text-4xl">Ihr Angebot liegt neben zwei anderen</h2>
-        <p class="mt-4 text-ink-muted">
-          Der Kunde kann Ihre Arbeit nicht beurteilen, noch nicht. Er hat drei
-          Angebote vor sich und sucht nach Anhaltspunkten, wem er trauen kann.
-          Also achtet er auf das, was er beurteilen kann: Wirkt das sortiert?
-          Passt das zusammen? Macht das den Eindruck eines Betriebs, der seine
-          Sachen im Griff hat?
-        </p>
-        <p class="mt-4 text-ink-muted">
-          Ein Angebot aus einer Textverarbeitung, ein Fahrzeug mit
-          aufgeklebter Handynummer und eine Visitenkarte in einer anderen Schrift
-          senden dieselbe Botschaft, auch wenn Ihre Arbeit die beste von den
-          dreien ist.
-        </p>
+  <Band ton="tief" kennung="Wo es klemmt" heading="Ihr Angebot liegt neben zwei anderen">
+    <div class="lage">
+      <div class="lage-text">
+        <p>Der Kunde kann Ihre Arbeit nicht beurteilen, noch nicht. Er hat drei Angebote vor sich und sucht nach Anhaltspunkten, wem er trauen kann. Also achtet er auf das, was er beurteilen kann: Wirkt das sortiert? Passt das zusammen? Macht das den Eindruck eines Betriebs, der seine Sachen im Griff hat?</p>
+        <p>Ein Angebot aus einer Textverarbeitung, ein Fahrzeug mit aufgeklebter Handynummer und eine Visitenkarte in einer anderen Schrift senden dieselbe Botschaft, auch wenn Ihre Arbeit die beste von den dreien ist.</p>
       </div>
 
-      <div class="rounded-card border border-border bg-surface-subtle p-7 md:p-8">
-        <h3 class="text-lg">Wo Ihr Betrieb täglich gesehen wird</h3>
-        <ul class="mt-5 flex flex-col gap-4 text-[0.9375rem] text-ink-muted">
-          <li class="border-b border-border pb-4">
-            <span class="text-ink">Auf der Straße.</span> Ihr Transporter steht
-            stundenlang vor dem Haus. Das ist Werbung, für die Sie nichts extra
-            zahlen, sofern man lesen kann, was Sie machen.
-          </li>
-          <li class="border-b border-border pb-4">
-            <span class="text-ink">Auf dem Küchentisch.</span> Ihr Angebot wird
-            mit zwei anderen verglichen, oft von jemandem, der nur den Preis
-            beurteilen kann.
-          </li>
-          <li>
-            <span class="text-ink">In der Hand.</span> Die Visitenkarte, die im
-            Sicherungskasten hängen bleibt, wird in zwei Jahren wieder
-            hervorgeholt. Oder eben nicht.
-          </li>
-        </ul>
+      <div class="lage-liste">
+        <h3 class="lage-titel">Wo Ihr Betrieb täglich gesehen wird</h3>
+        <Liste eintraege={lagepunkte} anordnung="reihen" ziffern={false} />
       </div>
     </div>
-  </Section>
+  </Band>
 
   {/* ===================== Leistungsumfang ===================== */}
-  <Section tone="subtle">
-    <div class="max-w-2xl">
-      <h2 class="text-3xl md:text-4xl">Was drin ist</h2>
-      <p class="mt-4 text-ink-muted">
-        Nicht nur ein Logo, sondern alles, was Sie im Alltag tatsächlich in die
-        Hand nehmen.
-      </p>
-    </div>
-
-    <CheckList items={included} class="mt-10" />
-  </Section>
+  <Band ton="gedaempft" kennung="Leistungsumfang" heading="Was drin ist"
+    intro="Nicht nur ein Logo, sondern alles, was Sie im Alltag tatsächlich in die Hand nehmen.">
+    <CheckList items={included} />
+  </Band>
 
   {/* ===================== Ablauf ===================== */}
-  <Section>
-    <div class="max-w-2xl">
-      <h2 class="text-3xl md:text-4xl">So läuft es ab</h2>
-      <p class="mt-4 text-ink-muted">
-        Sie sehen früh etwas Greifbares und entscheiden anhand von echten
-        Anwendungen, nicht anhand von Entwürfen auf weißem Grund.
-      </p>
-    </div>
+  <Band ton="farbe" farbe="#a63082" kennung="Ablauf" heading="So läuft es ab"
+    intro="Sie sehen früh etwas Greifbares und entscheiden anhand von echten Anwendungen, nicht anhand von Entwürfen auf weißem Grund.">
+    <Liste
+      eintraege={steps.map((s) => ({ titel: s.title, text: s.text }))}
+      anordnung="spalten"
+      geordnet
+    />
 
-    <div class="mt-12">
-      <Steps items={steps} />
-    </div>
-
-    <p class="mt-12 text-sm text-ink-faint">
-      Umgesetzt für Betriebe in {serviceArea.display}.
-    </p>
-  </Section>
+    <p class="gebiet">Umgesetzt für Betriebe in {serviceArea.display}.</p>
+  </Band>
 </Service>
+
+<style>
+  .lage {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  @media (width >= 64rem) {
+    .lage {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    }
+  }
+
+  .lage-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    max-width: 52ch;
+  }
+
+  .lage-text p {
+    margin: 0;
+    line-height: 1.65;
+    opacity: 0.9;
+  }
+
+  .lage-titel {
+    margin: 0 0 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+
+  .gebiet {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    font-size: 0.875rem;
+    opacity: 0.78;
+  }
+</style>

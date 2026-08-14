@@ -1,6 +1,6 @@
 ---
 import Base from '~/layouts/Base.astro';
-import Section from '~/components/Section.astro';
+import Band from '~/components/Band.astro';
 import PanelHero from '~/components/PanelHero.astro';
 import BookingEmbed from '~/components/BookingEmbed.astro';
 import WhatsappCta from '~/components/WhatsappCta.astro';
@@ -28,14 +28,14 @@ const agenda = [
     breadcrumbs={[{ label: 'Termin' }]}
   />
 
-  <Section>
-    <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
-      <div class="lg:col-span-7">
+  <Band ton="hell">
+    <div class="termin-raster">
+      <div class="termin-kalender">
         <BookingEmbed />
       </div>
 
-      <div class="lg:col-span-5">
-        <h2 class="text-xl">Was in den {booking.durationLabel} passiert</h2>
+      <div class="termin-ablauf">
+        <h2 class="termin-titel">Was in den {booking.durationLabel} passiert</h2>
         <ol class="mt-6 flex flex-col gap-5">
           {
             agenda.map((item, index) => (
@@ -49,10 +49,8 @@ const agenda = [
           }
         </ol>
 
-        <div class="mt-10 border-t border-border pt-8">
-          <h2 class="text-[0.8125rem] font-semibold uppercase tracking-wider text-ink-faint">
-            Kein passender Termin dabei?
-          </h2>
+        <div class="termin-notfall">
+          <h2 class="kennung termin-notfall-titel">Kein passender Termin dabei?</h2>
           <div class="mt-4 flex flex-col gap-3 text-[0.9375rem] text-ink-muted">
             <WhatsappCta variant="inline" class="text-ink-muted" />
             <p>
@@ -65,5 +63,48 @@ const agenda = [
         </div>
       </div>
     </div>
-  </Section>
+  </Band>
 </Base>
+
+<style>
+  .termin-raster {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  @media (width >= 64rem) {
+    .termin-raster {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(3rem, 6vw, 5rem);
+    }
+  }
+
+  .termin-titel {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .termin-notfall {
+    margin-top: clamp(2rem, 4vw, 2.75rem);
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .termin-notfall-titel {
+    margin: 0 0 1rem;
+    color: var(--color-ink-faint);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .termin-kalender,
+      .termin-ablauf {
+        animation: auftauchen linear both;
+        animation-timeline: view();
+        animation-range: entry 6% entry 45%;
+      }
+    }
+  }
+</style>

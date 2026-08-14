@@ -1,52 +1,164 @@
 ---
 import Button from './Button.astro';
-import GradientField from './GradientField.astro';
 import Texture from './Texture.astro';
+import Scramble from './Scramble.astro';
 import { cta, contactLinks } from '~/config/site';
 
 /**
  * Wiederkehrender Abschluss jeder Seite.
- * Genau ein hervorgehobener CTA, der zweite bleibt untergeordnet.
+ *
+ * Genau ein hervorgehobener CTA, der zweite bleibt untergeordnet und ist
+ * zugleich eine Vorführung: wer schreibt, erlebt die KI-Assistenz selbst.
+ *
+ * Nicht mehr mittig gesetzt. Ein zentrierter Kasten ist die Standardform für
+ * einen Abschluss und sieht auf jeder zweiten Website so aus. Linksbündig mit
+ * der Handlung rechts nimmt die Achse der übrigen Seite auf.
  */
 interface Props {
   heading?: string;
   text?: string;
+  kennung?: string;
 }
 
 const {
   heading = 'Klingt das nach Ihrem Betrieb?',
   text = 'In einem kurzen Gespräch schauen wir, wo bei Ihnen gerade Anfragen verloren gehen. Ohne Vorbereitung, ohne Verpflichtung.',
+  kennung = 'Loslegen',
 } = Astro.props;
 ---
 
-<section class="relative isolate overflow-hidden bg-surface-ink">
-  {/* Reihenfolge zaehlt: das Verlaufsfeld traegt die Tiefe, Schraffur und
-      Korn liegen darueber und nehmen ihm das Glatte. */}
-  <GradientField />
+<section class="schlussband">
   <Texture variant="schraffur" />
-  <div class="container-content relative z-10 py-16 md:py-20">
-    <div class="mx-auto max-w-2xl text-center">
-      <h2 class="text-3xl text-white md:text-4xl">{heading}</h2>
-      <p class="mt-4 text-white/85">{text}</p>
 
-      <div class="mt-8 flex flex-col items-center gap-4">
-        <Button href={cta.primary.href} size="lg">{cta.primary.label}</Button>
-        <p class="text-sm text-white/70">{cta.primary.note}</p>
-      </div>
+  <div class="container-content schlussband-inner">
+    <div class="schlussband-text">
+      <p class="schlussband-kennung kennung">
+        <Scramble text={kennung} />
+      </p>
+      <hr />
+      <h2 class="schlussband-schlag">{heading}</h2>
+      <p class="schlussband-satz">{text}</p>
+    </div>
 
-      {/* Sekundaerer Weg, bewusst untergeordnet und zugleich eine
-          Vorfuehrung: wer schreibt, erlebt die KI-Assistenz selbst. */}
-      <p class="mt-6 text-sm text-white/70">
+    <div class="schlussband-handlung">
+      <Button href={cta.primary.href} size="lg" variant="aufFarbe" class="max-sm:w-full">
+        {cta.primary.label}
+      </Button>
+      <p class="schlussband-notiz">{cta.primary.note}</p>
+
+      <p class="schlussband-notiz">
         Lieber schreiben?{' '}
         <a
           href={contactLinks.whatsapp}
           target="_blank"
           rel="noopener noreferrer"
-          class="text-white underline underline-offset-4 transition-colors hover:text-white"
-        >
-          Auf WhatsApp antwortet sofort meine KI-Assistenz
-        </a>. Sie sehen sie also gleich in Aktion.
+          class="schlussband-link">Auf WhatsApp antwortet sofort meine KI-Assistenz</a
+        >. Sie sehen sie also gleich in Aktion.
       </p>
     </div>
   </div>
 </section>
+
+<style>
+  .schlussband {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: #16193a;
+    color: #fff;
+  }
+
+  .schlussband-inner {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  }
+
+  @media (width >= 64rem) {
+    .schlussband-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    }
+  }
+
+  .schlussband-text {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.875rem, 1.8vw, 1.25rem);
+  }
+
+  .schlussband-kennung {
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  .schlussband hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.28);
+  }
+
+  .schlussband-schlag {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.875rem, 4vw, 3rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    max-width: 20ch;
+  }
+
+  .schlussband-satz {
+    margin: 0;
+    max-width: 48ch;
+    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+    line-height: 1.6;
+    opacity: 0.92;
+  }
+
+  .schlussband-handlung {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .schlussband-notiz {
+    margin: 0;
+    max-width: 40ch;
+    font-size: 0.875rem;
+    opacity: 0.82;
+  }
+
+  .schlussband-link {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgb(255 255 255 / 0.4);
+    transition: text-decoration-color 0.15s;
+  }
+
+  .schlussband-link:hover {
+    text-decoration-color: #fff;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .schlussband-text,
+      .schlussband-handlung {
+        animation: auftauchen linear both;
+        animation-timeline: view();
+      }
+
+      .schlussband-text {
+        animation-range: entry 8% entry 52%;
+      }
+
+      .schlussband-handlung {
+        animation-range: entry 16% entry 62%;
+      }
+    }
+  }
+</style>

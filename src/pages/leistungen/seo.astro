@@ -1,10 +1,17 @@
 ---
 import Service from '~/layouts/Service.astro';
-import Section from '~/components/Section.astro';
-import Steps from '~/components/Steps.astro';
+import Band from '~/components/Band.astro';
+import Liste from '~/components/Liste.astro';
 import CheckList from '~/components/CheckList.astro';
 import { serviceArea } from '~/config/site';
 import type { FaqItem } from '~/types';
+
+/** Die Punkte neben dem Fliesstext im ersten Abschnitt. */
+const lagepunkte = [
+  { titel: "Nähe", text: "Wie weit Ihr Betrieb vom Suchenden entfernt ist. Nicht steuerbar, erklärt aber, warum Platzierungen je nach Standort schwanken." },
+  { titel: "Vollständigkeit", text: "Sind Leistungen, Zeiten, Bilder und Einzugsgebiet hinterlegt, und stimmen sie mit Ihrer Website überein." },
+  { titel: "Bewertungen", text: "Anzahl, Durchschnitt und wie frisch sie sind. Der Hebel, den fast jeder Betrieb liegen lässt." },
+];
 
 const faq: FaqItem[] = [
   {
@@ -75,81 +82,75 @@ const steps = [
   faq={faq}
 >
   {/* ===================== Wie lokale Suche funktioniert ===================== */}
-  <Section>
-    <div class="grid gap-12 md:grid-cols-2 md:gap-16">
-      <div>
-        <h2 class="text-3xl md:text-4xl">Die Entscheidung fällt auf dem ersten Bildschirm</h2>
-        <p class="mt-4 text-ink-muted">
-          Bei einer Suche mit Ortsbezug zeigt Google zuerst eine Karte mit drei
-          Betrieben. Wer dort steht, bekommt den Großteil der Anrufe. Wer
-          darunter steht, bekommt den Rest, und wer auf Seite zwei steht,
-          bekommt nichts.
-        </p>
-        <p class="mt-4 text-ink-muted">
-          Diese drei Plätze vergibt Google nicht nach Größe oder Werbebudget,
-          sondern nach Nähe, Vollständigkeit der Angaben und Bewertungen. Alles
-          drei ist beeinflussbar, und genau darum geht es hier.
-        </p>
+  <Band ton="tief" kennung="Wo es klemmt" heading="Die Entscheidung fällt auf dem ersten Bildschirm">
+    <div class="lage">
+      <div class="lage-text">
+        <p>Bei einer Suche mit Ortsbezug zeigt Google zuerst eine Karte mit drei Betrieben. Wer dort steht, bekommt den Großteil der Anrufe. Wer darunter steht, bekommt den Rest, und wer auf Seite zwei steht, bekommt nichts.</p>
+        <p>Diese drei Plätze vergibt Google nicht nach Größe oder Werbebudget, sondern nach Nähe, Vollständigkeit der Angaben und Bewertungen. Alles drei ist beeinflussbar, und genau darum geht es hier.</p>
       </div>
 
-      <div class="rounded-card border border-border bg-surface-subtle p-7 md:p-8">
-        <h3 class="text-lg">Worauf Google im lokalen Umfeld schaut</h3>
-        <dl class="mt-5 flex flex-col gap-5 text-[0.9375rem]">
-          <div>
-            <dt class="font-medium text-ink">Nähe</dt>
-            <dd class="mt-1 text-ink-muted">
-              Wie weit ist Ihr Betrieb vom Suchenden entfernt. Nicht steuerbar,
-              aber es erklärt, warum Platzierungen je nach Standort schwanken.
-            </dd>
-          </div>
-          <div>
-            <dt class="font-medium text-ink">Vollständigkeit</dt>
-            <dd class="mt-1 text-ink-muted">
-              Sind Leistungen, Zeiten, Bilder und Einzugsgebiet hinterlegt, und
-              stimmen sie mit Ihrer Website überein.
-            </dd>
-          </div>
-          <div>
-            <dt class="font-medium text-ink">Bewertungen</dt>
-            <dd class="mt-1 text-ink-muted">
-              Anzahl, Durchschnitt und wie frisch sie sind. Der Hebel, den fast
-              jeder Betrieb liegen lässt.
-            </dd>
-          </div>
-        </dl>
+      <div class="lage-liste">
+        <h3 class="lage-titel">Worauf Google im lokalen Umfeld schaut</h3>
+        <Liste eintraege={lagepunkte} anordnung="reihen" ziffern={false} />
       </div>
     </div>
-  </Section>
+  </Band>
 
   {/* ===================== Leistungsumfang ===================== */}
-  <Section tone="subtle">
-    <div class="max-w-2xl">
-      <h2 class="text-3xl md:text-4xl">Was drin ist</h2>
-      <p class="mt-4 text-ink-muted">
-        Handfeste Arbeit an den Stellen, die im lokalen Umfeld tatsächlich
-        Anrufe bewegen. Keine Berichte voller Kennzahlen, die niemand liest.
-      </p>
-    </div>
-
-    <CheckList items={included} class="mt-10" />
-  </Section>
+  <Band ton="gedaempft" kennung="Leistungsumfang" heading="Was drin ist"
+    intro="Handfeste Arbeit an den Stellen, die im lokalen Umfeld tatsächlich Anrufe bewegen. Keine Berichte voller Kennzahlen, die niemand liest.">
+    <CheckList items={included} />
+  </Band>
 
   {/* ===================== Ablauf ===================== */}
-  <Section>
-    <div class="max-w-2xl">
-      <h2 class="text-3xl md:text-4xl">So läuft es ab</h2>
-      <p class="mt-4 text-ink-muted">
-        Erst die Grundlagen, weil sie am schnellsten wirken. Danach wird
-        ausgebaut.
-      </p>
-    </div>
+  <Band ton="farbe" farbe="#5c3491" kennung="Ablauf" heading="So läuft es ab"
+    intro="Erst die Grundlagen, weil sie am schnellsten wirken. Danach wird ausgebaut.">
+    <Liste
+      eintraege={steps.map((s) => ({ titel: s.title, text: s.text }))}
+      anordnung="spalten"
+      geordnet
+    />
 
-    <div class="mt-12">
-      <Steps items={steps} />
-    </div>
-
-    <p class="mt-12 text-sm text-ink-faint">
-      Betreut werden Betriebe in {serviceArea.display}.
-    </p>
-  </Section>
+    <p class="gebiet">Betreut werden Betriebe in {serviceArea.display}.</p>
+  </Band>
 </Service>
+
+<style>
+  .lage {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  @media (width >= 64rem) {
+    .lage {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    }
+  }
+
+  .lage-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+    max-width: 52ch;
+  }
+
+  .lage-text p {
+    margin: 0;
+    line-height: 1.65;
+    opacity: 0.9;
+  }
+
+  .lage-titel {
+    margin: 0 0 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+
+  .gebiet {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    font-size: 0.875rem;
+    opacity: 0.78;
+  }
+</style>

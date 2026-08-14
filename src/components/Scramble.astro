@@ -3,31 +3,34 @@
  * Text, der sich beim Erscheinen einläuft.
  *
  * Übernimmt die Idee einer React-Vorlage, die dafür Framer Motion voraussetzt:
- * rund 130 kB für einen Effekt, der in gut zwanzig Zeilen passt. Hier steht
- * stattdessen ein eigenes Element mit einem eingebetteten Skript.
+ * rund 130 kB für einen Effekt, der in gut zwanzig Zeilen passt.
+ *
+ * Diese Datei liefert NUR das Markup. Die Definition des eigenen Elements
+ * steht genau einmal je Seite in `Base.astro`. Stünde sie hier, hätte sie
+ * bei dreißig Kennungen dreißigmal im Dokument gestanden.
  *
  * ZWEI DINGE, DIE DIE VORLAGE NICHT LÖST:
  *
  * 1. Vorlesesoftware. Die Vorlage tauscht den sichtbaren Text vierzig Mal in
- *    der Sekunde aus. Ein Screenreader liest dabei Buchstabensalat vor.
+ *    der Sekunde aus, ein Screenreader liest dabei Buchstabensalat vor.
  *    Deshalb steht der echte Text hier ein zweites Mal unsichtbar daneben,
  *    und nur die sichtbare Fassung wird angefasst.
  * 2. Springendes Layout. Zufallszeichen sind unterschiedlich breit, die Zeile
  *    zappelt. Deshalb ist der Effekt an die Schreibmaschinenschrift gebunden,
  *    in der jedes Zeichen gleich breit ist.
  *
- * Ohne JavaScript steht der Text einfach da. Bei `prefers-reduced-motion`
+ * Ohne JavaScript steht der Text einfach da, bei `prefers-reduced-motion`
  * ebenso.
  */
 interface Props {
-  /** Der Text. Bewusst als Eigenschaft statt als Slot: das Skript braucht ihn als Zeichenkette. */
+  /** Der Text. Als Eigenschaft statt als Bereich: das Skript braucht ihn als Zeichenkette. */
   text: string;
   /** Millisekunden je Bild. Größer heißt langsamer. */
   tempo?: number;
   class?: string;
 }
 
-const { text, tempo = 34, class: className = '' }: Props = Astro.props;
+const { text, tempo = 32, class: className = '' }: Props = Astro.props;
 ---
 
 <text-scramble class={`scramble ${className}`} data-tempo={tempo}>
@@ -44,73 +47,6 @@ const { text, tempo = 34, class: className = '' }: Props = Astro.props;
      sonst springt die Zeile bei jedem Bild. */
   .scramble-sicht {
     font-variant-ligatures: none;
-    white-space: pre;
+    white-space: pre-wrap;
   }
 </style>
-
-<script is:inline>
-  if (!customElements.get('text-scramble')) {
-    customElements.define(
-      'text-scramble',
-      class extends HTMLElement {
-        connectedCallback() {
-          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-          const sicht = this.querySelector('.scramble-sicht');
-          if (!sicht) return;
-
-          const ziel = sicht.textContent;
-          const takt = Number(this.dataset.tempo) || 34;
-          const vorrat = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&/=+*';
-          // Breite der Zone, in der noch gewuerfelt wird, bevor der echte
-          // Buchstabe stehen bleibt.
-          const zone = 5;
-
-          const lauf = () => {
-            let schritt = 0;
-            const takte = ziel.length + zone;
-
-            const uhr = setInterval(() => {
-              let aus = '';
-              for (let i = 0; i < ziel.length; i++) {
-                const z = ziel[i];
-                // Leerzeichen und Trenner bleiben stehen, sonst verliert die
-                // Zeile ihre Gliederung und wird zu einem Block.
-                if (z === ' ' || z === '·' || z === '—') {
-                  aus += z;
-                } else if (i < schritt - zone) {
-                  aus += z;
-                } else {
-                  aus += vorrat[(Math.random() * vorrat.length) | 0];
-                }
-              }
-              sicht.textContent = aus;
-
-              if (++schritt > takte) {
-                clearInterval(uhr);
-                sicht.textContent = ziel;
-              }
-            }, takt);
-          };
-
-          // Erst laufen lassen, wenn das Element zu sehen ist. Sonst ist der
-          // Effekt bei allem unterhalb des ersten Bildschirms schon vorbei,
-          // bevor jemand hinschaut.
-          if (!('IntersectionObserver' in window)) return lauf();
-
-          const wache = new IntersectionObserver(
-            (eintraege) => {
-              for (const e of eintraege) {
-                if (!e.isIntersecting) continue;
-                wache.disconnect();
-                lauf();
-              }
-            },
-            { threshold: 0.6 },
-          );
-          wache.observe(this);
-        }
-      },
-    );
-  }
-</script>
