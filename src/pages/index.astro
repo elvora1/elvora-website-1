@@ -6,6 +6,10 @@ import Button from '~/components/Button.astro';
 import Portrait from '~/components/Portrait.astro';
 import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
 import Kanalkreise from '~/components/Kanalkreise.astro';
+import ReviewBadge from '~/components/ReviewBadge.astro';
+import Band from '~/components/Band.astro';
+import Sterne from '~/components/Sterne.astro';
+import { reviews } from '~/config/site';
 import {
   cta,
   services,
@@ -83,7 +87,16 @@ const belege = [
     neben={{ href: contactLinks.whatsapp, label: 'Oder direkt auf WhatsApp schreiben', extern: true }}
     belege={belege}
     color="#16193a"
-  />
+  >
+    {/* Social Proof ohne Scrollen: der Beleg steht im Fuss des Auftakts,
+        also im ersten Sichtbereich, direkt unter dem Haupt-CTA. */}
+    <div slot="unten" class="auftakt-beleg">
+      <ReviewBadge tone="inverse" />
+      <ul class="auftakt-belege kennung">
+        {belege.map((b) => <li>{b}</li>)}
+      </ul>
+    </div>
+  </Auftakt>
 
   {/* ========== 01 Das Problem ========== */}
   <StoryPanel
@@ -186,6 +199,26 @@ const belege = [
     </div>
   </StoryPanel>
 
+  {/* ========== Was Kunden sagen ========== */}
+  {
+    reviews.enabled && reviews.items.length > 0 && (
+      <Band ton="hell" kennung="Was Kunden sagen" heading="Bewertungen">
+        <ul class="stimmen">
+          {reviews.items.map((stimme, i) => (
+            <li class="stimme" style={`--rang:${i}`}>
+              <Sterne wert={stimme.rating} groesse={1} />
+              <p class="stimme-text">{stimme.text}</p>
+              <p class="stimme-quelle">
+                <span class="stimme-name">{stimme.author}</span>
+                {stimme.business && <span class="stimme-betrieb">{stimme.business}</span>}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Band>
+    )
+  }
+
   {/* ========== 07 Abschluss ========== */}
   <StoryPanel
     index={7}
@@ -254,6 +287,93 @@ const belege = [
     max-width: 46ch;
     font-size: 0.9375rem;
     opacity: 0.72;
+  }
+
+  .auftakt-beleg {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 2rem;
+  }
+
+  .auftakt-belege {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    opacity: 0.7;
+  }
+
+  .auftakt-belege li + li::before {
+    content: '\B7';
+    margin-inline-end: 1.25rem;
+  }
+
+  /* --- Bewertungen ------------------------------------------------------- */
+  .stimmen {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 48rem) {
+    .stimmen {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: clamp(2rem, 3.5vw, 3.5rem);
+    }
+
+    .stimme {
+      padding-inline-start: clamp(1.25rem, 2vw, 2rem);
+      border-inline-start: 1px solid var(--color-border);
+    }
+
+    .stimme:first-child {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+  }
+
+  .stimme-text {
+    margin: 1rem 0 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-ink-muted);
+  }
+
+  .stimme-quelle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin: 1.25rem 0 0;
+  }
+
+  .stimme-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .stimme-betrieb {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .stimme {
+        animation: auftauchen linear both;
+        animation-timeline: view();
+        animation-range: entry calc(10% + var(--rang) * 6%) entry
+          calc(60% + var(--rang) * 6%);
+      }
+    }
   }
 
   .wege {

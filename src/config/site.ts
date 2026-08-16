@@ -116,15 +116,51 @@ export const forms = {
  * eine Bewertungsbehauptung ohne Grundlage auf der Seite.
  */
 export const reviews = {
-  // TODO: auf true setzen, sobald echte Bewertungen vorliegen
-  enabled: false,
-  // TODO: echten Schnitt und echte Anzahl eintragen
-  rating: 5.0,
-  count: 0,
-  // TODO: Link zum Google-Unternehmensprofil
+  enabled: true,
+
+  /**
+   * ACHTUNG: Alles hier sind Platzhalter, damit die Gestaltung beurteilt
+   * werden kann. Sie sind frei erfunden.
+   *
+   * VOR DEM LIVEGANG ERSETZEN. Erfundene Bewertungen auf einer Website sind
+   * keine Kleinigkeit: sie sind eine irreführende geschäftliche Handlung
+   * nach § 5 UWG und abmahnfähig.
+   *
+   * Solange `platzhalter: true` steht, zeigt die Seite an sichtbarer Stelle
+   * den Hinweis „Beispieldaten". Erst wenn hier `false` steht, verschwindet
+   * er. Das ist die Sicherung dagegen, dass die Platzhalter versehentlich
+   * online gehen.
+   */
+  platzhalter: true,
+
+  rating: 4.9,
+  count: 12,
   profileUrl: '',
+
   /** Einzelstimmen für den ausführlichen Bewertungsabschnitt. */
-  items: [] as Array<{
+  items: [
+    {
+      author: 'Beispiel Nachname',
+      business: 'Musterbetrieb Haustechnik, Essen',
+      rating: 5,
+      text: 'Platzhaltertext. Hier steht später eine echte Bewertung. Am besten eine, die ein konkretes Ergebnis nennt statt nur zu loben: was vorher das Problem war und was sich seitdem geändert hat.',
+      date: '2026-05-14',
+    },
+    {
+      author: 'Beispiel Nachname',
+      business: 'Musterpraxis, Bochum',
+      rating: 5,
+      text: 'Platzhaltertext. Zwei bis vier Sätze sind ideal. Längere Bewertungen werden überflogen, kürzere wirken beliebig.',
+      date: '2026-04-02',
+    },
+    {
+      author: 'Beispiel Nachname',
+      business: 'Musterkanzlei, Essen',
+      rating: 4,
+      text: 'Platzhaltertext. Eine Bewertung mit vier Sternen darf ruhig dabei sein: ein Schnitt von glatt 5,0 bei zwölf Bewertungen wirkt auf viele Leser weniger glaubwürdig als 4,9.',
+      date: '2026-02-19',
+    },
+  ] as Array<{
     author: string;
     business?: string;
     rating: number;
