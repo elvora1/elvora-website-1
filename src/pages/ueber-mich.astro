@@ -1,13 +1,12 @@
 ---
 import Base from '~/layouts/Base.astro';
-import Auftakt from '~/components/Auftakt.astro';
-import StoryPanel from '~/components/StoryPanel.astro';
+import PanelHero from '~/components/PanelHero.astro';
 import Band from '~/components/Band.astro';
 import Liste from '~/components/Liste.astro';
 import Portrait from '~/components/Portrait.astro';
 import Button from '~/components/Button.astro';
 import WhatsappCta from '~/components/WhatsappCta.astro';
-import { cta, address, owner, contactLinks } from '~/config/site';
+import { cta, address, owner } from '~/config/site';
 
 /**
  * Was der Kunde davon hat, dass ich aus dem Handwerk komme.
@@ -44,43 +43,38 @@ const grundsaetze = [
   },
 ];
 
-const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
 ---
 
 <Base
   title="Über mich"
   description="Luan Qerkini von Elvora aus Essen: zuständig für Sichtbarkeit und Automatisierung bei Betrieben, in denen der Inhaber mitarbeitet."
   breadcrumbs={[{ label: 'Über mich' }]}
-  kopfFarbe="#1d2140"
 >
-  {/* ========== Auftakt ========== */}
-  <Auftakt
-    kennung="Der Mensch dahinter"
-    zeilen={['Ein Name.', 'Eine Nummer.', 'Ein Ansprechpartner.']}
+  <PanelHero
+    eyebrow="Der Mensch dahinter"
+    heading="Ein Name. Eine Nummer. Ein Ansprechpartner."
     intro={`Mein Name ist ${owner.fullName}, gelernter ${owner.trade}. Deshalb muss man mir nicht erklären, wie ein Betrieb von innen aussieht.`}
-    cta={{ href: cta.primary.href, label: cta.primary.label }}
-    neben={{ href: contactLinks.whatsapp, label: 'Oder direkt auf WhatsApp schreiben', extern: true }}
-    belege={belege}
-    color="#1d2140"
-  />
-
-  {/* ========== 01 Das Portrait ========== */}
-  <StoryPanel
-    index={1}
-    label="Wer das ist"
-    heading="Ich komme aus dem Handwerk"
-    color="#f1ece6"
-    ink="#191d21"
-    texture="punkte"
+    color="#b23a94"
+    breadcrumbs={[{ label: 'Über mich' }]}
   >
+    <div class="kopf-handlung">
+      <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
+        {cta.primary.label}
+      </Button>
+      <p class="kopf-notiz">{cta.primary.note}</p>
+    </div>
+  </PanelHero>
+
+  {/* ===================== Wer das ist ===================== */}
+  <Band ton="gedaempft" kennung="Wer das ist" heading="Ich komme aus dem Handwerk">
     <div class="portraet-raster">
       <div class="portraet-text">
-        <p class="fliess">
+        <p>
           Der Inhaber arbeitet mit, das Telefon klingelt zur Unzeit, und der
           Papierkram bleibt für abends übrig. Ob Werkstatt, Praxis oder Kanzlei
           ändert daran wenig.
         </p>
-        <p class="fliess-klein">
+        <p>
           Genau deshalb baue ich nichts, was im Alltag stört. Ich weiß, wie
           wenig Zeit für Zusatzaufwand übrig ist.
         </p>
@@ -90,52 +84,36 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
         <Portrait alt={`${owner.fullName}, Inhaber von Elvora aus ${address.city}`} />
       </div>
     </div>
-  </StoryPanel>
+  </Band>
 
-  {/* ========== 02 Der Weg ========== */}
-  <StoryPanel
-    index={2}
-    label="Wie es dazu kam"
-    heading="Erst aus Neugier, dann aus Ärger"
-    color="#2b2f7a"
-  >
-    <p class="fliess">
-      Irgendwann habe ich angefangen, mich abends mit Websites zu beschäftigen,
-      dann mit Google, später mit Automatisierung. Zuerst aus Neugier.
-    </p>
-
-    <div slot="fuss" class="weg">
-      <p class="weg-text">
-        Dann, weil mir auffiel, wie viel davon in Betrieben ungenutzt liegen
-        bleibt. Nicht aus Desinteresse, sondern weil niemand die Zeit hat, sich
-        damit zu befassen.
+  {/* ===================== Der Weg ===================== */}
+  <Band ton="hell" kennung="Wie es dazu kam" heading="Erst aus Neugier, dann aus Ärger">
+    <div class="weg">
+      <p>
+        Irgendwann habe ich angefangen, mich abends mit Websites zu beschäftigen,
+        dann mit Google, später mit Automatisierung. Zuerst aus Neugier. Dann,
+        weil mir auffiel, wie viel davon in Betrieben ungenutzt liegen bleibt.
+        Nicht aus Desinteresse, sondern weil niemand die Zeit hat, sich damit zu
+        befassen.
       </p>
-      <p class="weg-text">
-        Gleichzeitig habe ich gesehen, wie Betriebe von Agenturen betreut
-        werden, die deren Alltag nie erlebt haben. Da entstehen Websites mit
-        Bildern aus dem Katalog und Texten über „ganzheitliche
-        Lösungskompetenz". Wer gerade ein Problem hat, sucht etwas anderes.
+      <p>
+        Gleichzeitig habe ich gesehen, wie Betriebe von Agenturen betreut werden,
+        die deren Alltag nie erlebt haben. Da entstehen Websites mit Bildern aus
+        dem Katalog und Texten über „ganzheitliche Lösungskompetenz". Wer gerade
+        ein Problem hat, sucht etwas anderes.
       </p>
     </div>
-  </StoryPanel>
+  </Band>
 
-  {/* ========== 03 Für wen ========== */}
-  <StoryPanel
-    index={3}
-    label="Für wen ich arbeite"
+  {/* ===================== Für wen ===================== */}
+  <Band
+    ton="gedaempft"
+    kennung="Für wen ich arbeite"
     heading="Die Branche ist zweitrangig"
-    color="#5c3491"
+    intro="Praxen, Kanzleien, Studios, Dienstleister, Handwerksbetriebe, Einzelhändler. Das Muster ist überall dasselbe: Die Arbeit ist gut, die Kundschaft zufrieden, aber niemand hat Zeit für Sichtbarkeit und Abläufe."
   >
-    <p class="fliess">
-      Praxen, Kanzleien, Studios, Dienstleister, Handwerksbetriebe,
-      Einzelhändler. Das Muster ist überall dasselbe: Die Arbeit ist gut, die
-      Kundschaft zufrieden, aber niemand hat Zeit für Sichtbarkeit und Abläufe.
-    </p>
-
-    <p slot="fuss" class="fliess-klein">
-      Wenn Sie sich darin wiedererkennen, passt es.
-    </p>
-  </StoryPanel>
+    <p class="hinweis">Wenn Sie sich darin wiedererkennen, passt es.</p>
+  </Band>
 
   {/* ========== Was das für Sie bedeutet ========== */}
   <Band
@@ -157,7 +135,7 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
   </Band>
 
   {/* ========== Abschluss ========== */}
-  <Band ton="tief" kennung="Kennenlernen" heading="Lernen wir uns kennen" raum="md">
+  <Band ton="gedaempft" kennung="Kennenlernen" heading="Lernen wir uns kennen" raum="md">
     <div class="schluss">
       <p class="schluss-text">
         Am einfachsten in einem kurzen Gespräch. Sie erzählen, wo es klemmt, ich
@@ -165,50 +143,54 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
       </p>
 
       <div class="schluss-handlung">
-        <Button href={cta.primary.href} size="lg" variant="aufFarbe" class="max-sm:w-full">
+        <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
           {cta.primary.label}
         </Button>
         <p class="schluss-notiz">{cta.primary.note}</p>
-        <WhatsappCta variant="inline" class="text-white/80" />
+        <WhatsappCta variant="inline" class="text-ink-muted" />
       </div>
     </div>
   </Band>
 </Base>
 
 <style>
-  .fliess {
-    margin: 0;
-    max-width: 44ch;
-    font-size: clamp(1.0625rem, 1.9vw, 1.5rem);
-    line-height: 1.5;
-    opacity: 0.92;
+  .kopf-handlung {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
   }
 
-  .fliess-klein {
+  .kopf-notiz {
     margin: 0;
-    max-width: 52ch;
-    font-size: clamp(1rem, 1.4vw, 1.125rem);
-    line-height: 1.6;
-    opacity: 0.8;
+    font-size: 0.875rem;
+    color: var(--color-ink-faint);
   }
 
-  /* --- Portraetflaeche --------------------------------------------------- */
   .portraet-raster {
     display: grid;
-    gap: clamp(1.5rem, 4vw, 3rem);
+    gap: clamp(1.75rem, 4vw, 3.5rem);
     align-items: center;
   }
 
-  @media (width >= 64rem) {
+  @media (width >= 48rem) {
     .portraet-raster {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
     }
   }
 
   .portraet-text {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.125rem;
+    max-width: 52ch;
+  }
+
+  .portraet-text p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--color-ink-muted);
   }
 
   .portraet-bild :global(> div) {
@@ -222,23 +204,16 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
     object-fit: cover;
   }
 
-  /* Auf schmalen Geraeten steht das Bild oben und bleibt klein genug, dass
-     der Text darunter noch auf die Flaeche passt. */
-  @media (width < 64rem) {
+  @media (width < 48rem) {
     .portraet-bild {
-      order: -1;
       max-width: 13rem;
-    }
-
-    .portraet-bild :global(img) {
-      aspect-ratio: 1 / 1;
     }
   }
 
-  /* --- Der Weg ----------------------------------------------------------- */
   .weg {
     display: grid;
     gap: clamp(1.25rem, 3vw, 2.5rem);
+    max-width: 68rem;
   }
 
   @media (width >= 48rem) {
@@ -247,14 +222,18 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
     }
   }
 
-  .weg-text {
+  .weg p {
     margin: 0;
-    font-size: clamp(0.9375rem, 1.3vw, 1.0625rem);
-    line-height: 1.6;
-    opacity: 0.85;
+    line-height: 1.65;
+    color: var(--color-ink-muted);
   }
 
-  /* --- Abschluss --------------------------------------------------------- */
+  .hinweis {
+    margin: 0;
+    font-size: 1.0625rem;
+    color: var(--color-ink-muted);
+  }
+
   .schluss {
     display: grid;
     gap: clamp(1.5rem, 4vw, 3rem);
@@ -270,9 +249,8 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
   .schluss-text {
     margin: 0;
     max-width: 44ch;
-    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
-    line-height: 1.6;
-    opacity: 0.9;
+    line-height: 1.65;
+    color: var(--color-ink-muted);
   }
 
   .schluss-handlung {
@@ -285,6 +263,6 @@ const belege = [owner.trade, `Aus ${address.city}`, 'Seit 2023 selbstständig'];
   .schluss-notiz {
     margin: 0;
     font-size: 0.875rem;
-    opacity: 0.7;
+    color: var(--color-ink-faint);
   }
 </style>

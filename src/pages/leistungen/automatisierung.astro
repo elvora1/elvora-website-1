@@ -117,7 +117,7 @@ const painPoints = [
 >
   {/* ===================== Das Problem ===================== */}
   <Band
-    ton="tief"
+    ton="hell"
     kennung="Wo es klemmt"
     heading="Der Auftrag geht selten an den Besseren"
     intro="Er geht an den, der zuerst erreichbar war. Für einen Betrieb, in dem der Inhaber mitarbeitet, ist das eine unfaire Ausgangslage, und genau die lässt sich abstellen."
@@ -194,8 +194,7 @@ const painPoints = [
 
   {/* ===================== Individuelle Automatisierung ===================== */}
   <Band
-    ton="farbe"
-    farbe="#a93d28"
+    ton="gedaempft"
     kennung="Alles andere"
     heading="Und wenn Ihr Zeitfresser nicht dabei ist?"
   >
@@ -214,7 +213,7 @@ const painPoints = [
       </div>
 
       <div class="individuell-handlung">
-        <Button href={cta.primary.href} size="lg" variant="aufFarbe" class="max-sm:w-full">
+        <Button href={cta.primary.href} size="lg" class="max-sm:w-full">
           {cta.primary.label}
         </Button>
         <p class="individuell-notiz">{cta.primary.note}</p>
@@ -352,7 +351,7 @@ const painPoints = [
   .individuell-text p {
     margin: 0;
     line-height: 1.65;
-    opacity: 0.92;
+    color: var(--color-ink-muted);
   }
 
   .individuell-handlung {
@@ -365,6 +364,6 @@ const painPoints = [
   .individuell-notiz {
     margin: 0;
     font-size: 0.875rem;
-    opacity: 0.82;
+    color: var(--color-ink-faint);
   }
 </style>

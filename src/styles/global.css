@@ -22,18 +22,21 @@
   --font-display: var(--font-heading), Georgia, 'Times New Roman', serif;
   --font-mono: var(--font-label), ui-monospace, SFMono-Regular, monospace;
 
-  /* --- Flaechen und Text ------------------------------------------------ */
+  /* --- Flaechen und Text ------------------------------------------------
+     Hell und reduziert. Die Neutraltoene tragen einen minimalen warmen
+     Stich, damit die Seite nicht nach Krankenhaus aussieht, aber so wenig,
+     dass man ihn nicht als Farbe wahrnimmt. */
   --color-surface: #ffffff;
-  --color-surface-subtle: #f6f7f8;
-  --color-surface-ink: #14181c;
+  --color-surface-subtle: #faf9f8;
+  --color-surface-ink: #16181d;
 
-  --color-ink: #191d21;
-  --color-ink-muted: #59636d;
-  --color-ink-faint: #8a939c;
+  --color-ink: #16181d;
+  --color-ink-muted: #5b6067;
+  --color-ink-faint: #8e9299;
   --color-ink-inverse: #ffffff;
 
-  --color-border: #e3e7ea;
-  --color-border-strong: #cfd5da;
+  --color-border: #e8e6e3;
+  --color-border-strong: #d3d0cc;
 
   /* --- Akzent ------------------------------------------------------------
      Aus dem Logo abgeleitet. Die Marke ist ein Verlauf von Indigo ueber
