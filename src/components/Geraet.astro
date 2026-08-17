@@ -70,9 +70,12 @@ const { art = 'handy', bildunterschrift, class: className = '' }: Props = Astro.
     padding: 0.6rem;
   }
 
+  /* Kein fester Mindestwert mehr: der Schirm war 26rem hoch, egal wie
+     viel darin stand, und hinterliess unter kurzen Verlaeufen eine leere
+     weisse Flaeche. Jetzt waechst er mit dem Inhalt. */
   .geraet-handy .geraet-schirm {
     border-radius: 2rem;
-    min-height: 26rem;
+    min-height: 18rem;
   }
 
   /* Die Aussparung fuer Kamera und Sensoren. Liegt ueber dem Schirm, nicht
@@ -97,7 +100,7 @@ const { art = 'handy', bildunterschrift, class: className = '' }: Props = Astro.
 
   .geraet-rechner .geraet-schirm {
     border-radius: 0.25rem;
-    min-height: 20rem;
+    min-height: 14rem;
   }
 
   /* Der Standfuss. Reine Andeutung, bewusst ohne Scharnier und Verlaeufe:

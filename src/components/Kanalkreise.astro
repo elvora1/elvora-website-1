@@ -105,9 +105,10 @@ const { kanaele, tone = 'light', class: className = '' }: Props = Astro.props;
     width: 3.25rem;
     height: 3.25rem;
     border-radius: 999px;
-    border: 2px solid var(--color-surface);
-    background: var(--color-accent-soft);
-    color: var(--color-accent);
+    border: 1px solid var(--color-border-strong);
+    box-shadow: 0 0 0 3px var(--color-surface);
+    background: var(--color-surface);
+    color: var(--color-ink);
     text-decoration: none;
     transition:
       background-color 0.2s,

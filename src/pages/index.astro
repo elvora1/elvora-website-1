@@ -9,6 +9,7 @@ import ReviewBadge from '~/components/ReviewBadge.astro';
 import Geraet from '~/components/Geraet.astro';
 import Tippend from '~/components/Tippend.astro';
 import Kanalkreise from '~/components/Kanalkreise.astro';
+import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
 import {
   cta,
   services,
@@ -36,6 +37,25 @@ const verluste = [
   {
     titel: 'Niemand findet Sie',
     text: 'Gesucht wird bei Google, angerufen wird einer der ersten drei Treffer. Stehen Sie dort nicht, existieren Sie nicht.',
+  },
+];
+
+/** Was hereinkommt, während der Betrieb arbeitet. */
+const eingang = [
+  {
+    kanal: 'WhatsApp',
+    zeit: '08:14',
+    text: 'Guten Tag, ich bräuchte kurzfristig einen Termin. Geht diese Woche noch was?',
+  },
+  {
+    kanal: 'Verpasster Anruf',
+    zeit: '09:02',
+    text: 'Angerufen, niemand erreicht. Die Assistenz hat nachgefasst und die Nummer notiert.',
+  },
+  {
+    kanal: 'Kontaktformular',
+    zeit: '11:37',
+    text: 'Anfrage über die Website. Bereits beantwortet, Rückruf für 16 Uhr vereinbart.',
   },
 ];
 
@@ -171,6 +191,16 @@ const wege = [
         ))
       }
     </ul>
+  </Band>
+
+  {/* ===================== Was hereinkommt ===================== */}
+  <Band
+    ton="hell"
+    kennung="Ein Vormittag"
+    heading="So sieht ein Vormittag mit Assistenz aus"
+    intro="Drei Anfragen, alle beantwortet, keine liegen geblieben. Sie waren in der Zeit bei Ihren Kunden."
+  >
+    <Nachrichtenstapel nachrichten={eingang} class="eingang" />
   </Band>
 
   {/* ===================== Die Vorführung ===================== */}
@@ -603,6 +633,28 @@ const wege = [
     border-radius: 0.875rem 0.875rem 0.25rem;
     background: var(--color-accent);
     color: var(--color-accent-contrast);
+  }
+
+  /* Der Stapel war fuer dunkle Flaechen gebaut: helle Raender, abgedunkelte
+     Karten. Auf Weiss dreht sich das um. */
+  .eingang {
+    max-width: 34rem;
+  }
+
+  .eingang :global(.stapel-karte) {
+    border-color: var(--color-border);
+    background: var(--color-surface-subtle);
+    color: var(--color-ink);
+  }
+
+  .eingang :global(.stapel-symbol) {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .eingang :global(.stapel-karte:hover) {
+    background: var(--color-surface);
+    border-color: var(--color-border-strong);
   }
 
   /* ===================== Der Mensch ===================== */

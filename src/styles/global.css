@@ -32,7 +32,10 @@
 
   --color-ink: #16181d;
   --color-ink-muted: #5b6067;
-  --color-ink-faint: #8e9299;
+  /* 4.76:1 auf Weiss, 4.53:1 auf der gedaempften Flaeche. Der frueher hier
+     stehende Wert #8e9299 kam nur auf 3.12:1 und fiel damit durch WCAG AA --
+     er traegt aber die Kennungen und Notizen, also echten Text. */
+  --color-ink-faint: #6f737a;
   --color-ink-inverse: #ffffff;
 
   --color-border: #e8e6e3;
@@ -180,6 +183,44 @@
   @media (width >= 48rem) {
     padding-inline: 2rem;
   }
+}
+
+/* Freistehende Textlinks sind mit der Maus gut zu treffen, mit dem Daumen
+   nicht. Auf Geraeten ohne genaues Zeigegeraet bekommen sie deshalb Hoehe,
+   ohne dass sich am Aussehen etwas aendert.
+
+   Links MITTEN im Fliesstext bleiben ausgenommen: dort wuerde zusaetzliche
+   Hoehe den Zeilenabstand sprengen. Die Richtlinie nimmt sie ausdruecklich
+   aus (WCAG 2.5.8, Ausnahme "inline").
+
+   Gebunden an die Fensterbreite, nicht an `pointer: coarse`: die Angabe zum
+   Zeigegeraet ist unzuverlaessig -- Geraete mit Touch UND Maus melden
+   "fein", und die Regel griffe dann nicht. Eine Breite unter 48rem ist in
+   der Praxis ein Telefon. */
+@media (width < 48rem) {
+  .hero-neben,
+  .mensch-weiter,
+  .leistung-link,
+  .weiter,
+  .brotkrumen-link,
+  .wa-inline,
+  /* Die Kontaktdaten auf /kontakt/ und /termin/: Telefonnummer und
+     E-Mail-Adresse stehen dort einzeln in einer Zeile, nicht im Fliesstext. */
+  dd > a,
+  /* Der schwaechste Knopf ist ein reiner Textlink und hat deshalb keine
+     eigene Hoehe. */
+  a.text-ink-muted.underline {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* Der Seitenkopf hat unten Polsterung, das folgende Band oben ebenfalls.
+   Beides zusammen riss ein Loch von rund 140 Pixeln. Direkt nach dem Kopf
+   faellt die obere Polsterung des Bandes deshalb kleiner aus. */
+.tafel + .band {
+  padding-block-start: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 /* ==========================================================================

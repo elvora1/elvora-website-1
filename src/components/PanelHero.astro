@@ -1,8 +1,6 @@
 ---
-import Texture from './Texture.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
 import Scramble from './Scramble.astro';
-import mark from '~/assets/mark.svg';
 
 /**
  * Vollflächige Farbtafel als Kopfbereich.
@@ -42,15 +40,6 @@ const {
   class:list={['tafel', size === 'kompakt' && 'tafel-kompakt', className]}
   style={`--grund:${color}`}
 >
-  <Texture variant="schraffur" />
-
-  <img
-    src={mark.src}
-    alt=""
-    aria-hidden="true"
-    class="tafel-marke"
-  />
-
   <div class="container-content tafel-inner">
     {breadcrumbs.length > 0 && <Breadcrumbs trail={breadcrumbs} />}
 
@@ -79,7 +68,6 @@ const {
     overflow: hidden;
     background: var(--color-surface);
     color: var(--color-ink);
-    border-top: 3px solid var(--grund);
   }
 
   .tafel-inner {
@@ -88,7 +76,7 @@ const {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 7vw, 5.5rem);
+    padding-block: clamp(2.25rem, 5vw, 3.5rem) clamp(2.5rem, 5vw, 3.5rem);
   }
 
   .tafel-kompakt .tafel-inner {
@@ -130,25 +118,4 @@ const {
     color: var(--color-ink-muted);
   }
 
-  /* Bildmarke als angeschnittene Flaeche. Nur die Marke, kein Schriftzug:
-     ein angeschnittenes Wort waere als Fragment lesbar. */
-  .tafel-marke {
-    position: absolute;
-    top: 50%;
-    right: -9rem;
-    z-index: 0;
-    width: 30rem;
-    translate: 0 -50%;
-    rotate: 8deg;
-    opacity: 0.055;
-    pointer-events: none;
-  }
-
-  @media (width < 64rem) {
-    .tafel-marke {
-      right: -12rem;
-      width: 24rem;
-      opacity: 0.045;
-    }
-  }
 </style>

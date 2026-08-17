@@ -22,7 +22,7 @@ const items = [{ label: 'Start', href: '/' }, ...trail];
             </span>
           )}
           {item.href && i < items.length - 1 ? (
-            <a href={item.href} class:list={["transition-colors", inv ? "hover:text-white" : "hover:text-ink"]}>
+            <a href={item.href} class:list={["brotkrumen-link transition-colors", inv ? "hover:text-white" : "hover:text-ink"]}>
               {item.label}
             </a>
           ) : (

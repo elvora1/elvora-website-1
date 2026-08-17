@@ -20,7 +20,7 @@ import { services, automationModules, serviceArea } from '~/config/site';
     breadcrumbs={[{ label: 'Leistungen' }]}
   />
 
-  <Band ton="hell">
+  <Band ton="hell" kennung="Die vier Bausteine">
     <ul class="leistungen">
       {
         services.map((service, i) => (
@@ -58,9 +58,7 @@ import { services, automationModules, serviceArea } from '~/config/site';
         ))
       }
     </ul>
-  </Band>
 
-  <Band ton="gedaempft" raum="md">
     <p class="gebiet">Betreut werden Betriebe in {serviceArea.display}.</p>
   </Band>
 
@@ -130,7 +128,6 @@ import { services, automationModules, serviceArea } from '~/config/site';
     font-size: clamp(1.5rem, 3vw, 2.25rem);
     line-height: 1.12;
     letter-spacing: -0.015em;
-    max-width: 20ch;
   }
 
   .leistung-teaser {
@@ -158,7 +155,7 @@ import { services, automationModules, serviceArea } from '~/config/site';
   }
 
   .gebiet {
-    margin: 0;
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
     font-size: 0.9375rem;
     color: var(--color-ink-muted);
   }
