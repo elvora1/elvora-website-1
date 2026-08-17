@@ -41,10 +41,19 @@ interface Props {
   teile: Teil[];
   /** Abstand zwischen zwei Buchstaben in Sekunden. */
   takt?: number;
+  /**
+   * Lässt die Fassung für Vorlesesoftware weg.
+   *
+   * Zu setzen, wenn das umgebende Element den Satz schon als `aria-label`
+   * trägt. Ohne das stünde der Satz ZWEIMAL im Quelltext: einmal als
+   * Buchstaben, einmal für Vorlesesoftware. In einer Überschrift heißt das
+   * für Google die doppelte Überschrift.
+   */
+  stumm?: boolean;
   class?: string;
 }
 
-const { teile, takt = 0.028, class: className = '' }: Props = Astro.props;
+const { teile, takt = 0.028, stumm = false, class: className = '' }: Props = Astro.props;
 
 const ganz = teile.map((t) => t.text).join('');
 
@@ -78,7 +87,7 @@ const gestaffelt = woerter.map((wort) =>
 ---
 
 <span class={`rolle ${className}`} style={`--takt:${takt}s`}>
-  <span class="sr-only">{ganz}</span>
+  {!stumm && <span class="sr-only">{ganz}</span>}
 
   <span aria-hidden="true">
     {

@@ -8,7 +8,7 @@ import Liste from '~/components/Liste.astro';
 import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
 import Geraet from '~/components/Geraet.astro';
 import Iphone from '~/components/Iphone.astro';
-import { automationModules, cta, serviceArea } from '~/config/site';
+import { automationModules, cta, serviceArea, versprechen } from '~/config/site';
 import type { FaqItem } from '~/types';
 
 /**
@@ -58,6 +58,14 @@ const eingang = [
 ];
 
 const faq: FaqItem[] = [
+  /* Steht bewusst AN ERSTER STELLE. Auf einer Seite ohne Preise ist das die
+     Frage, die jeder zuerst stellt. Bleibt sie unbeantwortet, klickt ein
+     Teil der Leute weg, statt zu fragen. Der Text kommt aus einer einzigen
+     Stelle in `site.ts`, damit er auf allen vier Seiten gleich lautet. */
+  {
+    question: 'Was kostet das?',
+    answer: versprechen.preis,
+  },
   {
     question: 'Merken meine Kunden, dass da eine KI antwortet?',
     answer:

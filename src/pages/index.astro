@@ -18,6 +18,7 @@ import {
   owner,
   contactLinks,
   reviews,
+  versprechen,
 } from '~/config/site';
 
 const title = 'Elvora: Mehr Anfragen für Betriebe in Essen';
@@ -142,8 +143,12 @@ const wege = [
         {/* Die Buchstaben klappen einzeln herein. Das ist der bewegte
             Moment im ersten Sichtbereich, und er sitzt auf dem Satz, auf
             den es ankommt, statt auf einer Zierleiste. */}
-        <h1 class="hero-schlag">
+        <h1
+          class="hero-schlag"
+          aria-label="Ihr Betrieb wird gefunden, angerufen und beauftragt."
+        >
           <Textrolle
+            stumm
             teile={[
               { text: 'Ihr Betrieb wird ' },
               { text: 'gefunden', betont: true },
@@ -280,6 +285,20 @@ const wege = [
     intro="Drei Anfragen, alle beantwortet, keine liegen geblieben. Sie waren in der Zeit bei Ihren Kunden."
   >
     <Vormittag ereignisse={vormittag} />
+
+    {/* Ein Aufruf an der Stelle, an der der Beweis gerade gelaufen ist.
+        Vorher standen die Aufrufe nur ganz oben und ganz unten, dazwischen
+        lagen 500 Woerter ohne einen einzigen Weg zur Handlung. Wer hier
+        ueberzeugt ist, soll nicht erst bis zum Fuss scrollen muessen. */}
+    <div class="zwischenruf">
+      <p class="zwischenruf-satz">
+        So sähe ein Vormittag in Ihrem Betrieb aus. In 15 Minuten schauen wir,
+        welcher der drei Wege bei Ihnen gerade am meisten kostet.
+      </p>
+      <Button href={cta.primary.href} class="max-sm:w-full">
+        {cta.primary.label}
+      </Button>
+    </div>
   </Band>
 
   {/* ===================== Der Mensch dahinter ===================== */}
@@ -322,7 +341,11 @@ const wege = [
   {/* ===================== Bewertungen ===================== */}
   {
     reviews.enabled && reviews.items.length > 0 && (
-      <Band ton="gedaempft" kennung="Was Kunden sagen" heading="Bewertungen">
+      <Band
+        ton="gedaempft"
+        kennung="Bewertungen"
+        heading="Was Betriebe hinterher sagen"
+      >
         <ul class="stimmen">
           {reviews.items.map((stimme, i) => (
             <li class="stimme einblenden" style={`--verzug:${i}`}>
@@ -361,6 +384,12 @@ const wege = [
           {cta.primary.label}
         </Button>
         <p class="schluss-notiz">{cta.primary.note}</p>
+
+        {/* Beleg und Antwortzeit gehoeren an die Stelle, an der jemand sich
+            entscheidet. Bis hierhin liegen 700 Woerter zwischen dem Beleg
+            oben und diesem Aufruf. */}
+        <ReviewBadge tone="inverse" class="schluss-beleg" />
+        <p class="schluss-notiz">{versprechen.antwortzeit}</p>
       </div>
     </div>
   </Band>
@@ -745,6 +774,27 @@ const wege = [
     to { opacity: 1; }
   }
 
+  /* Der Aufruf mitten auf der Seite. Bewusst eine Zeile mit Haarlinie und
+     kein zweiter farbiger Kasten: das Schlussband weiter unten ist der
+     grosse Auftritt, dieser hier soll ihn nicht vorwegnehmen. */
+  .zwischenruf {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    margin-block-start: clamp(2.5rem, 5vw, 3.5rem);
+    padding-block-start: clamp(1.5rem, 3vw, 2rem);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .zwischenruf-satz {
+    max-width: 46ch;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-ink-muted);
+  }
+
   /* ===================== Der Mensch ===================== */
   .mensch {
     display: grid;
@@ -895,6 +945,10 @@ const wege = [
     margin: 0;
     line-height: 1.65;
     opacity: 0.92;
+  }
+
+  .schluss-beleg {
+    margin-block-start: 1rem;
   }
 
   .schluss-wege {

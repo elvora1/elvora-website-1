@@ -182,11 +182,39 @@ export const reviews = {
  * CTA ist visuell klar untergeordnet und tritt nie in der Akzentfarbe auf.
  * Ein Wechsel des Haupt-CTA passiert ausschließlich hier.
  */
+/**
+ * Zusagen, die Reibung nehmen.
+ *
+ * BITTE PRÜFEN, das sind IHRE Aussagen, nicht meine: beides steht künftig
+ * sichtbar auf der Seite, und was dort steht, müssen Sie einhalten können.
+ *
+ * `antwortzeit` stand bisher NUR in der Beschreibung für Google und nirgends
+ * auf der Seite selbst. Ein Versprechen, das nur die Suchmaschine liest,
+ * nimmt keinem Besucher die Hemmung.
+ *
+ * `preis` ist die Antwort auf die Frage, die auf einer Seite ohne Preise
+ * jeder zuerst stellt. Ohne eine Antwort darauf klickt ein Teil der Leute
+ * weg, statt zu fragen. Es geht NICHT darum, Preise zu nennen, sondern
+ * darum zu sagen, WIE der Preis zustande kommt.
+ */
+export const versprechen = {
+  antwortzeit: 'Antwort innerhalb von 24 Stunden, werktags meist schneller',
+  preis:
+    'Das hängt vom Umfang ab, deshalb steht hier keine Zahl, die für Ihren Betrieb ohnehin nicht stimmen würde. Nach dem Erstgespräch bekommen Sie ein schriftliches Angebot mit einem festen Preis. Erst wenn Sie zusagen, fange ich an. Es gibt keine Stundenzettel und keine Nachforderungen für das, was vorher besprochen war.',
+} as const;
+
 export const cta = {
   primary: {
     label: 'Kostenloses Erstgespräch',
-    /** Kurzfassung für den klebenden Kopfbereich auf Mobil. */
-    labelShort: 'Termin sichern',
+    /**
+     * Kurzfassung für den klebenden Kopfbereich auf Mobil.
+     *
+     * Bewusst dasselbe Wort wie in der Langfassung. Vorher stand hier
+     * „Termin sichern", also ein zweiter Name für dieselbe Handlung. Wer
+     * am Schreibtisch „Kostenloses Erstgespräch" liest und auf dem Handy
+     * „Termin sichern", hat zwei Angebote im Kopf statt einem.
+     */
+    labelShort: 'Erstgespräch',
     href: '/termin/',
     /** Kurzer Zusatz direkt unter dem Button, nimmt die Hemmschwelle. */
     note: `${booking.durationLabel}, unverbindlich, ohne Verkaufsgespräch`,

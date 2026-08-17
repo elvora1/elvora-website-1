@@ -1,7 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Button from './Button.astro';
-import { nav, cta } from '~/config/site';
+import { nav, cta, contact, contactLinks } from '~/config/site';
 
 /**
  * Kopfbereich.
@@ -28,6 +28,11 @@ const dunkel = Boolean(kopfFarbe);
 
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || path.startsWith(href);
+
+/* Welcher Eintrag gerade dran ist. Die Pille steht darauf und wandert beim
+   Zeigen zum jeweils anderen. Ist keiner dran, etwa auf der Startseite,
+   bleibt sie unsichtbar, bis jemand hinzeigt. */
+const hier = nav.findIndex((item) => isActive(item.href));
 ---
 
 <header
@@ -41,8 +46,24 @@ const isActive = (href: string) => path === href || path.startsWith(href);
         <Logo ton={dunkel ? 'hell' : 'dunkel'} />
       </a>
 
-      <nav aria-label="Hauptnavigation" class="hidden md:block">
-        <ul class="flex items-center gap-8">
+      {/*
+        Die Pille zeigt, wo man ist, und wandert beim Zeigen zum jeweils
+        anderen Eintrag. Ohne JavaScript: die Spalten sind gleich breit, die
+        Pille ist eine Spalte breit und wird um ihre Nummer verschoben.
+        Welche Nummer gilt, entscheidet `:has()` im Stylesheet.
+
+        Deshalb steht die Nummer NICHT als Stilangabe am Element: eine
+        Stilangabe am Element schlaegt jede Regel im Stylesheet, und die
+        Pille kaeme beim Zeigen nicht von der Stelle.
+      */}
+      <nav
+        aria-label="Hauptnavigation"
+        class="kopf-nav hidden md:block"
+        data-hier={hier >= 0 ? String(hier) : undefined}
+      >
+        <span class="kopf-pille" aria-hidden="true"></span>
+
+        <ul class="kopf-liste">
           {
             nav.map((item) => (
               <li>
@@ -96,7 +117,7 @@ const isActive = (href: string) => path === href || path.startsWith(href);
           </summary>
 
           <div
-            class="absolute right-0 top-[calc(100%+0.5rem)] w-56 rounded-card border border-border bg-surface p-2 shadow-raised"
+            class="absolute right-0 top-[calc(100%+0.5rem)] w-64 rounded-card border border-border bg-surface p-2 shadow-raised"
           >
             <ul class="flex flex-col">
               {
@@ -116,6 +137,39 @@ const isActive = (href: string) => path === href || path.startsWith(href);
                 ))
               }
             </ul>
+
+            {/*
+              Anrufen und Schreiben gehoeren hierher. Wer auf dem Handy das
+              Menue oeffnet, sucht meistens genau das, und hat bis hierhin
+              sonst nur drei Seitennamen gefunden.
+            */}
+            <div class="mt-2 border-t border-border pt-2">
+              <a
+                href={contactLinks.tel}
+                class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[0.9375rem] text-ink transition-colors hover:bg-surface-subtle"
+              >
+                <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0 text-ink-faint" fill="none"
+                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <path d="M6.5 3h-3v3a10.5 10.5 0 0 0 10.5 10.5h3v-3l-3.5-1.5-2 2A8.5 8.5 0 0 1 7 7l2-2z" />
+                </svg>
+                {contact.phoneDisplay}
+              </a>
+
+              <a
+                href={contactLinks.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[0.9375rem] text-ink transition-colors hover:bg-surface-subtle"
+              >
+                <svg viewBox="0 0 20 20" class="h-4 w-4 shrink-0 text-ink-faint" fill="none"
+                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                  stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 17l1.3-3.4A7 7 0 1 1 6.6 16z" />
+                </svg>
+                Auf WhatsApp schreiben
+              </a>
+            </div>
           </div>
         </details>
       </div>
@@ -129,13 +183,71 @@ const isActive = (href: string) => path === href || path.startsWith(href);
     border-bottom-color: var(--color-border);
   }
 
+  /* --- Navigation als Pillen ------------------------------------------- */
+  .kopf-nav {
+    position: relative;
+    --i: 0;
+  }
+
+  /* Gleich breite Spalten. Nur so kann die Pille um genau eine Spaltenbreite
+     je Eintrag verschoben werden, ohne dass jemand Breiten misst. */
+  .kopf-liste {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+
   .kopf-link {
+    display: block;
+    padding: 0.45rem 1.1rem;
+    text-align: center;
+    white-space: nowrap;
     color: var(--color-ink-muted);
   }
 
   .kopf-link:hover,
   .kopf-link.ist-hier {
     color: var(--color-ink);
+  }
+
+  .kopf-pille {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: -1;
+    width: calc(100% / 3);
+    border-radius: 999px;
+    background: var(--color-surface-subtle);
+    box-shadow: inset 0 0 0 1px var(--color-border);
+    opacity: 0;
+    transform: translateX(calc(var(--i) * 100%));
+    transition:
+      transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.2s;
+  }
+
+  .kopf-nav[data-hier] .kopf-pille,
+  .kopf-nav:hover .kopf-pille {
+    opacity: 1;
+  }
+
+  /* Wo die Pille steht. Erst die Seite, auf der man ist, danach das
+     Zeigen: die `:has()`-Regeln stehen spaeter und sind spezifischer,
+     also gewinnen sie, solange der Zeiger auf einem Eintrag liegt. */
+  .kopf-nav[data-hier='0'] { --i: 0; }
+  .kopf-nav[data-hier='1'] { --i: 1; }
+  .kopf-nav[data-hier='2'] { --i: 2; }
+
+  .kopf-nav:has(li:nth-child(1) a:hover) { --i: 0; }
+  .kopf-nav:has(li:nth-child(2) a:hover) { --i: 1; }
+  .kopf-nav:has(li:nth-child(3) a:hover) { --i: 2; }
+
+  /* Ohne `:has()` faellt nur das Wandern weg, die Pille steht dann fest auf
+     der aktuellen Seite. Das ist die Aussage, auf die es ankommt. */
+  @media (prefers-reduced-motion: reduce) {
+    .kopf-pille {
+      transition: none;
+    }
   }
 
   .kopf-knopf {
@@ -162,6 +274,11 @@ const isActive = (href: string) => path === href || path.startsWith(href);
   .kopf[data-ton='dunkel'] .kopf-link:hover,
   .kopf[data-ton='dunkel'] .kopf-link.ist-hier {
     color: #fff;
+  }
+
+  .kopf[data-ton='dunkel'] .kopf-pille {
+    background: rgb(255 255 255 / 0.16);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2);
   }
 
   .kopf[data-ton='dunkel'] .kopf-knopf {

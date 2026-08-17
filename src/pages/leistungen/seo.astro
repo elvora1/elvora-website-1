@@ -4,7 +4,7 @@ import Band from '~/components/Band.astro';
 import Liste from '~/components/Liste.astro';
 import Sterne from '~/components/Sterne.astro';
 import CheckList from '~/components/CheckList.astro';
-import { serviceArea } from '~/config/site';
+import { serviceArea, versprechen } from '~/config/site';
 import type { FaqItem } from '~/types';
 
 /** Die Punkte neben dem Fliesstext im ersten Abschnitt. */
@@ -15,6 +15,14 @@ const lagepunkte = [
 ];
 
 const faq: FaqItem[] = [
+  /* Steht bewusst AN ERSTER STELLE. Auf einer Seite ohne Preise ist das die
+     Frage, die jeder zuerst stellt. Bleibt sie unbeantwortet, klickt ein
+     Teil der Leute weg, statt zu fragen. Der Text kommt aus einer einzigen
+     Stelle in `site.ts`, damit er auf allen vier Seiten gleich lautet. */
+  {
+    question: 'Was kostet das?',
+    answer: versprechen.preis,
+  },
   {
     question: 'Wie lange dauert es, bis ich weiter oben stehe?',
     answer:

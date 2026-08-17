@@ -2,7 +2,8 @@
 import Button from './Button.astro';
 import Texture from './Texture.astro';
 import Scramble from './Scramble.astro';
-import { cta, contactLinks } from '~/config/site';
+import ReviewBadge from './ReviewBadge.astro';
+import { cta, contactLinks, versprechen } from '~/config/site';
 
 /**
  * Wiederkehrender Abschluss jeder Seite.
@@ -45,6 +46,16 @@ const {
         {cta.primary.label}
       </Button>
       <p class="schlussband-notiz">{cta.primary.note}</p>
+
+      {/* Der Beleg gehoert NEBEN den Aufruf, nicht nur an den Seitenanfang.
+          An der Stelle, an der jemand sich entscheidet, ist die Frage
+          „kann der das ueberhaupt" wieder da. */}
+      <ReviewBadge tone="inverse" class="schlussband-beleg" />
+
+      {/* Nimmt die Sorge, in ein schwarzes Loch zu schreiben. Stand bisher
+          nur in der Beschreibung fuer Google und auf der Dankeseite, also
+          erst NACH dem Absenden. Da hilft sie niemandem mehr. */}
+      <p class="schlussband-notiz">{versprechen.antwortzeit}</p>
 
       <p class="schlussband-notiz">
         Lieber schreiben?{' '}
@@ -123,6 +134,10 @@ const {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
+  }
+
+  .schlussband-beleg {
+    margin-top: 1rem;
   }
 
   .schlussband-notiz {
