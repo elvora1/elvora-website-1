@@ -1,38 +1,54 @@
 ---
 import mark from '~/assets/mark.svg';
+import { planen, WECHSEL } from '~/lib/chat';
+import type { Blickwinkel, Gespraech, Nachricht } from '~/lib/chat';
 
 /**
  * Ein Nachrichtenverlauf, wie er auf dem Telefon aussieht.
  *
- * BLICKWINKEL: Gezeigt wird das Telefon des Interessenten. Deshalb stehen
- * SEINE Nachrichten rechts und die der Assistenz links, mit Profilbild und
- * Namen. Vorher war das vertauscht, was den ganzen Verlauf verdreht hat.
+ * BLICKWINKEL: Wessen Telefon zu sehen ist, entscheidet `blickwinkel`.
+ * Beim Kunden stehen seine Nachrichten rechts und die der Assistenz links.
+ * Beim Betrieb ist es umgekehrt, denn dort geht die Antwort über die
+ * eigene Nummer hinaus.
  *
- * ABLAUF: Der Verlauf spielt sich einmal ab, sobald er zu sehen ist. Vor
- * jeder Antwort der Assistenz erscheint erst die Tippanzeige, dann die
- * Nachricht. Das ist die eigentliche Aussage: es antwortet sofort jemand.
+ * MEHRERE VERLÄUFE: Über `gespraeche` laufen mehrere Verläufe nacheinander
+ * auf demselben Schirm, so wie man auf einem echten Gerät von einem Chat in
+ * den nächsten wechselt. Jeder Verlauf ist ein vollständiger Schirm mit
+ * eigener Statusleiste, eigenem Kopf und eigenem Namen. Sie liegen
+ * übereinander und werden nacheinander eingeblendet.
  *
- * Der Ablauf läuft über CSS-Verzögerungen, ausgelöst von einem Klassen-
- * wechsel. Kein Zustand, keine Schleife, kein Nachrechnen.
+ * ABLAUF: Es spielt sich einmal ab, sobald es zu sehen ist. Vor jeder
+ * Nachricht des Gegenübers erscheint erst die Tippanzeige, dann die
+ * Nachricht. Die eigenen Antworten stehen sofort da.
  *
- * Bei `prefers-reduced-motion` steht der vollständige Verlauf sofort da.
+ * Der Ablauf läuft über CSS-Verzögerungen, ausgelöst von einem Attribut.
+ * Kein Zustand, keine Schleife, kein Nachrechnen zur Laufzeit.
+ *
+ * OHNE JAVASCRIPT steht der vollständige Verlauf da. Das Verstecken vor
+ * dem Start hängt an `html[data-js]`, und das setzt nur ein Skript.
+ *
+ * Bei `prefers-reduced-motion` steht der erste Verlauf sofort vollständig da.
  */
-interface Nachricht {
-  /** `kunde` steht rechts, `assistenz` links. */
-  von: 'kunde' | 'assistenz';
-  text: string;
-  /** Uhrzeit an der Blase. */
-  zeit: string;
-}
-
 interface Props {
-  /** Name im Kopf des Verlaufs. */
+  /** Einzelner Verlauf: Name im Kopf. */
   name?: string;
-  /** Zeile unter dem Namen. */
+  /** Einzelner Verlauf: Zeile unter dem Namen. */
   status?: string;
-  nachrichten: Nachricht[];
-  /** Uhrzeit in der Statusleiste. */
+  /** Einzelner Verlauf: die Nachrichten. */
+  nachrichten?: Nachricht[];
+  /** Einzelner Verlauf: Uhrzeit in der Statusleiste. */
   uhrzeit?: string;
+  /** Mehrere Verläufe nacheinander. Ersetzt die vier Angaben darüber. */
+  gespraeche?: Gespraech[];
+  blickwinkel?: Blickwinkel;
+  /** Streckt oder staucht den Ablauf. Kleiner ist schneller. */
+  tempo?: number;
+  /**
+   * Worin der Verlauf steht. Auf dem Telefon gehört die Statusleiste dazu,
+   * im Fenster auf dem Rechner nicht: dort sitzt sie am Bildschirmrand und
+   * nicht über dem Gespräch.
+   */
+  geraet?: 'telefon' | 'fenster';
   class?: string;
 }
 
@@ -41,145 +57,180 @@ const {
   status = 'online',
   nachrichten,
   uhrzeit = '9:41',
+  gespraeche,
+  blickwinkel = 'kunde',
+  tempo = 1,
+  geraet = 'telefon',
   class: className = '',
 }: Props = Astro.props;
 
-/**
- * Zeitplan des Ablaufs in Sekunden.
- *
- * Eine Nachricht des Kunden erscheint direkt. Vor einer Antwort der
- * Assistenz läuft erst die Tippanzeige. Deren Dauer richtet sich nach der
- * Länge der Antwort, sonst wirkt ein langer Text sofort fertig getippt.
- */
-let uhr = 0.4;
-const plan = nachrichten.map((n) => {
-  if (n.von === 'kunde') {
-    const eintrag = { ...n, ab: uhr, tippenAb: 0, tippenDauer: 0 };
-    uhr += 1.1;
-    return eintrag;
-  }
-  const tippenDauer = Math.min(2.2, 0.7 + n.text.length * 0.014);
-  const eintrag = { ...n, tippenAb: uhr, tippenDauer, ab: uhr + tippenDauer };
-  uhr += tippenDauer + 1.0;
-  return eintrag;
-});
+/* Der einzelne Verlauf ist nur der Sonderfall mit genau einem Eintrag.
+   Damit gibt es im Markup und im CSS nur einen Weg. */
+const eingaben: Gespraech[] = gespraeche ?? [
+  { name, status, uhrzeit, bild: mark.src, nachrichten: nachrichten ?? [] },
+];
+
+const { folge } = planen(eingaben, blickwinkel, tempo);
+const mehrere = folge.length > 1;
 ---
 
-<div class={`chat ${className}`} data-chat>
-  {/* --- Statusleiste --------------------------------------------------- */}
-  <div class="chat-status" aria-hidden="true">
-    <span class="chat-uhr">{uhrzeit}</span>
-    <span class="chat-anzeigen">
-      <svg viewBox="0 0 18 12" class="chat-signal" fill="currentColor">
-        <rect x="0" y="8" width="3" height="4" rx="1" />
-        <rect x="5" y="5.5" width="3" height="6.5" rx="1" />
-        <rect x="10" y="3" width="3" height="9" rx="1" />
-        <rect x="15" y="0.5" width="3" height="11.5" rx="1" opacity="0.35" />
-      </svg>
-      <svg viewBox="0 0 16 12" class="chat-wlan" fill="currentColor">
-        <path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0zM8 6.1c-1.5 0-2.9.6-3.9 1.6L2.8 6.3A7.4 7.4 0 0 1 8 4.2c2 0 3.9.8 5.2 2.1l-1.3 1.4A5.4 5.4 0 0 0 8 6.1zM8 2.2c-2.5 0-4.9 1-6.6 2.7L0 3.5A11.3 11.3 0 0 1 8 .3c3.1 0 6 1.2 8 3.2l-1.4 1.4A9.3 9.3 0 0 0 8 2.2z" />
-      </svg>
-      <svg viewBox="0 0 26 12" class="chat-akku" fill="none">
-        <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.45" />
-        <rect x="2" y="2" width="16" height="8" rx="1.6" fill="currentColor" />
-        <path d="M23.5 4.2v3.6a2 2 0 0 0 0-3.6z" fill="currentColor" opacity="0.45" />
-      </svg>
-    </span>
-  </div>
+<div class={`chat chat-in-${geraet} ${className}`} data-chat style={`--wechsel:${WECHSEL}s`}>
+  {
+    folge.map((gespraech, stelle) => (
+      <div
+        class:list={[
+          'chat-schirm',
+          mehrere && 'chat-teil',
+          stelle === folge.length - 1 && 'chat-letzte',
+        ]}
+        style={`--von:${gespraech.von.toFixed(2)}s;--bis:${gespraech.bis.toFixed(2)}s`}
+      >
+        {/* --- Statusleiste -----------------------------------------------
+             Gehoert zum Telefon, nicht zum Gespraech. Im Fenster auf dem
+             Rechner sitzt sie am Bildschirmrand und faellt hier weg.
+             Alles andere ist auf jedem Geraet Zeichen fuer Zeichen gleich. */}
+        {geraet === 'telefon' && (
+        <div class="chat-status" aria-hidden="true">
+          <span class="chat-uhr">{gespraech.uhrzeit}</span>
+          <span class="chat-anzeigen">
+            <svg viewBox="0 0 18 12" class="chat-signal" fill="currentColor">
+              <rect x="0" y="8" width="3" height="4" rx="1" />
+              <rect x="5" y="5.5" width="3" height="6.5" rx="1" />
+              <rect x="10" y="3" width="3" height="9" rx="1" />
+              <rect x="15" y="0.5" width="3" height="11.5" rx="1" opacity="0.35" />
+            </svg>
+            <svg viewBox="0 0 16 12" class="chat-wlan" fill="currentColor">
+              <path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0zM8 6.1c-1.5 0-2.9.6-3.9 1.6L2.8 6.3A7.4 7.4 0 0 1 8 4.2c2 0 3.9.8 5.2 2.1l-1.3 1.4A5.4 5.4 0 0 0 8 6.1zM8 2.2c-2.5 0-4.9 1-6.6 2.7L0 3.5A11.3 11.3 0 0 1 8 .3c3.1 0 6 1.2 8 3.2l-1.4 1.4A9.3 9.3 0 0 0 8 2.2z" />
+            </svg>
+            <svg viewBox="0 0 26 12" class="chat-akku" fill="none">
+              <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.45" />
+              <rect x="2" y="2" width="16" height="8" rx="1.6" fill="currentColor" />
+              <path d="M23.5 4.2v3.6a2 2 0 0 0 0-3.6z" fill="currentColor" opacity="0.45" />
+            </svg>
+          </span>
+        </div>
+        )}
 
-  {/* --- Kopf des Verlaufs ---------------------------------------------- */}
-  <div class="chat-kopf">
-    <svg viewBox="0 0 20 20" class="chat-zurueck" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M12 4 6 10l6 6" />
-    </svg>
+        {/* --- Kopf des Verlaufs ---------------------------------------- */}
+        <div class="chat-kopf">
+          <svg viewBox="0 0 20 20" class="chat-zurueck" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 4 6 10l6 6" />
+          </svg>
 
-    <img class="chat-bild" src={mark.src} alt="" aria-hidden="true" width="34" height="34" />
-
-    <span class="chat-wer">
-      <span class="chat-name">{name}</span>
-      <span class="chat-status-text">{status}</span>
-    </span>
-
-    <svg viewBox="0 0 20 20" class="chat-kamera" fill="currentColor" aria-hidden="true">
-      <path d="M2.5 5.5h9a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 13V7a1.5 1.5 0 0 1 1.5-1.5zM14.5 8.6l3.3-2.1a.6.6 0 0 1 .9.5v6a.6.6 0 0 1-.9.5l-3.3-2.1z" />
-    </svg>
-  </div>
-
-  {/* --- Der Verlauf ----------------------------------------------------- */}
-  <ol class="chat-verlauf">
-    <li class="chat-tag" aria-hidden="true"><span>Heute</span></li>
-
-    {
-      plan.map((n) => (
-        <>
-          {n.von === 'assistenz' && (
-            <li
-              class="chat-zeile chat-links chat-tippzeile"
-              style={`--ab:${n.tippenAb}s;--dauer:${n.tippenDauer}s`}
-              aria-hidden="true"
-            >
-              <span class="chat-halter">
-                <span class="chat-blase chat-blase-links chat-tippen">
-                  <span class="chat-punkt" />
-                  <span class="chat-punkt" />
-                  <span class="chat-punkt" />
-                </span>
-              </span>
-            </li>
+          {gespraech.bild ? (
+            <img class="chat-bild" src={gespraech.bild} alt="" aria-hidden="true" width="34" height="34" />
+          ) : (
+            <span class="chat-bild chat-kuerzel" aria-hidden="true">{gespraech.kuerzel}</span>
           )}
 
-          <li
-            class:list={[
-              'chat-zeile',
-              n.von === 'kunde' ? 'chat-rechts' : 'chat-links',
-            ]}
-            style={`--ab:${n.ab}s`}
-          >
-            <span class="chat-halter">
-            <span
-              class:list={[
-                'chat-blase',
-                n.von === 'kunde' ? 'chat-blase-rechts' : 'chat-blase-links',
-              ]}
-            >
-              {n.text}
-              <span class="chat-meta">
-                <span class="chat-zeit">{n.zeit}</span>
-                {n.von === 'kunde' && (
-                  <svg viewBox="0 0 16 11" class="chat-haken" fill="none" stroke="currentColor"
-                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 6l3 3 5.5-6.5M7 9l5.5-6.5" />
-                  </svg>
-                )}
-              </span>
-            </span>
-            </span>
-          </li>
-        </>
-      ))
-    }
-  </ol>
+          <span class="chat-wer">
+            <span class="chat-name">{gespraech.name}</span>
+            <span class="chat-status-text">{gespraech.status}</span>
+          </span>
 
-  {/* --- Eingabezeile ---------------------------------------------------- */}
-  <div class="chat-eingabe" aria-hidden="true">
-    <span class="chat-feld">Nachricht</span>
-    <span class="chat-senden">
-      <svg viewBox="0 0 20 20" fill="currentColor">
-        <path d="M2.2 17.5 18.5 10 2.2 2.5 2.2 8.3l11 1.7-11 1.7z" />
-      </svg>
-    </span>
-  </div>
+          <svg viewBox="0 0 20 20" class="chat-kamera" fill="currentColor" aria-hidden="true">
+            <path d="M2.5 5.5h9a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 13V7a1.5 1.5 0 0 1 1.5-1.5zM14.5 8.6l3.3-2.1a.6.6 0 0 1 .9.5v6a.6.6 0 0 1-.9.5l-3.3-2.1z" />
+          </svg>
+        </div>
+
+        {/* --- Der Verlauf ----------------------------------------------- */}
+        <ol class="chat-verlauf">
+          <li class="chat-tag" aria-hidden="true"><span>{gespraech.stempel}</span></li>
+
+          {gespraech.nachrichten.map((n) => (
+            <>
+              {n.links && (
+                <li
+                  class="chat-zeile chat-links chat-tippzeile"
+                  style={`--ab:${n.tippenAb.toFixed(2)}s;--dauer:${n.tippenDauer.toFixed(2)}s`}
+                  aria-hidden="true"
+                >
+                  <span class="chat-halter">
+                    <span class="chat-blase chat-blase-links chat-tippen">
+                      <span class="chat-punkt" />
+                      <span class="chat-punkt" />
+                      <span class="chat-punkt" />
+                    </span>
+                  </span>
+                </li>
+              )}
+
+              <li
+                class:list={['chat-zeile', n.links ? 'chat-links' : 'chat-rechts']}
+                style={`--ab:${n.ab.toFixed(2)}s`}
+              >
+                <span class="chat-halter">
+                  <span
+                    class:list={[
+                      'chat-blase',
+                      n.links ? 'chat-blase-links' : 'chat-blase-rechts',
+                    ]}
+                  >
+                    {n.text}
+                    <span class="chat-meta">
+                      <span class="chat-zeit">{n.zeit}</span>
+                      {!n.links && (
+                        <svg viewBox="0 0 16 11" class="chat-haken" fill="none" stroke="currentColor"
+                          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 6l3 3 5.5-6.5M7 9l5.5-6.5" />
+                        </svg>
+                      )}
+                    </span>
+                  </span>
+                </span>
+              </li>
+            </>
+          ))}
+        </ol>
+
+        {/* --- Eingabezeile ---------------------------------------------- */}
+        <div class="chat-eingabe" aria-hidden="true">
+          <span class="chat-feld">Nachricht</span>
+          <span class="chat-senden">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2.2 17.5 18.5 10 2.2 2.5 2.2 8.3l11 1.7-11 1.7z" />
+            </svg>
+          </span>
+        </div>
+      </div>
+    ))
+  }
 </div>
 
 <style>
+  /* Alle Schirme liegen in derselben Rasterzelle uebereinander. Damit
+     bestimmt der hoechste die Hoehe nicht: das Raster hat genau eine Reihe
+     und die fuellt den Telefonbildschirm. */
   .chat {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr;
     height: 100%;
+    overflow: hidden;
     /* Hintergrund wie im Messenger: warmes Papier statt Weiss. */
     background: #efe7de;
     font-family: var(--font-sans);
+  }
+
+  .chat-schirm {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: #efe7de;
+  }
+
+  /* Ruhezustand bei mehreren Verlaeufen: nur der LETZTE steht da, also das
+     Ergebnis. Ohne diese Regel laegen ohne JavaScript und ohne Bewegung
+     alle drei uebereinander und ergaeben Buchstabensalat. */
+  .chat-teil {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .chat-teil.chat-letzte {
+    opacity: 1;
+    visibility: visible;
   }
 
   /* --- Statusleiste ---------------------------------------------------- */
@@ -229,6 +280,20 @@ const plan = nachrichten.map((n) => {
     background: #fff;
     padding: 0.28rem;
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
+  }
+
+  /* Ohne Bild stehen die Anfangsbuchstaben im Kreis, wie im Messenger bei
+     einem Kontakt ohne Profilbild. Kein erfundenes Gesicht. */
+  .chat-kuerzel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: #cfd4da;
+    color: #4a5058;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
 
   .chat-wer {
@@ -290,12 +355,12 @@ const plan = nachrichten.map((n) => {
   }
 
   /* Jede Zeile ist ein Raster mit genau einer Reihe. Deren Hoehe laesst
-     sich von 0fr auf 1fr animieren -- anders als `height: auto`, das sich
+     sich von 0fr auf 1fr animieren, anders als `height: auto`, das sich
      nicht animieren laesst. Der Halter darin wird beschnitten.
 
      Das ist der Grund, warum der Verlauf von unten waechst: eine noch
      nicht erschienene Nachricht belegt keinen Platz. Vorher standen alle
-     sechs Zeilen von Anfang an da, nur unsichtbar, und der Verlauf klebte
+     Zeilen von Anfang an da, nur unsichtbar, und der Verlauf klebte
      dadurch oben. */
   .chat-zeile {
     display: grid;
@@ -321,8 +386,9 @@ const plan = nachrichten.map((n) => {
     color: #16181d;
     box-shadow: 0 1px 1px rgb(0 0 0 / 0.09);
     /* Die Uhrzeit sitzt in der letzten Zeile. Der Freiraum verhindert,
-       dass der Text sie ueberlaeuft. */
-    padding-inline-end: 2.6rem;
+       dass der Text sie ueberlaeuft. Etwas mehr als die Uhrzeit breit ist,
+       sonst stossen Satzende und Uhrzeit in breiten Blasen aneinander. */
+    padding-inline-end: 3rem;
   }
 
   .chat-blase-links {
@@ -370,11 +436,20 @@ const plan = nachrichten.map((n) => {
     background: #9aa0a8;
   }
 
+  /* Die Tippanzeige gehoert zum Ablauf und sonst nirgendwohin. Ohne diese
+     Regel stuenden ohne JavaScript drei Punkte ueber einer Nachricht, die
+     laengst da ist. */
+  .chat-tippzeile {
+    opacity: 0;
+    grid-template-rows: 0fr;
+  }
+
   /* --- Eingabezeile ----------------------------------------------------- */
   .chat-eingabe {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    /* Unten mehr Luft: dort sitzt auf dem Geraet der Bedienbalken. */
     padding: 0.45rem 0.6rem 1.15rem;
     background: #f6f2ee;
     border-top: 1px solid rgb(0 0 0 / 0.07);
@@ -404,13 +479,22 @@ const plan = nachrichten.map((n) => {
 
   .chat-senden svg { width: 0.7rem; }
 
+  /* Der EINZIGE Unterschied zwischen Telefon und Fenster: der Platz fuer
+     den Bedienbalken am unteren Rand des Geraets. Blasen, Farben, Schrift,
+     Kopf und Tippanzeige sind ueberall auf der Seite dieselben. */
+  .chat-in-fenster .chat-eingabe {
+    padding-block-end: 0.55rem;
+  }
+
   /* ======================================================================
      Der Ablauf
 
-     Ausgangslage: alles unsichtbar. Sobald `data-laeuft` gesetzt ist,
-     erscheint jedes Stueck zu seiner Zeit. Das Setzen uebernimmt der
-     Beobachter in Base.astro, damit der Verlauf erst laeuft, wenn ihn
-     jemand sieht -- und nicht schon vorbei ist, bevor man hinschaut.
+     Ausgangslage OHNE Skript: alles steht fertig da. Erst wenn ein Skript
+     laeuft, traegt es `data-js` an das Dokument, und dann erst wird vor dem
+     Start versteckt. So bleibt die Seite ohne JavaScript vollstaendig.
+
+     `data-laeuft` setzt der Beobachter in Base.astro, sobald der Verlauf zu
+     sehen ist. Ohne das waere er vorbei, bevor jemand hinschaut.
      ====================================================================== */
   @media (prefers-reduced-motion: no-preference) {
     .chat[data-laeuft] .chat-zeile:not(.chat-tippzeile) {
@@ -433,16 +517,43 @@ const plan = nachrichten.map((n) => {
     .chat[data-laeuft] .chat-punkt:nth-child(2) { animation-delay: 0.16s; }
     .chat[data-laeuft] .chat-punkt:nth-child(3) { animation-delay: 0.32s; }
 
+    /* Der Wechsel von einem Verlauf zum naechsten. Der abgehende schiebt
+       nach links weg, waehrend der naechste von rechts hereinkommt, so wie
+       beim Wechsel zwischen zwei Chats auf dem Geraet.
+
+       Zwei Animationen an einem Element: die zweite darf NICHT rueckwaerts
+       fuellen, sonst wuerde sie den Zustand schon waehrend des Hereinkommens
+       ueberschreiben. Deshalb `forwards` und nicht `both`. */
+    .chat[data-laeuft] .chat-teil {
+      animation: schirm-herein var(--wechsel) cubic-bezier(0.22, 1, 0.36, 1) var(--von) both;
+    }
+
+    /* Der letzte Verlauf bleibt stehen. Ein leerer Schirm am Ende waere
+       das Gegenteil der Aussage. */
+    .chat[data-laeuft] .chat-teil:not(.chat-letzte) {
+      animation:
+        schirm-herein var(--wechsel) cubic-bezier(0.22, 1, 0.36, 1) var(--von) both,
+        schirm-hinaus var(--wechsel) cubic-bezier(0.5, 0, 0.9, 0.4) var(--bis) forwards;
+    }
+
     /* Vor dem Start ist nichts zu sehen. Ohne das blitzte der fertige
        Verlauf einmal auf, bevor er sich zurueckstellt. */
-    .chat:not([data-laeuft]) .chat-zeile {
+    :global(html[data-js]) .chat:not([data-laeuft]) .chat-zeile {
       opacity: 0;
       grid-template-rows: 0fr;
     }
+
+    :global(html[data-js]) .chat:not([data-laeuft]) .chat-teil {
+      opacity: 0;
+      visibility: hidden;
+    }
   }
 
-  /* Ohne Bewegung steht der vollstaendige Verlauf sofort da, nur die
-     Tippanzeigen entfallen -- sie ergeben ohne Ablauf keinen Sinn. */
+  /* Ohne Bewegung steht der Verlauf sofort da, nur die Tippanzeigen
+     entfallen: sie ergeben ohne Ablauf keinen Sinn. Mehrere Verlaeufe
+     koennen einander ohne Bewegung nicht abloesen, es bleibt also der
+     Ruhezustand von oben: der letzte Verlauf. Was in den anderen passiert
+     ist, steht als Text daneben. */
   @media (prefers-reduced-motion: reduce) {
     .chat-tippzeile {
       display: none;
@@ -480,5 +591,19 @@ const plan = nachrichten.map((n) => {
   @keyframes punkt-huepfen {
     0%, 60%, 100% { transform: none; opacity: 0.55; }
     30% { transform: translateY(-0.16rem); opacity: 1; }
+  }
+
+  /* `visibility` springt nicht in der Mitte um, sondern gilt fuer die
+     gesamte Laufzeit, sobald ein Ende sichtbar ist. Genau deshalb steht es
+     hier: der Schirm ist waehrend der ganzen Bewegung da und davor bzw.
+     danach vollstaendig weg, auch fuer die Maus. */
+  @keyframes schirm-herein {
+    from { opacity: 0; visibility: hidden; transform: translateX(12%); }
+    to { opacity: 1; visibility: visible; transform: none; }
+  }
+
+  @keyframes schirm-hinaus {
+    from { opacity: 1; visibility: visible; transform: none; }
+    to { opacity: 0; visibility: hidden; transform: translateX(-12%); }
   }
 </style>

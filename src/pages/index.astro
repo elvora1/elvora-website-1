@@ -9,7 +9,7 @@ import ReviewBadge from '~/components/ReviewBadge.astro';
 import Iphone from '~/components/Iphone.astro';
 import Chat from '~/components/Chat.astro';
 import Kanalkreise from '~/components/Kanalkreise.astro';
-import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
+import Vormittag from '~/components/Vormittag.astro';
 import {
   cta,
   services,
@@ -40,22 +40,61 @@ const verluste = [
   },
 ];
 
-/** Was hereinkommt, während der Betrieb arbeitet. */
-const eingang = [
+/**
+ * Was hereinkommt, während der Betrieb arbeitet.
+ *
+ * Zu jedem Ereignis gehört der Verlauf, der auf dem Telefon dazu abläuft.
+ * Blickwinkel ist hier das Telefon des BETRIEBS: der Kunde steht links,
+ * die Antwort der Assistenz rechts, weil sie über die eigene Nummer
+ * hinausgeht.
+ *
+ * Die Namen sind Beispiele, keine echten Vorgänge.
+ */
+const vormittag = [
   {
     kanal: 'WhatsApp',
     zeit: '08:14',
-    text: 'Guten Tag, ich bräuchte kurzfristig einen Termin. Geht diese Woche noch was?',
+    text: 'Terminanfrage vor Arbeitsbeginn. Beantwortet und eingetragen, ohne dass Sie das Telefon in die Hand genommen haben.',
+    gespraech: {
+      name: 'Frau Kern',
+      status: 'zuletzt online 08:15',
+      nachrichten: [
+        { von: 'kunde' as const, zeit: '08:14', text: 'Guten Tag, ich bräuchte kurzfristig einen Termin. Geht diese Woche noch was?' },
+        { von: 'assistenz' as const, zeit: '08:14', text: 'Guten Tag! Donnerstag 9:00 Uhr ist frei. Soll ich Sie eintragen?' },
+        { von: 'kunde' as const, zeit: '08:15', text: 'Ja, gern.' },
+        { von: 'assistenz' as const, zeit: '08:15', text: 'Eingetragen. Am Mittwoch kommt eine Erinnerung.' },
+      ],
+    },
   },
   {
     kanal: 'Verpasster Anruf',
     zeit: '09:02',
-    text: 'Angerufen, niemand erreicht. Die Assistenz hat nachgefasst und die Nummer notiert.',
+    text: 'Angerufen, niemand erreicht. Die Assistenz hat nachgefasst, das Anliegen aufgenommen und die Nummer notiert.',
+    gespraech: {
+      name: '0201 ••• ••••',
+      status: 'nicht in den Kontakten',
+      kuerzel: '?',
+      nachrichten: [
+        { von: 'assistenz' as const, zeit: '09:02', text: 'Guten Tag, Sie haben uns gerade angerufen und wir konnten leider nicht abnehmen. Worum geht es? Ich helfe Ihnen direkt hier weiter.' },
+        { von: 'kunde' as const, zeit: '09:03', text: 'Ich bräuchte ein Angebot für eine Sanierung.' },
+        { von: 'assistenz' as const, zeit: '09:03', text: 'Danke, ich habe Ihre Nummer notiert. Sie bekommen heute noch einen Rückruf.' },
+      ],
+    },
   },
   {
     kanal: 'Kontaktformular',
     zeit: '11:37',
-    text: 'Anfrage über die Website. Bereits beantwortet, Rückruf für 16 Uhr vereinbart.',
+    text: 'Anfrage über die Website. Eingang bestätigt, Rückruf für 16 Uhr vereinbart, alles ohne Ihr Zutun.',
+    gespraech: {
+      name: 'Familie Weber',
+      status: 'zuletzt online 11:38',
+      nachrichten: [
+        { von: 'kunde' as const, zeit: '11:37', text: 'Guten Tag, ich habe eben das Formular auf Ihrer Website ausgefüllt. Ist das angekommen?' },
+        { von: 'assistenz' as const, zeit: '11:37', text: 'Ja, Ihre Anfrage liegt vor. Passt Ihnen ein Rückruf heute um 16 Uhr?' },
+        { von: 'kunde' as const, zeit: '11:38', text: 'Ja, perfekt.' },
+        { von: 'assistenz' as const, zeit: '11:38', text: 'Notiert. Sie werden um 16 Uhr angerufen.' },
+      ],
+    },
   },
 ];
 
@@ -205,7 +244,7 @@ const wege = [
     heading="So sieht ein Vormittag mit Assistenz aus"
     intro="Drei Anfragen, alle beantwortet, keine liegen geblieben. Sie waren in der Zeit bei Ihren Kunden."
   >
-    <Nachrichtenstapel nachrichten={eingang} class="eingang" />
+    <Vormittag ereignisse={vormittag} />
   </Band>
 
   {/* ===================== Die Vorführung ===================== */}
@@ -605,28 +644,6 @@ const wege = [
     color: var(--color-ink-muted);
   }
 
-
-  /* Der Stapel war fuer dunkle Flaechen gebaut: helle Raender, abgedunkelte
-     Karten. Auf Weiss dreht sich das um. */
-  .eingang {
-    max-width: 34rem;
-  }
-
-  .eingang :global(.stapel-karte) {
-    border-color: var(--color-border);
-    background: var(--color-surface-subtle);
-    color: var(--color-ink);
-  }
-
-  .eingang :global(.stapel-symbol) {
-    background: var(--color-accent-soft);
-    color: var(--color-accent);
-  }
-
-  .eingang :global(.stapel-karte:hover) {
-    background: var(--color-surface);
-    border-color: var(--color-border-strong);
-  }
 
   /* ===================== Der Mensch ===================== */
   .mensch {

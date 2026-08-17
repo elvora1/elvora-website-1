@@ -46,6 +46,23 @@ const {
       kopfFarbe={kopfFarbe}
     />
     {!noindex && <Schema breadcrumbs={breadcrumbs} service={service} faq={faq} />}
+
+    {/*
+      Merkzeichen, dass ein Skript laeuft.
+
+      Die Nachrichtenverlaeufe verstecken sich vor ihrem Start, damit man
+      sie ablaufen sieht und nicht nur das Ergebnis. Ohne JavaScript
+      koennte sie aber nichts starten, und der Schirm bliebe fuer immer
+      leer. Deshalb wird nur versteckt, wenn dieses Merkzeichen steht.
+
+      Es steht bewusst im Kopf und nicht am Ende der Seite: sonst waere der
+      fertige Verlauf einen Wimpernschlag lang zu sehen, bevor er sich
+      zurueckstellt.
+    */}
+    <script is:inline>
+      document.documentElement.setAttribute('data-js', '');
+    </script>
+
     <slot name="head" />
   </head>
   <body class="min-h-dvh">
@@ -74,6 +91,11 @@ const {
       eine einzige JavaScript-Datei und ohne zusätzliche Anfrage.
     */}
     <script is:inline>
+      // Nur anmelden, wenn es die Kennung noch nicht gibt. Auf der Seite
+      // selbst steht das Skript ohnehin nur einmal, in der Vorschau liegen
+      // aber alle Seiten in EINEM Dokument, und ein zweiter Anlauf wuerde
+      // dort einen Fehler werfen und alles danach abbrechen.
+      if (!customElements.get('text-scramble'))
       customElements.define(
         'text-scramble',
         class extends HTMLElement {
@@ -148,11 +170,30 @@ const {
         jedem Vorbeiscrollen neu anfaengt, wirkt wie eine Werbeschleife.
       */
       (function () {
-        var verlaeufe = document.querySelectorAll('[data-chat]');
-        if (!verlaeufe.length) return;
+        var alle = document.querySelectorAll('[data-chat]');
+        if (!alle.length) return;
+
+        /*
+          Ein Verlauf kann in einer groesseren Einheit stecken, etwa im
+          Vormittag: dort laeuft neben dem Telefon eine Zeitleiste mit, die
+          auf dieselbe Sekunde gehoert. Beobachtet wird deshalb nur die
+          aeusserste Einheit, und die startet alles darin GLEICHZEITIG.
+          Zwei eigene Beobachter wuerden frueher oder spaeter auseinander
+          liegen, und dann zeigt die Leiste etwas anderes als das Telefon.
+        */
+        var aeussere = [].filter.call(alle, function (el) {
+          return !el.parentElement || !el.parentElement.closest('[data-chat]');
+        });
+
+        function starten(el) {
+          el.setAttribute('data-laeuft', '');
+          [].forEach.call(el.querySelectorAll('[data-chat]'), function (k) {
+            k.setAttribute('data-laeuft', '');
+          });
+        }
 
         if (!('IntersectionObserver' in window)) {
-          verlaeufe.forEach(function (v) { v.setAttribute('data-laeuft', ''); });
+          aeussere.forEach(starten);
           return;
         }
 
@@ -160,14 +201,14 @@ const {
           function (eintraege) {
             eintraege.forEach(function (e) {
               if (!e.isIntersecting) return;
-              e.target.setAttribute('data-laeuft', '');
+              starten(e.target);
               wache.unobserve(e.target);
             });
           },
           { threshold: 0.35 },
         );
 
-        verlaeufe.forEach(function (v) { wache.observe(v); });
+        aeussere.forEach(function (v) { wache.observe(v); });
       })();
     </script>
   </body>
