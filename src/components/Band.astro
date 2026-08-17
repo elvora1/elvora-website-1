@@ -241,7 +241,9 @@ const hatKopf = Boolean(kennung || heading || intro);
     @supports (animation-timeline: view()) {
       .band-kopf,
       .band-koerper-abstand {
-        animation: auftauchen linear both;
+        animation-name: auftauchen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
       }
 

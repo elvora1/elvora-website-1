@@ -41,7 +41,10 @@ const { text, dauer = 1.6, class: className = '' }: Props = Astro.props;
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .tippend {
-        animation: schreiben var(--dauer) steps(var(--zeichen), end) both;
+        animation-name: schreiben;
+        animation-duration: var(--dauer);
+        animation-timing-function: steps(var(--zeichen), end);
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 30% entry 80%;
       }

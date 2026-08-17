@@ -148,7 +148,9 @@ const {
     @supports (animation-timeline: view()) {
       .schlussband-text,
       .schlussband-handlung {
-        animation: auftauchen linear both;
+        animation-name: auftauchen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
       }
 

@@ -149,7 +149,9 @@ const { nachrichten, class: className = '' }: Props = Astro.props;
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .stapel-karte {
-        animation: auffaechern linear both;
+        animation-name: auffaechern;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         /* Alle Karten teilen sich denselben Bereich: der Stapel oeffnet
            sich als Ganzes, statt Karte fuer Karte nachzuklappern. */

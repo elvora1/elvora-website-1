@@ -117,7 +117,9 @@ const initialen = (name: string) =>
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .kreis {
-        animation: aufrucken linear both;
+        animation-name: aufrucken;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry calc(15% + var(--rang) * 8%) entry
           calc(50% + var(--rang) * 8%);

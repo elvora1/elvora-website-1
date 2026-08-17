@@ -241,7 +241,20 @@
    dafuer, dass man etwas lesen kann.
    ========================================================================== */
 
-/* ACHTUNG BEIM STAFFELN: `animation-delay` wirkt hier NICHT. Bei einer
+/* ACHTUNG, NIEMALS DIE KURZSCHREIBWEISE `animation:` BENUTZEN, wenn im
+   selben Block `animation-timeline` steht.
+
+   Der CSS-Verdichter zieht beides zusammen und schreibt daraus
+   `animation: linear both auftauchen view()`. Diese Zeile kennt kein
+   Browser, sie wird komplett verworfen, und damit faellt die Animation
+   ersatzlos aus -- ohne Fehlermeldung, ohne Warnung im Bauprotokoll.
+
+   Genau das war hier ueber Wochen der Fall: saemtliche Bewegung beim
+   Scrollen lag still, auf jeder Seite. Deshalb stehen hier ueberall die
+   Langformen `animation-name`, `animation-timing-function` und
+   `animation-fill-mode`. Die bleiben stehen.
+
+   ACHTUNG BEIM STAFFELN: `animation-delay` wirkt hier NICHT. Bei einer
    fortschrittsgebundenen Zeitachse gibt es keine Uhr, auf die eine
    Verzoegerung sich beziehen koennte; die Angabe wird ignoriert. Gestaffelt
    wird deshalb ueber `animation-range`, also ueber die Scrollstrecke. */
@@ -249,7 +262,9 @@
 @utility einblenden {
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
-      animation: auftauchen linear both;
+      animation-name: auftauchen;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       /* Beginnt, sobald das Element von unten hereinkommt, und ist fertig,
          bevor es die Mitte erreicht. Sonst zappelt beim Zurueckscrollen. */
@@ -264,7 +279,9 @@
 @utility hereinziehen {
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
-      animation: heranruecken linear both;
+      animation-name: heranruecken;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry calc(10% + var(--verzug, 0) * 4%) entry
         calc(70% + var(--verzug, 0) * 4%);

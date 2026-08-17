@@ -153,7 +153,9 @@ const kanaele = [
     @supports (animation-timeline: view()) {
       .kontakt-wege,
       .kontakt-formular {
-        animation: auftauchen linear both;
+        animation-name: auftauchen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 6% entry 45%;
       }

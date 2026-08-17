@@ -1,0 +1,154 @@
+---
+/**
+ * Buchstaben, die einzeln hereinklappen.
+ *
+ * Jeder Buchstabe kippt um seine waagerechte Achse nach vorn, leicht
+ * versetzt zum nächsten. Der Satz baut sich damit von links auf, statt
+ * einfach da zu sein.
+ *
+ * ABWEICHUNGEN VON DER VORLAGE
+ *
+ * 1. Kein React, kein Bewegungspaket. Der Ablauf sind CSS-Verzögerungen,
+ *    im Build ausgerechnet. Damit bleibt die Seite bei null
+ *    JavaScript-Dateien, und der Satz ist beim ersten Bild schon da,
+ *    statt auf ein nachgeladenes Paket zu warten. Bei einer Überschrift
+ *    im ersten Sichtbereich ist das der Unterschied zwischen Wirkung und
+ *    Ruckeln.
+ *
+ * 2. Die Vorlage legt ZWEI Sätze Buchstaben übereinander, einen
+ *    hereindrehenden und einen herausdrehenden. Das ergibt einen
+ *    laufenden Wechsel zwischen zwei Texten. Hier kommt der Text einmal
+ *    herein und bleibt stehen, also genügt ein Satz. Der doppelte hätte
+ *    jeden Buchstaben zweimal ins Dokument geschrieben, ohne dass man den
+ *    zweiten je zu sehen bekäme.
+ *
+ * 3. Ganze WÖRTER bleiben zusammen. Reine Buchstabenkästchen dürfen
+ *    überall umbrechen, und dann steht mitten im Wort ein Zeilenwechsel.
+ *
+ * Für Vorlesesoftware steht der Satz einmal am Stück da, die Buchstaben
+ * selbst sind ausgeblendet. Ohne diese Trennung liest der Screenreader
+ * jeden Buchstaben einzeln vor.
+ *
+ * Bei `prefers-reduced-motion` steht der Satz sofort.
+ */
+export interface Teil {
+  text: string;
+  /** Hebt diesen Teil hervor: kursiv und in der Markenfarbe. */
+  betont?: boolean;
+}
+
+interface Props {
+  teile: Teil[];
+  /** Abstand zwischen zwei Buchstaben in Sekunden. */
+  takt?: number;
+  class?: string;
+}
+
+const { teile, takt = 0.028, class: className = '' }: Props = Astro.props;
+
+const ganz = teile.map((t) => t.text).join('');
+
+/* Erst alle Zeichen mit ihrer Auszeichnung sammeln, dann in Wörter
+   zerlegen. Andersherum, also je Teil getrennt, stünde bei
+   „gefunden" + „," ein Umbruch zwischen Wort und Komma. */
+type Zeichen = { z: string; betont: boolean };
+
+const zeichen: Zeichen[] = teile.flatMap((t) =>
+  Array.from(t.text).map((z) => ({ z, betont: Boolean(t.betont) })),
+);
+
+const woerter: Zeichen[][] = [];
+let laufend: Zeichen[] = [];
+for (const eintrag of zeichen) {
+  if (/\s/.test(eintrag.z)) {
+    if (laufend.length) woerter.push(laufend);
+    laufend = [];
+    continue;
+  }
+  laufend.push(eintrag);
+}
+if (laufend.length) woerter.push(laufend);
+
+/* Fortlaufende Nummer über alle Wörter hinweg, sonst begänne die
+   Staffelung in jedem Wort von vorn. */
+let nummer = 0;
+const gestaffelt = woerter.map((wort) =>
+  wort.map((eintrag) => ({ ...eintrag, i: nummer++ })),
+);
+---
+
+<span class={`rolle ${className}`} style={`--takt:${takt}s`}>
+  <span class="sr-only">{ganz}</span>
+
+  <span aria-hidden="true">
+    {
+      gestaffelt.map((wort, w) => (
+        <>
+          {w > 0 && ' '}
+          <span class="rolle-wort">
+            {wort.map((eintrag) => (
+              <span
+                class:list={['rolle-zeichen', eintrag.betont && 'rolle-betont']}
+                style={`--i:${eintrag.i}`}
+              >
+                {eintrag.z}
+              </span>
+            ))}
+          </span>
+        </>
+      ))
+    }
+  </span>
+</span>
+
+<style>
+  .rolle {
+    display: inline;
+  }
+
+  /* Die Fluchtlinie sitzt am Wort, nicht am einzelnen Buchstaben. Sonst
+     kippt jeder Buchstabe um seine eigene Achse und die Zeile wellt sich. */
+  .rolle-wort {
+    display: inline-block;
+    white-space: nowrap;
+    perspective: 900px;
+  }
+
+  .rolle-zeichen {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    backface-visibility: hidden;
+  }
+
+  .rolle-betont {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /*
+      Langformen, keine Kurzschreibweise. Der CSS-Verdichter zieht
+      `animation:` mit allem zusammen, was danach kommt, und hat damit
+      schon einmal die gesamte Bewegung der Seite stillgelegt. Siehe die
+      Warnung in `global.css`.
+    */
+    .rolle-zeichen {
+      animation-name: klappen;
+      animation-duration: 0.6s;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      animation-fill-mode: backwards;
+      animation-delay: calc(var(--i) * var(--takt));
+    }
+  }
+
+  @keyframes klappen {
+    from {
+      opacity: 0;
+      transform: rotateX(-88deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

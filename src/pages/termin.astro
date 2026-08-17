@@ -101,7 +101,9 @@ const agenda = [
     @supports (animation-timeline: view()) {
       .termin-kalender,
       .termin-ablauf {
-        animation: auftauchen linear both;
+        animation-name: auftauchen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 6% entry 45%;
       }

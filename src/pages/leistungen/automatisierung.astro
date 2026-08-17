@@ -318,13 +318,17 @@ const painPoints = [
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .modul-text {
-        animation: auftauchen linear both;
+        animation-name: auftauchen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 10% entry 55%;
       }
 
       .modul-bild {
-        animation: heranruecken linear both;
+        animation-name: heranruecken;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 12% entry 62%;
       }

@@ -96,7 +96,9 @@ const stern =
          einer scrollgebundenen Zeitachse gibt es keine Uhr, auf die eine
          Verzoegerung sich beziehen koennte. */
       .stern-voll {
-        animation: fuellen linear both;
+        animation-name: fuellen;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry calc(20% + var(--rang) * 7%) entry
           calc(48% + var(--rang) * 7%);

@@ -137,24 +137,30 @@ export const reviews = {
   count: 12,
   profileUrl: '',
 
-  /** Einzelstimmen für den ausführlichen Bewertungsabschnitt. */
+  /**
+   * Einzelstimmen für den ausführlichen Bewertungsabschnitt.
+   *
+   * Die Namen sind bewusst unterschiedlich: aus ihnen entstehen die
+   * Initialen in den Bewerterkreisen, und dreimal dasselbe Kürzel sah dort
+   * nach einem Fehler aus.
+   */
   items: [
     {
-      author: 'Beispiel Nachname',
+      author: 'M. Beispiel',
       business: 'Musterbetrieb Haustechnik, Essen',
       rating: 5,
       text: 'Platzhaltertext. Hier steht später eine echte Bewertung. Am besten eine, die ein konkretes Ergebnis nennt statt nur zu loben: was vorher das Problem war und was sich seitdem geändert hat.',
       date: '2026-05-14',
     },
     {
-      author: 'Beispiel Nachname',
+      author: 'S. Vorlage',
       business: 'Musterpraxis, Bochum',
       rating: 5,
       text: 'Platzhaltertext. Zwei bis vier Sätze sind ideal. Längere Bewertungen werden überflogen, kürzere wirken beliebig.',
       date: '2026-04-02',
     },
     {
-      author: 'Beispiel Nachname',
+      author: 'T. Platzhalter',
       business: 'Musterkanzlei, Essen',
       rating: 4,
       text: 'Platzhaltertext. Eine Bewertung mit vier Sternen darf ruhig dabei sein: ein Schnitt von glatt 5,0 bei zwölf Bewertungen wirkt auf viele Leser weniger glaubwürdig als 4,9.',

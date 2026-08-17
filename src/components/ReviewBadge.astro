@@ -1,22 +1,36 @@
 ---
 import { reviews } from '~/config/site';
 import Sterne from './Sterne.astro';
+import Bewerterkreise from './Bewerterkreise.astro';
 
 /**
- * Kompakter Bewertungsbeleg fuer den ersten Sichtbereich.
+ * Bewertungsbeleg.
  *
- * Rendert nichts, solange `reviews.enabled` false ist -- damit steht auf der
- * Seite nie eine Bewertungsbehauptung ohne Grundlage.
+ * Rendert nichts, solange `reviews.enabled` false ist, damit auf der Seite
+ * nie eine Bewertungsbehauptung ohne Grundlage steht.
+ *
+ * ZWEI GRÖSSEN
+ *
+ * `kompakt` ist die Zeile für Fußbereiche und Nebenplätze.
+ *
+ * `gross` ist der Beleg im ersten Sichtbereich. Er steht dort direkt unter
+ * der Überschrift und nicht mehr am unteren Rand: auf einem Bildschirm mit
+ * 900 Punkten Höhe stand die kompakte Zeile genau an der Kante und war beim
+ * ersten Blick nicht dabei. Ein Beleg, den man erst durch Scrollen findet,
+ * arbeitet nicht.
  */
 interface Props {
   /** `light` fuer helle Flaechen, `inverse` fuer dunkle. */
   tone?: 'light' | 'inverse';
+  /** `gross` fuer den ersten Sichtbereich. */
+  groesse?: 'kompakt' | 'gross';
   class?: string;
 }
 
-const { tone = 'light', class: className = '' } = Astro.props;
+const { tone = 'light', groesse = 'kompakt', class: className = '' } = Astro.props;
 
 const show = reviews.enabled && reviews.count > 0;
+const gross = groesse === 'gross';
 
 const ratingText = reviews.rating.toLocaleString('de-DE', {
   minimumFractionDigits: 1,
@@ -32,7 +46,7 @@ const Tag = reviews.profileUrl ? 'a' : 'div';
 ---
 
 {
-  show && (
+  show && !gross && (
     <Tag
       class={`inline-flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.9375rem] ${textColor} ${reviews.profileUrl ? 'hover:opacity-80 transition-opacity' : ''} ${className}`}
       {...(reviews.profileUrl
@@ -55,6 +69,35 @@ const Tag = reviews.profileUrl ? 'a' : 'div';
   )
 }
 
+{
+  show && gross && (
+    <div class:list={['beleg-halter', className]}>
+      <Tag
+        class:list={['beleg', tone === 'inverse' && 'beleg-invers']}
+        {...(reviews.profileUrl
+          ? { href: reviews.profileUrl, target: '_blank', rel: 'noopener noreferrer' }
+          : {})}
+        aria-label={label}
+      >
+        <Bewerterkreise max={4} tone={tone} class="beleg-kreise" />
+
+        <span class="beleg-wertung" aria-hidden="true">
+          <Sterne wert={reviews.rating} groesse={1.25} class="beleg-sterne" />
+          <span class="beleg-zahl">{ratingText}</span>
+        </span>
+
+        <span class="beleg-text" aria-hidden="true">
+          aus {reviews.count} Google-Bewertungen
+        </span>
+      </Tag>
+
+      {/* Steht NEBEN der Pille, nicht darin: darin sprengte der Hinweis die
+          Zeile und machte aus der Pille einen zweizeiligen Klotz. */}
+      {reviews.platzhalter && <span class="platzhalter-marke">Beispieldaten</span>}
+    </div>
+  )
+}
+
 <style>
   /* Unuebersehbar, aber klein: der Hinweis soll beim Gestalten nicht
      stoeren und trotzdem verhindern, dass die Platzhalter unbemerkt
@@ -69,5 +112,76 @@ const Tag = reviews.profileUrl ? 'a' : 'div';
     border-radius: 0.25rem;
     background: #b3261e;
     color: #fff;
+  }
+
+  /* --- Die grosse Fassung ------------------------------------------------ */
+  .beleg-halter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .beleg {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.875rem;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.6rem 1rem 0.6rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .beleg-invers {
+    border-color: rgb(255 255 255 / 0.22);
+    background: rgb(255 255 255 / 0.08);
+  }
+
+  .beleg-wertung {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Die Zahl in der Serifenschrift und gross: sie ist das Einzige an dieser
+     Zeile, das aus zwei Metern Abstand noch zu erkennen ist. Instrument
+     Serif hat keinen Fettschnitt, die Wirkung kommt aus dem Mass. */
+  .beleg-zahl {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+
+  .beleg-invers .beleg-zahl {
+    color: #fff;
+  }
+
+  .beleg-text {
+    font-size: 0.875rem;
+    color: var(--color-ink-muted);
+  }
+
+  .beleg-invers .beleg-text {
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  .beleg-kreise {
+    flex-shrink: 0;
+  }
+
+  /* Unter dieser Breite braeuchte die Zeile drei Zeilen. Die Kreise sind
+     die Zugabe und gehen zuerst. */
+  @media (width < 26rem) {
+    .beleg-kreise {
+      display: none;
+    }
   }
 </style>
