@@ -111,12 +111,18 @@ const mehrere = folge.length > 1;
         </div>
         )}
 
-        {/* --- Kopf des Verlaufs ---------------------------------------- */}
+        {/* --- Kopf des Verlaufs ------------------------------------------
+             Der Zurueck-Pfeil gehoert auf das Telefon, wo man aus einer
+             Liste in einen Chat springt. In einem Fenster mit Seitenleiste
+             gibt es kein Zurueck, dort sah er nur nach vergroessertem
+             Telefon aus. Der Verlauf selbst bleibt identisch. */}
         <div class="chat-kopf">
-          <svg viewBox="0 0 20 20" class="chat-zurueck" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 4 6 10l6 6" />
-          </svg>
+          {geraet === 'telefon' && (
+            <svg viewBox="0 0 20 20" class="chat-zurueck" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 4 6 10l6 6" />
+            </svg>
+          )}
 
           {gespraech.bild ? (
             <img class="chat-bild" src={gespraech.bild} alt="" aria-hidden="true" width="34" height="34" />
@@ -129,9 +135,24 @@ const mehrere = folge.length > 1;
             <span class="chat-status-text">{gespraech.status}</span>
           </span>
 
-          <svg viewBox="0 0 20 20" class="chat-kamera" fill="currentColor" aria-hidden="true">
-            <path d="M2.5 5.5h9a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 13V7a1.5 1.5 0 0 1 1.5-1.5zM14.5 8.6l3.3-2.1a.6.6 0 0 1 .9.5v6a.6.6 0 0 1-.9.5l-3.3-2.1z" />
-          </svg>
+          {geraet === 'telefon' ? (
+            <svg viewBox="0 0 20 20" class="chat-kamera" fill="currentColor" aria-hidden="true">
+              <path d="M2.5 5.5h9a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 13V7a1.5 1.5 0 0 1 1.5-1.5zM14.5 8.6l3.3-2.1a.6.6 0 0 1 .9.5v6a.6.6 0 0 1-.9.5l-3.3-2.1z" />
+            </svg>
+          ) : (
+            <span class="chat-werkzeuge" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round">
+                <circle cx="9" cy="9" r="5.5" />
+                <path d="M13 13l4 4" />
+              </svg>
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="4" r="1.6" />
+                <circle cx="10" cy="10" r="1.6" />
+                <circle cx="10" cy="16" r="1.6" />
+              </svg>
+            </span>
+          )}
         </div>
 
         {/* --- Der Verlauf ----------------------------------------------- */}
@@ -199,9 +220,18 @@ const mehrere = folge.length > 1;
 </div>
 
 <style>
-  /* Alle Schirme liegen in derselben Rasterzelle uebereinander. Damit
-     bestimmt der hoechste die Hoehe nicht: das Raster hat genau eine Reihe
-     und die fuellt den Telefonbildschirm. */
+  /* ======================================================================
+     EINE Groesse regelt alles.
+
+     Vorher standen alle Masse in `rem`, also fest. Derselbe Verlauf sass
+     dann im 240 Punkte breiten Telefon richtig und im 1000 Punkte breiten
+     Fenster wie ein aufgeblasenes Telefon: 11 Punkte Schrift, Blasen ueber
+     die volle Breite, Bedienelemente aus dem Handy.
+
+     Jetzt haengt jedes Mass an der Schriftgroesse des Verlaufs und steht in
+     `em`. Ein Wert, und beide Geraete stimmen. Die Gestaltung bleibt dabei
+     Zeichen fuer Zeichen dieselbe, nur der Massstab wechselt.
+     ====================================================================== */
   .chat {
     display: grid;
     grid-template-rows: 1fr;
@@ -210,6 +240,11 @@ const mehrere = folge.length > 1;
     /* Hintergrund wie im Messenger: warmes Papier statt Weiss. */
     background: #efe7de;
     font-family: var(--font-sans);
+    font-size: 0.6875rem;
+  }
+
+  .chat-in-fenster {
+    font-size: 0.8125rem;
   }
 
   .chat-schirm {
@@ -233,15 +268,15 @@ const mehrere = folge.length > 1;
     visibility: visible;
   }
 
-  /* --- Statusleiste ---------------------------------------------------- */
+  /* --- Statusleiste, nur auf dem Telefon -------------------------------- */
   .chat-status {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.55rem 1.15rem 0.3rem;
+    padding: 0.8em 1.7em 0.44em;
     background: #f6f2ee;
     color: #16181d;
-    font-size: 0.6875rem;
+    font-size: 1em;
     font-weight: 600;
     letter-spacing: 0.01em;
   }
@@ -249,36 +284,42 @@ const mehrere = folge.length > 1;
   .chat-anzeigen {
     display: flex;
     align-items: center;
-    gap: 0.28rem;
+    gap: 0.4em;
   }
 
-  .chat-signal { width: 1rem; }
-  .chat-wlan { width: 0.9rem; }
-  .chat-akku { width: 1.45rem; }
+  .chat-signal { width: 1.45em; }
+  .chat-wlan { width: 1.31em; }
+  .chat-akku { width: 2.11em; }
 
   /* --- Kopf ------------------------------------------------------------- */
   .chat-kopf {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.35rem 0.7rem 0.6rem;
+    gap: 0.8em;
+    padding: 0.51em 1.02em 0.87em;
     background: #f6f2ee;
     border-bottom: 1px solid rgb(0 0 0 / 0.08);
   }
 
+  /* Im Fenster traegt die Kopfzeile keine Statusleiste ueber sich und
+     braucht deshalb oben denselben Abstand wie unten. */
+  .chat-in-fenster .chat-kopf {
+    padding: 0.8em 1.1em;
+  }
+
   .chat-zurueck {
-    width: 0.9rem;
+    width: 1.31em;
     flex-shrink: 0;
     color: #2f6df6;
   }
 
   .chat-bild {
-    width: 2.05rem;
-    height: 2.05rem;
+    width: 2.98em;
+    height: 2.98em;
     flex-shrink: 0;
     border-radius: 999px;
     background: #fff;
-    padding: 0.28rem;
+    padding: 0.4em;
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
   }
 
@@ -291,7 +332,7 @@ const mehrere = folge.length > 1;
     padding: 0;
     background: #cfd4da;
     color: #4a5058;
-    font-size: 0.6875rem;
+    font-size: 1em;
     font-weight: 600;
     letter-spacing: 0.02em;
   }
@@ -304,21 +345,38 @@ const mehrere = folge.length > 1;
   }
 
   .chat-name {
-    font-size: 0.8125rem;
+    font-size: 1.18em;
     font-weight: 600;
     color: #16181d;
   }
 
   .chat-status-text {
-    font-size: 0.625rem;
+    font-size: 0.91em;
     color: #6b7079;
   }
 
   .chat-kamera {
-    width: 1.05rem;
+    width: 1.53em;
     margin-inline-start: auto;
     flex-shrink: 0;
     color: #2f6df6;
+  }
+
+  /* Im Fenster stehen Suche und Menue statt Kamera, und zwar in den Grautoenen
+     der Seite. Blaue Bedienelemente sind das Erkennungszeichen von iOS und
+     haben auf einem Rechnerbildschirm nichts verloren. */
+  .chat-werkzeuge {
+    display: flex;
+    align-items: center;
+    gap: 1.1em;
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    color: #7b8089;
+  }
+
+  .chat-werkzeuge svg {
+    width: 1.35em;
+    height: 1.35em;
   }
 
   /* --- Verlauf ---------------------------------------------------------- */
@@ -332,22 +390,26 @@ const mehrere = folge.length > 1;
     justify-content: flex-end;
     gap: 0;
     margin: 0;
-    padding: 0.7rem 0.6rem 0.5rem;
+    padding: 1.02em 0.87em 0.73em;
     list-style: none;
     overflow: hidden;
   }
 
+  .chat-in-fenster .chat-verlauf {
+    padding: 1.2em 1.4em 1em;
+  }
+
   .chat-tag {
     align-self: center;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.51em;
   }
 
   .chat-tag span {
     display: inline-block;
-    padding: 0.15rem 0.55rem;
+    padding: 0.22em 0.8em;
     border-radius: 999px;
     background: rgb(255 255 255 / 0.75);
-    font-size: 0.5625rem;
+    font-size: 0.82em;
     font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -359,9 +421,7 @@ const mehrere = folge.length > 1;
      nicht animieren laesst. Der Halter darin wird beschnitten.
 
      Das ist der Grund, warum der Verlauf von unten waechst: eine noch
-     nicht erschienene Nachricht belegt keinen Platz. Vorher standen alle
-     Zeilen von Anfang an da, nur unsichtbar, und der Verlauf klebte
-     dadurch oben. */
+     nicht erschienene Nachricht belegt keinen Platz. */
   .chat-zeile {
     display: grid;
     grid-template-rows: 1fr;
@@ -376,46 +436,50 @@ const mehrere = folge.length > 1;
   .chat-links .chat-halter { justify-content: flex-start; }
   .chat-rechts .chat-halter { justify-content: flex-end; }
 
+  /* Die Breite ist nach OBEN begrenzt, nicht nur anteilig. Im breiten
+     Fenster liefen die Zeilen sonst ueber 80 Zeichen, und eine Chatblase
+     mit 80 Zeichen je Zeile ist keine Chatblase mehr. */
   .chat-blase {
     position: relative;
-    max-width: 82%;
-    padding: 0.34rem 0.5rem 0.28rem;
-    border-radius: 0.5rem;
-    font-size: 0.6875rem;
-    line-height: 1.38;
+    max-width: min(80%, 26em);
+    padding: 0.5em 0.73em 0.4em;
+    border-radius: 0.73em;
+    font-size: 1em;
+    line-height: 1.42;
     color: #16181d;
     box-shadow: 0 1px 1px rgb(0 0 0 / 0.09);
     /* Die Uhrzeit sitzt in der letzten Zeile. Der Freiraum verhindert,
-       dass der Text sie ueberlaeuft. Etwas mehr als die Uhrzeit breit ist,
-       sonst stossen Satzende und Uhrzeit in breiten Blasen aneinander. */
-    padding-inline-end: 3rem;
+       dass der Text sie ueberlaeuft. */
+    padding-inline-end: 4.4em;
   }
 
   .chat-blase-links {
     background: #fff;
-    border-start-start-radius: 0.15rem;
+    border-start-start-radius: 0.22em;
   }
 
   /* Die Farbe der eigenen Blase kommt aus der Marke, nicht aus dem
-     Messenger: der Verlauf ist eine Darstellung, keine Nachbildung. */
+     Messenger: der Verlauf ist eine Darstellung, keine Nachbildung.
+     Kraeftiger als vorher, sonst war die Seite, von der die Antwort kommt,
+     kaum von der anderen zu unterscheiden. */
   .chat-blase-rechts {
-    background: var(--color-accent-soft);
-    border-start-end-radius: 0.15rem;
+    background: color-mix(in oklab, var(--color-accent) 16%, #fff);
+    border-start-end-radius: 0.22em;
   }
 
   .chat-meta {
     position: absolute;
-    inset-block-end: 0.28rem;
-    inset-inline-end: 0.5rem;
+    inset-block-end: 0.4em;
+    inset-inline-end: 0.73em;
     display: flex;
     align-items: center;
-    gap: 0.16rem;
-    font-size: 0.5rem;
+    gap: 0.23em;
+    font-size: 0.73em;
     color: #8b9099;
   }
 
   .chat-haken {
-    width: 0.6rem;
+    width: 1.1em;
     color: #2f6df6;
   }
 
@@ -423,44 +487,42 @@ const mehrere = folge.length > 1;
   .chat-tippen {
     display: inline-flex;
     align-items: center;
-    gap: 0.16rem;
-    padding: 0.42rem 0.6rem;
+    gap: 0.23em;
+    padding: 0.61em 0.87em;
     background: #fff;
-    border-start-start-radius: 0.15rem;
+    border-start-start-radius: 0.22em;
   }
 
   .chat-punkt {
-    width: 0.26rem;
-    height: 0.26rem;
+    width: 0.38em;
+    height: 0.38em;
     border-radius: 999px;
     background: #9aa0a8;
-  }
-
-  /* Die Tippanzeige gehoert zum Ablauf und sonst nirgendwohin. Ohne diese
-     Regel stuenden ohne JavaScript drei Punkte ueber einer Nachricht, die
-     laengst da ist. */
-  .chat-tippzeile {
-    opacity: 0;
-    grid-template-rows: 0fr;
   }
 
   /* --- Eingabezeile ----------------------------------------------------- */
   .chat-eingabe {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.58em;
     /* Unten mehr Luft: dort sitzt auf dem Geraet der Bedienbalken. */
-    padding: 0.45rem 0.6rem 1.15rem;
+    padding: 0.65em 0.87em 1.67em;
     background: #f6f2ee;
     border-top: 1px solid rgb(0 0 0 / 0.07);
   }
 
+  /* Der EINZIGE Unterschied im Aufbau zwischen Telefon und Fenster: der
+     Platz fuer den Bedienbalken am unteren Rand des Geraets. */
+  .chat-in-fenster .chat-eingabe {
+    padding: 0.8em 1.4em;
+  }
+
   .chat-feld {
     flex: 1;
-    padding: 0.34rem 0.7rem;
+    padding: 0.5em 1.02em;
     border-radius: 999px;
     background: #fff;
-    font-size: 0.6875rem;
+    font-size: 1em;
     color: #9aa0a8;
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
   }
@@ -469,22 +531,15 @@ const mehrere = folge.length > 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.96em;
+    height: 1.96em;
     flex-shrink: 0;
     border-radius: 999px;
     background: var(--color-accent);
     color: #fff;
   }
 
-  .chat-senden svg { width: 0.7rem; }
-
-  /* Der EINZIGE Unterschied zwischen Telefon und Fenster: der Platz fuer
-     den Bedienbalken am unteren Rand des Geraets. Blasen, Farben, Schrift,
-     Kopf und Tippanzeige sind ueberall auf der Seite dieselben. */
-  .chat-in-fenster .chat-eingabe {
-    padding-block-end: 0.55rem;
-  }
+  .chat-senden svg { width: 1.02em; }
 
   /* ======================================================================
      Der Ablauf
@@ -498,42 +553,55 @@ const mehrere = folge.length > 1;
      ====================================================================== */
   @media (prefers-reduced-motion: no-preference) {
     .chat[data-laeuft] .chat-zeile:not(.chat-tippzeile) {
-      animation: blase-herein 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-name: blase-herein;
+      animation-duration: 0.34s;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      animation-fill-mode: both;
       animation-delay: var(--ab);
     }
 
     /* Die Tippanzeige kommt UND geht wieder: sie waechst auf, bleibt fuer
-       ihre Dauer stehen und verschwindet, wenn die Antwort erscheint.
-       Deshalb eine eigene Kurve statt `both`. */
+       ihre Dauer stehen und verschwindet, wenn die Antwort erscheint. */
     .chat[data-laeuft] .chat-tippzeile {
-      animation: tippen-zeigen var(--dauer) linear both;
+      animation-name: tippen-zeigen;
+      animation-duration: var(--dauer);
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-delay: var(--ab);
     }
 
     .chat[data-laeuft] .chat-tippzeile .chat-punkt {
-      animation: punkt-huepfen 1.1s ease-in-out infinite;
+      animation-name: punkt-huepfen;
+      animation-duration: 1.1s;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
     }
 
     .chat[data-laeuft] .chat-punkt:nth-child(2) { animation-delay: 0.16s; }
     .chat[data-laeuft] .chat-punkt:nth-child(3) { animation-delay: 0.32s; }
 
     /* Der Wechsel von einem Verlauf zum naechsten. Der abgehende schiebt
-       nach links weg, waehrend der naechste von rechts hereinkommt, so wie
-       beim Wechsel zwischen zwei Chats auf dem Geraet.
+       nach links weg, waehrend der naechste von rechts hereinkommt.
 
        Zwei Animationen an einem Element: die zweite darf NICHT rueckwaerts
        fuellen, sonst wuerde sie den Zustand schon waehrend des Hereinkommens
        ueberschreiben. Deshalb `forwards` und nicht `both`. */
     .chat[data-laeuft] .chat-teil {
-      animation: schirm-herein var(--wechsel) cubic-bezier(0.22, 1, 0.36, 1) var(--von) both;
+      animation-name: schirm-herein;
+      animation-duration: var(--wechsel);
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      animation-fill-mode: both;
+      animation-delay: var(--von);
     }
 
     /* Der letzte Verlauf bleibt stehen. Ein leerer Schirm am Ende waere
        das Gegenteil der Aussage. */
     .chat[data-laeuft] .chat-teil:not(.chat-letzte) {
-      animation:
-        schirm-herein var(--wechsel) cubic-bezier(0.22, 1, 0.36, 1) var(--von) both,
-        schirm-hinaus var(--wechsel) cubic-bezier(0.5, 0, 0.9, 0.4) var(--bis) forwards;
+      animation-name: schirm-herein, schirm-hinaus;
+      animation-duration: var(--wechsel), var(--wechsel);
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1), cubic-bezier(0.5, 0, 0.9, 0.4);
+      animation-fill-mode: both, forwards;
+      animation-delay: var(--von), var(--bis);
     }
 
     /* Vor dem Start ist nichts zu sehen. Ohne das blitzte der fertige
@@ -549,11 +617,17 @@ const mehrere = folge.length > 1;
     }
   }
 
+  /* Die Tippanzeige gehoert zum Ablauf und sonst nirgendwohin. Ohne diese
+     Regel stuenden ohne JavaScript drei Punkte ueber einer Nachricht, die
+     laengst da ist. */
+  .chat-tippzeile {
+    opacity: 0;
+    grid-template-rows: 0fr;
+  }
+
   /* Ohne Bewegung steht der Verlauf sofort da, nur die Tippanzeigen
-     entfallen: sie ergeben ohne Ablauf keinen Sinn. Mehrere Verlaeufe
-     koennen einander ohne Bewegung nicht abloesen, es bleibt also der
-     Ruhezustand von oben: der letzte Verlauf. Was in den anderen passiert
-     ist, steht als Text daneben. */
+     entfallen. Mehrere Verlaeufe koennen einander ohne Bewegung nicht
+     abloesen, es bleibt also der Ruhezustand von oben: der letzte. */
   @media (prefers-reduced-motion: reduce) {
     .chat-tippzeile {
       display: none;
@@ -569,22 +643,20 @@ const mehrere = folge.length > 1;
     }
     60% {
       grid-template-rows: 1fr;
-      margin-block-start: 0.3rem;
+      margin-block-start: 0.44em;
     }
     to {
       opacity: 1;
       grid-template-rows: 1fr;
-      margin-block-start: 0.3rem;
+      margin-block-start: 0.44em;
       transform: none;
     }
   }
 
-  /* Die Tippanzeige kommt UND geht: sie waechst auf, bleibt stehen und
-     klappt wieder zu, wenn die Antwort erscheint. */
   @keyframes tippen-zeigen {
     0% { opacity: 0; grid-template-rows: 0fr; margin-block-start: 0; }
-    14% { opacity: 1; grid-template-rows: 1fr; margin-block-start: 0.3rem; }
-    86% { opacity: 1; grid-template-rows: 1fr; margin-block-start: 0.3rem; }
+    14% { opacity: 1; grid-template-rows: 1fr; margin-block-start: 0.44em; }
+    86% { opacity: 1; grid-template-rows: 1fr; margin-block-start: 0.44em; }
     100% { opacity: 0; grid-template-rows: 0fr; margin-block-start: 0; }
   }
 
@@ -594,9 +666,7 @@ const mehrere = folge.length > 1;
   }
 
   /* `visibility` springt nicht in der Mitte um, sondern gilt fuer die
-     gesamte Laufzeit, sobald ein Ende sichtbar ist. Genau deshalb steht es
-     hier: der Schirm ist waehrend der ganzen Bewegung da und davor bzw.
-     danach vollstaendig weg, auch fuer die Maus. */
+     gesamte Laufzeit, sobald ein Ende sichtbar ist. */
   @keyframes schirm-herein {
     from { opacity: 0; visibility: hidden; transform: translateX(12%); }
     to { opacity: 1; visibility: visible; transform: none; }

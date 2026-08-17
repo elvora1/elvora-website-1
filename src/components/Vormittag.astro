@@ -90,6 +90,19 @@ const zeilen = ereignisse.map((e, i) => {
   <div class="vormittag-geraet">
   <Geraet art="rechner" bildunterschrift="Ihr Posteingang, schematische Darstellung">
     <div class="fenster">
+      {/*
+        Die Fensterleiste. Ohne sie sah der Bildschirm aus wie ein Telefon
+        in Gross: eine Anwendung ganz ohne Rahmen, die den ganzen Schirm
+        fuellt. Erst die Leiste macht daraus ein Fenster auf einem Rechner.
+      */}
+      <div class="fenster-leiste" aria-hidden="true">
+        <span class="fenster-ampel">
+          <i></i><i></i><i></i>
+        </span>
+        <span class="fenster-marke">Posteingang</span>
+      </div>
+
+      <div class="fenster-koerper">
       {/* --- Die Liste der Anfragen ------------------------------------- */}
       <aside class="fenster-liste">
         <div class="fenster-kopf">
@@ -157,6 +170,7 @@ const zeilen = ereignisse.map((e, i) => {
           geraet="fenster"
         />
       </div>
+      </div>
     </div>
   </Geraet>
   </div>
@@ -207,8 +221,45 @@ const zeilen = ereignisse.map((e, i) => {
   /* --- Das Fenster im Bildschirm ---------------------------------------- */
   .fenster {
     display: flex;
-    height: clamp(18rem, 40vw, 21.5rem);
+    flex-direction: column;
+    height: clamp(18rem, 40vw, 22.5rem);
     background: var(--color-surface);
+  }
+
+  .fenster-leiste {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    padding: 0.5rem 0.75rem;
+    border-block-end: 1px solid var(--color-border);
+    background: var(--color-surface-subtle);
+  }
+
+  .fenster-ampel {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .fenster-ampel i {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: var(--color-border-strong);
+  }
+
+  .fenster-marke {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+
+  .fenster-koerper {
+    display: flex;
+    flex: 1;
+    min-height: 0;
   }
 
   .fenster-liste {

@@ -239,13 +239,16 @@ const wege = [
         services.map((service, i) => (
           <li class="leistung" style={`--farbe:${service.color}`}>
             <a class="leistung-link" href={service.href}>
-              {/* Farbflaeche und Balken kommen beim Vorbeiscrollen herein.
-                  Sie sind der Grund, warum sich die vier Zeilen ueberhaupt
+              {/* Die Farbflaeche laeuft beim Vorbeiscrollen von links herein.
+                  Sie ist der Grund, warum sich die vier Zeilen ueberhaupt
                   voneinander unterscheiden. */}
               <span class="leistung-flaeche" aria-hidden="true" />
-              <span class="leistung-balken" aria-hidden="true" />
 
-              <span class="leistung-nummer ziffern einblenden" aria-hidden="true">
+              {/* Die Nummer sitzt in einem Feld in der Farbe der Leistung.
+                  Eine kleine graue Ziffer hat vorher nichts gegliedert, ein
+                  duenner Balken am Rand kaum mehr. Das Feld ist das Erste,
+                  was man beim Scrollen sieht. */}
+              <span class="leistung-nummer ziffern" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
 
@@ -645,31 +648,25 @@ const wege = [
     z-index: -1;
     background: linear-gradient(
       to right,
-      color-mix(in oklab, var(--farbe) 15%, transparent),
-      color-mix(in oklab, var(--farbe) 5%, transparent) 50%,
-      transparent 88%
+      color-mix(in oklab, var(--farbe) 18%, transparent),
+      color-mix(in oklab, var(--farbe) 7%, transparent) 45%,
+      transparent 92%
     );
     opacity: 0;
   }
 
-  .leistung-balken {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    z-index: -1;
-    width: 4px;
-    background: var(--farbe);
-    transform-origin: top;
-    scale: 1 0;
-  }
-
-  /* Gross und in der Farbe der Leistung. Vorher stand hier eine 12 Punkt
-     kleine graue Ziffer, die nichts gegliedert hat. Jetzt ist sie der
-     Anker, an dem das Auge beim Scrollen haengen bleibt. */
   .leistung-nummer {
-    font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.9rem;
+    background: var(--farbe);
+    color: #fff;
+    font-size: 1.0625rem;
     line-height: 1;
-    color: var(--farbe);
+    box-shadow: 0 6px 16px -8px var(--farbe);
   }
 
   .leistung-haupt {
@@ -746,12 +743,23 @@ const wege = [
      also ueber die Scrollstrecke. */
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
-      .leistung-balken {
-        animation-name: balken-wachsen;
+      /* Das Farbfeld kippt beim Hereinkommen auf. Zusammen mit der
+         Farbflaeche dahinter ist das der Auftritt jeder einzelnen
+         Leistung, statt vier gleicher Zeilen hintereinander. */
+      .leistung-nummer {
+        animation-name: feld-aufziehen;
         animation-timing-function: linear;
         animation-fill-mode: both;
         animation-timeline: view();
-        animation-range: entry 12% entry 52%;
+        animation-range: entry 10% entry 48%;
+      }
+
+      .leistung-pfeil {
+        animation-name: pfeil-faerben;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 20% entry 60%;
       }
 
       .leistung-flaeche {
@@ -764,9 +772,28 @@ const wege = [
     }
   }
 
-  @keyframes balken-wachsen {
-    from { scale: 1 0; }
-    to { scale: 1 1; }
+  @keyframes feld-aufziehen {
+    from {
+      opacity: 0;
+      transform: scale(0.55) rotate(-12deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Der Pfeilkreis nimmt beim Vorbeiscrollen die Farbe der Leistung an.
+     Damit ist auch am rechten Rand zu sehen, um welche es geht. */
+  @keyframes pfeil-faerben {
+    from {
+      border-color: var(--color-border-strong);
+      color: var(--color-ink-muted);
+    }
+    to {
+      border-color: color-mix(in oklab, var(--farbe) 45%, transparent);
+      color: var(--farbe);
+    }
   }
 
   @keyframes flaeche-herein {
