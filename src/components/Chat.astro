@@ -1,0 +1,484 @@
+---
+import mark from '~/assets/mark.svg';
+
+/**
+ * Ein Nachrichtenverlauf, wie er auf dem Telefon aussieht.
+ *
+ * BLICKWINKEL: Gezeigt wird das Telefon des Interessenten. Deshalb stehen
+ * SEINE Nachrichten rechts und die der Assistenz links, mit Profilbild und
+ * Namen. Vorher war das vertauscht, was den ganzen Verlauf verdreht hat.
+ *
+ * ABLAUF: Der Verlauf spielt sich einmal ab, sobald er zu sehen ist. Vor
+ * jeder Antwort der Assistenz erscheint erst die Tippanzeige, dann die
+ * Nachricht. Das ist die eigentliche Aussage: es antwortet sofort jemand.
+ *
+ * Der Ablauf läuft über CSS-Verzögerungen, ausgelöst von einem Klassen-
+ * wechsel. Kein Zustand, keine Schleife, kein Nachrechnen.
+ *
+ * Bei `prefers-reduced-motion` steht der vollständige Verlauf sofort da.
+ */
+interface Nachricht {
+  /** `kunde` steht rechts, `assistenz` links. */
+  von: 'kunde' | 'assistenz';
+  text: string;
+  /** Uhrzeit an der Blase. */
+  zeit: string;
+}
+
+interface Props {
+  /** Name im Kopf des Verlaufs. */
+  name?: string;
+  /** Zeile unter dem Namen. */
+  status?: string;
+  nachrichten: Nachricht[];
+  /** Uhrzeit in der Statusleiste. */
+  uhrzeit?: string;
+  class?: string;
+}
+
+const {
+  name = 'Elvora',
+  status = 'online',
+  nachrichten,
+  uhrzeit = '9:41',
+  class: className = '',
+}: Props = Astro.props;
+
+/**
+ * Zeitplan des Ablaufs in Sekunden.
+ *
+ * Eine Nachricht des Kunden erscheint direkt. Vor einer Antwort der
+ * Assistenz läuft erst die Tippanzeige. Deren Dauer richtet sich nach der
+ * Länge der Antwort, sonst wirkt ein langer Text sofort fertig getippt.
+ */
+let uhr = 0.4;
+const plan = nachrichten.map((n) => {
+  if (n.von === 'kunde') {
+    const eintrag = { ...n, ab: uhr, tippenAb: 0, tippenDauer: 0 };
+    uhr += 1.1;
+    return eintrag;
+  }
+  const tippenDauer = Math.min(2.2, 0.7 + n.text.length * 0.014);
+  const eintrag = { ...n, tippenAb: uhr, tippenDauer, ab: uhr + tippenDauer };
+  uhr += tippenDauer + 1.0;
+  return eintrag;
+});
+---
+
+<div class={`chat ${className}`} data-chat>
+  {/* --- Statusleiste --------------------------------------------------- */}
+  <div class="chat-status" aria-hidden="true">
+    <span class="chat-uhr">{uhrzeit}</span>
+    <span class="chat-anzeigen">
+      <svg viewBox="0 0 18 12" class="chat-signal" fill="currentColor">
+        <rect x="0" y="8" width="3" height="4" rx="1" />
+        <rect x="5" y="5.5" width="3" height="6.5" rx="1" />
+        <rect x="10" y="3" width="3" height="9" rx="1" />
+        <rect x="15" y="0.5" width="3" height="11.5" rx="1" opacity="0.35" />
+      </svg>
+      <svg viewBox="0 0 16 12" class="chat-wlan" fill="currentColor">
+        <path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0zM8 6.1c-1.5 0-2.9.6-3.9 1.6L2.8 6.3A7.4 7.4 0 0 1 8 4.2c2 0 3.9.8 5.2 2.1l-1.3 1.4A5.4 5.4 0 0 0 8 6.1zM8 2.2c-2.5 0-4.9 1-6.6 2.7L0 3.5A11.3 11.3 0 0 1 8 .3c3.1 0 6 1.2 8 3.2l-1.4 1.4A9.3 9.3 0 0 0 8 2.2z" />
+      </svg>
+      <svg viewBox="0 0 26 12" class="chat-akku" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.45" />
+        <rect x="2" y="2" width="16" height="8" rx="1.6" fill="currentColor" />
+        <path d="M23.5 4.2v3.6a2 2 0 0 0 0-3.6z" fill="currentColor" opacity="0.45" />
+      </svg>
+    </span>
+  </div>
+
+  {/* --- Kopf des Verlaufs ---------------------------------------------- */}
+  <div class="chat-kopf">
+    <svg viewBox="0 0 20 20" class="chat-zurueck" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 4 6 10l6 6" />
+    </svg>
+
+    <img class="chat-bild" src={mark.src} alt="" aria-hidden="true" width="34" height="34" />
+
+    <span class="chat-wer">
+      <span class="chat-name">{name}</span>
+      <span class="chat-status-text">{status}</span>
+    </span>
+
+    <svg viewBox="0 0 20 20" class="chat-kamera" fill="currentColor" aria-hidden="true">
+      <path d="M2.5 5.5h9a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 1 13V7a1.5 1.5 0 0 1 1.5-1.5zM14.5 8.6l3.3-2.1a.6.6 0 0 1 .9.5v6a.6.6 0 0 1-.9.5l-3.3-2.1z" />
+    </svg>
+  </div>
+
+  {/* --- Der Verlauf ----------------------------------------------------- */}
+  <ol class="chat-verlauf">
+    <li class="chat-tag" aria-hidden="true"><span>Heute</span></li>
+
+    {
+      plan.map((n) => (
+        <>
+          {n.von === 'assistenz' && (
+            <li
+              class="chat-zeile chat-links chat-tippzeile"
+              style={`--ab:${n.tippenAb}s;--dauer:${n.tippenDauer}s`}
+              aria-hidden="true"
+            >
+              <span class="chat-halter">
+                <span class="chat-blase chat-blase-links chat-tippen">
+                  <span class="chat-punkt" />
+                  <span class="chat-punkt" />
+                  <span class="chat-punkt" />
+                </span>
+              </span>
+            </li>
+          )}
+
+          <li
+            class:list={[
+              'chat-zeile',
+              n.von === 'kunde' ? 'chat-rechts' : 'chat-links',
+            ]}
+            style={`--ab:${n.ab}s`}
+          >
+            <span class="chat-halter">
+            <span
+              class:list={[
+                'chat-blase',
+                n.von === 'kunde' ? 'chat-blase-rechts' : 'chat-blase-links',
+              ]}
+            >
+              {n.text}
+              <span class="chat-meta">
+                <span class="chat-zeit">{n.zeit}</span>
+                {n.von === 'kunde' && (
+                  <svg viewBox="0 0 16 11" class="chat-haken" fill="none" stroke="currentColor"
+                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 6l3 3 5.5-6.5M7 9l5.5-6.5" />
+                  </svg>
+                )}
+              </span>
+            </span>
+            </span>
+          </li>
+        </>
+      ))
+    }
+  </ol>
+
+  {/* --- Eingabezeile ---------------------------------------------------- */}
+  <div class="chat-eingabe" aria-hidden="true">
+    <span class="chat-feld">Nachricht</span>
+    <span class="chat-senden">
+      <svg viewBox="0 0 20 20" fill="currentColor">
+        <path d="M2.2 17.5 18.5 10 2.2 2.5 2.2 8.3l11 1.7-11 1.7z" />
+      </svg>
+    </span>
+  </div>
+</div>
+
+<style>
+  .chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Hintergrund wie im Messenger: warmes Papier statt Weiss. */
+    background: #efe7de;
+    font-family: var(--font-sans);
+  }
+
+  /* --- Statusleiste ---------------------------------------------------- */
+  .chat-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 1.15rem 0.3rem;
+    background: #f6f2ee;
+    color: #16181d;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .chat-anzeigen {
+    display: flex;
+    align-items: center;
+    gap: 0.28rem;
+  }
+
+  .chat-signal { width: 1rem; }
+  .chat-wlan { width: 0.9rem; }
+  .chat-akku { width: 1.45rem; }
+
+  /* --- Kopf ------------------------------------------------------------- */
+  .chat-kopf {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.35rem 0.7rem 0.6rem;
+    background: #f6f2ee;
+    border-bottom: 1px solid rgb(0 0 0 / 0.08);
+  }
+
+  .chat-zurueck {
+    width: 0.9rem;
+    flex-shrink: 0;
+    color: #2f6df6;
+  }
+
+  .chat-bild {
+    width: 2.05rem;
+    height: 2.05rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: #fff;
+    padding: 0.28rem;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
+  }
+
+  .chat-wer {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+  }
+
+  .chat-name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #16181d;
+  }
+
+  .chat-status-text {
+    font-size: 0.625rem;
+    color: #6b7079;
+  }
+
+  .chat-kamera {
+    width: 1.05rem;
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    color: #2f6df6;
+  }
+
+  /* --- Verlauf ---------------------------------------------------------- */
+  /* Nachrichten sammeln sich UNTEN und wachsen nach oben, wie in jedem
+     Messenger. Oben verankert klaffte waehrend des Ablaufs eine grosse
+     leere Flaeche unter den ersten Nachrichten. */
+  .chat-verlauf {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0;
+    margin: 0;
+    padding: 0.7rem 0.6rem 0.5rem;
+    list-style: none;
+    overflow: hidden;
+  }
+
+  .chat-tag {
+    align-self: center;
+    margin-bottom: 0.35rem;
+  }
+
+  .chat-tag span {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.75);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7079;
+  }
+
+  /* Jede Zeile ist ein Raster mit genau einer Reihe. Deren Hoehe laesst
+     sich von 0fr auf 1fr animieren -- anders als `height: auto`, das sich
+     nicht animieren laesst. Der Halter darin wird beschnitten.
+
+     Das ist der Grund, warum der Verlauf von unten waechst: eine noch
+     nicht erschienene Nachricht belegt keinen Platz. Vorher standen alle
+     sechs Zeilen von Anfang an da, nur unsichtbar, und der Verlauf klebte
+     dadurch oben. */
+  .chat-zeile {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .chat-halter {
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .chat-links .chat-halter { justify-content: flex-start; }
+  .chat-rechts .chat-halter { justify-content: flex-end; }
+
+  .chat-blase {
+    position: relative;
+    max-width: 82%;
+    padding: 0.34rem 0.5rem 0.28rem;
+    border-radius: 0.5rem;
+    font-size: 0.6875rem;
+    line-height: 1.38;
+    color: #16181d;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 0.09);
+    /* Die Uhrzeit sitzt in der letzten Zeile. Der Freiraum verhindert,
+       dass der Text sie ueberlaeuft. */
+    padding-inline-end: 2.6rem;
+  }
+
+  .chat-blase-links {
+    background: #fff;
+    border-start-start-radius: 0.15rem;
+  }
+
+  /* Die Farbe der eigenen Blase kommt aus der Marke, nicht aus dem
+     Messenger: der Verlauf ist eine Darstellung, keine Nachbildung. */
+  .chat-blase-rechts {
+    background: var(--color-accent-soft);
+    border-start-end-radius: 0.15rem;
+  }
+
+  .chat-meta {
+    position: absolute;
+    inset-block-end: 0.28rem;
+    inset-inline-end: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.16rem;
+    font-size: 0.5rem;
+    color: #8b9099;
+  }
+
+  .chat-haken {
+    width: 0.6rem;
+    color: #2f6df6;
+  }
+
+  /* --- Tippanzeige ------------------------------------------------------ */
+  .chat-tippen {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.16rem;
+    padding: 0.42rem 0.6rem;
+    background: #fff;
+    border-start-start-radius: 0.15rem;
+  }
+
+  .chat-punkt {
+    width: 0.26rem;
+    height: 0.26rem;
+    border-radius: 999px;
+    background: #9aa0a8;
+  }
+
+  /* --- Eingabezeile ----------------------------------------------------- */
+  .chat-eingabe {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.6rem 1.15rem;
+    background: #f6f2ee;
+    border-top: 1px solid rgb(0 0 0 / 0.07);
+  }
+
+  .chat-feld {
+    flex: 1;
+    padding: 0.34rem 0.7rem;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 0.6875rem;
+    color: #9aa0a8;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.07);
+  }
+
+  .chat-senden {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .chat-senden svg { width: 0.7rem; }
+
+  /* ======================================================================
+     Der Ablauf
+
+     Ausgangslage: alles unsichtbar. Sobald `data-laeuft` gesetzt ist,
+     erscheint jedes Stueck zu seiner Zeit. Das Setzen uebernimmt der
+     Beobachter in Base.astro, damit der Verlauf erst laeuft, wenn ihn
+     jemand sieht -- und nicht schon vorbei ist, bevor man hinschaut.
+     ====================================================================== */
+  @media (prefers-reduced-motion: no-preference) {
+    .chat[data-laeuft] .chat-zeile:not(.chat-tippzeile) {
+      animation: blase-herein 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: var(--ab);
+    }
+
+    /* Die Tippanzeige kommt UND geht wieder: sie waechst auf, bleibt fuer
+       ihre Dauer stehen und verschwindet, wenn die Antwort erscheint.
+       Deshalb eine eigene Kurve statt `both`. */
+    .chat[data-laeuft] .chat-tippzeile {
+      animation: tippen-zeigen var(--dauer) linear both;
+      animation-delay: var(--ab);
+    }
+
+    .chat[data-laeuft] .chat-tippzeile .chat-punkt {
+      animation: punkt-huepfen 1.1s ease-in-out infinite;
+    }
+
+    .chat[data-laeuft] .chat-punkt:nth-child(2) { animation-delay: 0.16s; }
+    .chat[data-laeuft] .chat-punkt:nth-child(3) { animation-delay: 0.32s; }
+
+    /* Vor dem Start ist nichts zu sehen. Ohne das blitzte der fertige
+       Verlauf einmal auf, bevor er sich zurueckstellt. */
+    .chat:not([data-laeuft]) .chat-zeile {
+      opacity: 0;
+      grid-template-rows: 0fr;
+    }
+  }
+
+  /* Ohne Bewegung steht der vollstaendige Verlauf sofort da, nur die
+     Tippanzeigen entfallen -- sie ergeben ohne Ablauf keinen Sinn. */
+  @media (prefers-reduced-motion: reduce) {
+    .chat-tippzeile {
+      display: none;
+    }
+  }
+
+  @keyframes blase-herein {
+    from {
+      opacity: 0;
+      grid-template-rows: 0fr;
+      margin-block-start: 0;
+      transform: translateY(0.4rem) scale(0.97);
+    }
+    60% {
+      grid-template-rows: 1fr;
+      margin-block-start: 0.3rem;
+    }
+    to {
+      opacity: 1;
+      grid-template-rows: 1fr;
+      margin-block-start: 0.3rem;
+      transform: none;
+    }
+  }
+
+  /* Die Tippanzeige kommt UND geht: sie waechst auf, bleibt stehen und
+     klappt wieder zu, wenn die Antwort erscheint. */
+  @keyframes tippen-zeigen {
+    0% { opacity: 0; grid-template-rows: 0fr; margin-block-start: 0; }
+    14% { opacity: 1; grid-template-rows: 1fr; margin-block-start: 0.3rem; }
+    86% { opacity: 1; grid-template-rows: 1fr; margin-block-start: 0.3rem; }
+    100% { opacity: 0; grid-template-rows: 0fr; margin-block-start: 0; }
+  }
+
+  @keyframes punkt-huepfen {
+    0%, 60%, 100% { transform: none; opacity: 0.55; }
+    30% { transform: translateY(-0.16rem); opacity: 1; }
+  }
+</style>

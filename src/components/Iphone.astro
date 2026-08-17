@@ -1,0 +1,143 @@
+---
+/**
+ * iPhone 16 Pro als Rahmen.
+ *
+ * Die Umrisse stammen aus einer SVG-Vorlage. Übernommen wurden nur die
+ * Pfade der Hülle, nicht die Art, wie sie befüllt wird.
+ *
+ * ABWEICHUNG VON DER VORLAGE: Dort wird über `src` eine Bilddatei in den
+ * Bildschirm gelegt. Eine Rastergrafik in einem 172 Einheiten breiten
+ * Ausschnitt wird auf jedem größeren Bildschirm unscharf, und Text darin
+ * ist weder auswählbar noch für Vorlesesoftware erreichbar.
+ *
+ * Hier liegt stattdessen echtes HTML im Bildschirm, punktgenau über dem
+ * Ausschnitt positioniert. Damit bleibt der Inhalt in jeder Größe scharf,
+ * lässt sich lesen, markieren und vorlesen.
+ *
+ * Die Vorlage führte außerdem eine feste Kennung `roundedCorners` mit sich.
+ * Stünden zwei Geräte auf einer Seite, gäbe es diese Kennung zweimal, und
+ * der Browser nähme für beide die erste. Der Ausschnitt läuft hier über
+ * CSS, die Kennung entfällt.
+ */
+interface Props {
+  /** Beschriftung unter dem Gerät. */
+  bildunterschrift?: string;
+  /** Breite des Geräts. */
+  breite?: string;
+  class?: string;
+}
+
+const {
+  bildunterschrift,
+  breite = '17rem',
+  class: className = '',
+}: Props = Astro.props;
+
+/* Masse des Bildschirmausschnitts aus der Vorlage, in Prozent der Huelle.
+   Damit sitzt die HTML-Ebene exakt auf dem Ausschnitt der Grafik. */
+const schirm = {
+  links: (14.08 / 200) * 100,
+  oben: (12.81 / 400) * 100,
+  breit: (171.98 / 200) * 100,
+  hoch: (374.37 / 400) * 100,
+};
+---
+
+<figure class={`iphone ${className}`} style={`--breite:${breite}`}>
+  <div class="iphone-huelle">
+    <svg class="iphone-rahmen" viewBox="0 0 200 400" fill="none" aria-hidden="true">
+      {/* Titangehäuse */}
+      <path
+        fill="#303333"
+        d="M196.11,128.09c0-.25-.2-.45-.45-.45-.11.04-.37.03-.69,0V36.69c0-17.84-14.46-32.31-32.31-32.31H37.48C19.63,4.39,5.17,18.85,5.17,36.69v48.99c-.3.02-.55.03-.66-.02-.25,0-.45.2-.45.45,0,0,0,17.29,0,17.29-.03.41.5.49,1.11.48v13.63c-.61,0-1.14.08-1.11.48,0,0,0,28.54,0,28.54-.03.42.5.49,1.11.48v7.95c-.61,0-1.14.08-1.11.48,0,0,0,28.54,0,28.54-.03.42.5.49,1.11.48v178.86c0,17.84,14.46,32.31,32.31,32.31h125.2c17.84,0,32.31-14.46,32.31-32.31v-188.87c.32-.02.58-.03.69.04,1.26.1.03-45.94.45-46.38ZM186.07,362.63c0,13.56-10.99,24.56-24.56,24.56H38.64c-13.56,0-24.56-10.99-24.56-24.56V37.37c0-13.56,10.99-24.56,24.56-24.56h122.87c13.56,0,24.56,10.99,24.56,24.56v325.26Z"
+      />
+      <path
+        fill="#000000"
+        d="M161.38,7.29H38.78c-16.54,0-29.95,13.41-29.95,29.95v325.52c0,16.54,13.41,29.95,29.95,29.95h122.6c16.54,0,29.95-13.41,29.95-29.95V37.24c0-16.54-13.41-29.95-29.95-29.95ZM186.07,362.57c0,13.6-11.02,24.62-24.62,24.62H38.7c-13.6,0-24.62-11.02-24.62-24.62V37.43c0-13.6,11.02-24.62,24.62-24.62h122.75c13.6,0,24.62,11.02,24.62,24.62v325.14Z"
+      />
+      {/* Der Bildschirm bleibt schwarz: darüber liegt die HTML-Ebene. */}
+      <rect fill="#000" x="14.08" y="12.81" width="171.98" height="374.37" rx="24.62" ry="24.62" />
+    </svg>
+
+    <div
+      class="iphone-schirm"
+      style={`--links:${schirm.links}%;--oben:${schirm.oben}%;--breit:${schirm.breit}%;--hoch:${schirm.hoch}%`}
+    >
+      <slot />
+    </div>
+
+    {/* Dynamic Island. Liegt ÜBER dem Inhalt, nicht darin: sonst würde sie
+        mitscrollen, und genau das tut sie auf einem echten Gerät nicht. */}
+    <span class="iphone-insel" aria-hidden="true">
+      <span class="iphone-linse"></span>
+    </span>
+  </div>
+
+  {bildunterschrift && <figcaption class="iphone-schrift">{bildunterschrift}</figcaption>}
+</figure>
+
+<style>
+  .iphone {
+    margin: 0;
+    width: var(--breite);
+    max-width: 100%;
+  }
+
+  .iphone-huelle {
+    position: relative;
+    filter: drop-shadow(0 20px 40px rgb(0 0 0 / 0.22));
+  }
+
+  .iphone-rahmen {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Sitzt punktgenau auf dem Ausschnitt der Grafik. Die Werte kommen aus
+     den Massen der Vorlage, umgerechnet in Prozent. */
+  .iphone-schirm {
+    position: absolute;
+    left: var(--links);
+    top: var(--oben);
+    width: var(--breit);
+    height: var(--hoch);
+    overflow: hidden;
+    /* 24.62 von 171.98 Einheiten Breite. */
+    border-radius: 14.3%/6.6%;
+    background: #fff;
+  }
+
+  .iphone-insel {
+    position: absolute;
+    top: 3.6%;
+    left: 50%;
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 24%;
+    height: 4.2%;
+    padding-inline-end: 6%;
+    border-radius: 999px;
+    background: #000;
+  }
+
+  .iphone-linse {
+    width: 22%;
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: #0b1030;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  }
+
+  .iphone-schrift {
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+    text-align: center;
+  }
+</style>

@@ -136,6 +136,39 @@ const {
           }
         },
       );
+
+      /*
+        Nachrichtenverlaeufe starten, sobald sie zu sehen sind.
+
+        Ohne das liefe der Ablauf beim Laden der Seite los und waere
+        vorbei, bevor jemand hinscrollt -- man saehe nur das Ergebnis und
+        nie, dass die Antwort sofort kommt. Genau das ist aber die Aussage.
+
+        Einmalig: `disconnect` nach dem ersten Mal. Ein Verlauf, der bei
+        jedem Vorbeiscrollen neu anfaengt, wirkt wie eine Werbeschleife.
+      */
+      (function () {
+        var verlaeufe = document.querySelectorAll('[data-chat]');
+        if (!verlaeufe.length) return;
+
+        if (!('IntersectionObserver' in window)) {
+          verlaeufe.forEach(function (v) { v.setAttribute('data-laeuft', ''); });
+          return;
+        }
+
+        var wache = new IntersectionObserver(
+          function (eintraege) {
+            eintraege.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              e.target.setAttribute('data-laeuft', '');
+              wache.unobserve(e.target);
+            });
+          },
+          { threshold: 0.35 },
+        );
+
+        verlaeufe.forEach(function (v) { wache.observe(v); });
+      })();
     </script>
   </body>
 </html>

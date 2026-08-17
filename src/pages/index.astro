@@ -6,8 +6,8 @@ import Portrait from '~/components/Portrait.astro';
 import Scramble from '~/components/Scramble.astro';
 import Sterne from '~/components/Sterne.astro';
 import ReviewBadge from '~/components/ReviewBadge.astro';
-import Geraet from '~/components/Geraet.astro';
-import Tippend from '~/components/Tippend.astro';
+import Iphone from '~/components/Iphone.astro';
+import Chat from '~/components/Chat.astro';
 import Kanalkreise from '~/components/Kanalkreise.astro';
 import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
 import {
@@ -59,12 +59,17 @@ const eingang = [
   },
 ];
 
-/** Der Empfang, den man auf WhatsApp tatsächlich bekommt. */
+/**
+ * Der Empfang, den man auf WhatsApp tatsächlich bekommt.
+ *
+ * Blickwinkel ist das Telefon des Interessenten: seine Nachrichten stehen
+ * rechts, die der Assistenz links mit Profilbild.
+ */
 const empfang = [
-  { von: 'sie' as const, text: 'Guten Tag, hätten Sie diese Woche noch einen Termin frei?' },
-  { von: 'wir' as const, text: 'Guten Tag! Ich bin die digitale Assistenz von Elvora. Worum geht es genau?' },
-  { von: 'sie' as const, text: 'Wir bräuchten eine neue Website.' },
-  { von: 'wir' as const, text: 'Danke. Ich gebe das an Luan weiter, er meldet sich heute noch bei Ihnen.' },
+  { von: 'kunde' as const, zeit: '9:41', text: 'Guten Tag, hätten Sie diese Woche noch einen Termin frei?' },
+  { von: 'assistenz' as const, zeit: '9:41', text: 'Guten Tag! Ich bin die digitale Assistenz von Elvora. Worum geht es genau?' },
+  { von: 'kunde' as const, zeit: '9:42', text: 'Wir bräuchten eine neue Website.' },
+  { von: 'assistenz' as const, zeit: '9:42', text: 'Danke. Ich gebe das an Luan weiter, er meldet sich heute noch bei Ihnen.' },
 ];
 
 const wege = [
@@ -227,17 +232,9 @@ const wege = [
       </div>
 
       <div class="vorfuehrung-geraet hereinziehen">
-        <Geraet art="handy" bildunterschrift="Schematische Darstellung">
-          <ul class="chat">
-            {
-              empfang.map((n, i) => (
-                <li class:list={['blase', n.von === 'wir' && 'blase-wir']}>
-                  {i === empfang.length - 1 ? <Tippend text={n.text} dauer={2.4} /> : n.text}
-                </li>
-              ))
-            }
-          </ul>
-        </Geraet>
+        <Iphone bildunterschrift="Schematische Darstellung" breite="17.5rem">
+          <Chat name="Elvora" status="online" nachrichten={empfang} uhrzeit="9:41" />
+        </Iphone>
       </div>
     </div>
   </Band>
@@ -608,32 +605,6 @@ const wege = [
     color: var(--color-ink-muted);
   }
 
-  .chat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 3.5rem 0.875rem 1.25rem;
-    list-style: none;
-  }
-
-  .blase {
-    max-width: 88%;
-    align-self: flex-start;
-    border-radius: 0.875rem 0.875rem 0.875rem 0.25rem;
-    background: var(--color-surface-subtle);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-    line-height: 1.45;
-    color: var(--color-ink);
-  }
-
-  .blase-wir {
-    align-self: flex-end;
-    border-radius: 0.875rem 0.875rem 0.25rem;
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
-  }
 
   /* Der Stapel war fuer dunkle Flaechen gebaut: helle Raender, abgedunkelte
      Karten. Auf Weiss dreht sich das um. */

@@ -7,6 +7,7 @@ import Band from '~/components/Band.astro';
 import Liste from '~/components/Liste.astro';
 import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
 import Geraet from '~/components/Geraet.astro';
+import Iphone from '~/components/Iphone.astro';
 import { automationModules, cta, serviceArea } from '~/config/site';
 import type { FaqItem } from '~/types';
 
@@ -167,23 +168,23 @@ const painPoints = [
                   "Schematische Darstellung" -- damit wird aus der Zeichnung
                   kein erfundener Beleg. */}
               <div class:list={['modul-bild', flip && 'modul-bild-links']}>
-                <Geraet
-                  art={rahmenArt(module.slug)}
-                  bildunterschrift={shot ? 'Aus dem laufenden Betrieb' : 'Schematische Darstellung'}
-                >
-                  {shot ? (
-                    <Image
-                      src={shot}
-                      alt={module.screenshotAlt}
-                      widths={[400, 800]}
-                      sizes="(min-width: 768px) 40vw, 90vw"
-                      loading="lazy"
-                      class="w-full"
-                    />
-                  ) : (
-                    <ModuleVisual slug={module.slug} />
-                  )}
-                </Geraet>
+                {rahmenArt(module.slug) === 'handy' ? (
+                  <Iphone bildunterschrift={shot ? 'Aus dem laufenden Betrieb' : 'Schematische Darstellung'} breite="16rem">
+                    {shot ? (
+                      <Image src={shot} alt={module.screenshotAlt} widths={[400, 800]} loading="lazy" class="w-full" />
+                    ) : (
+                      <ModuleVisual slug={module.slug} />
+                    )}
+                  </Iphone>
+                ) : (
+                  <Geraet art="rechner" bildunterschrift={shot ? 'Aus dem laufenden Betrieb' : 'Schematische Darstellung'}>
+                    {shot ? (
+                      <Image src={shot} alt={module.screenshotAlt} widths={[400, 800]} loading="lazy" class="w-full" />
+                    ) : (
+                      <ModuleVisual slug={module.slug} />
+                    )}
+                  </Geraet>
+                )}
               </div>
             </li>
           );
@@ -309,6 +310,8 @@ const painPoints = [
   }
 
   .modul-bild {
+    display: flex;
+    justify-content: center;
     min-width: 0;
   }
 
