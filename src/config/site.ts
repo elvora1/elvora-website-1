@@ -110,7 +110,8 @@ export const forms = {
 } as const;
 
 /**
- * Google-Bewertungen. Erscheinen im ersten Sichtbereich der Startseite.
+ * Kundenstimmen. Erscheinen im ersten Sichtbereich der Startseite und an
+ * jedem Abschluss-Aufruf.
  *
  * `enabled: false` blendet den Bewertungsbeleg überall aus. So steht nie
  * eine Bewertungsbehauptung ohne Grundlage auf der Seite.
@@ -120,11 +121,12 @@ export const reviews = {
 
   /**
    * ACHTUNG: Alles hier sind Platzhalter, damit die Gestaltung beurteilt
-   * werden kann. Sie sind frei erfunden.
+   * werden kann. Die Stimmen sind frei erfunden, auch wenn sie nur Branche
+   * und Stadt nennen.
    *
-   * VOR DEM LIVEGANG ERSETZEN. Erfundene Bewertungen auf einer Website sind
-   * keine Kleinigkeit: sie sind eine irreführende geschäftliche Handlung
-   * nach § 5 UWG und abmahnfähig.
+   * VOR DEM LIVEGANG durch echte Rückmeldungen ersetzen. Erfundene
+   * Kundenstimmen sind eine irreführende geschäftliche Handlung nach
+   * § 5 UWG und abmahnfähig, mit und ohne Namen.
    *
    * Solange `platzhalter: true` steht, zeigt die Seite an sichtbarer Stelle
    * den Hinweis „Beispieldaten". Erst wenn hier `false` steht, verschwindet
@@ -135,35 +137,39 @@ export const reviews = {
 
   rating: 4.9,
   count: 12,
+
+  /**
+   * Woher die Stimmen kommen, so wie es neben der Zahl steht.
+   *
+   * Bewusst NICHT „Google-Bewertungen": auf Google gibt es noch keine, und
+   * eine falsche Quellenangabe ist schlimmer als gar keine. Sobald das
+   * Google-Profil Bewertungen hat, hier umstellen und `profileUrl` setzen.
+   */
+  quelle: 'Kundenstimmen',
   profileUrl: '',
 
   /**
-   * Einzelstimmen für den ausführlichen Bewertungsabschnitt.
-   *
-   * Die Namen sind bewusst unterschiedlich: aus ihnen entstehen die
-   * Initialen in den Bewerterkreisen, und dreimal dasselbe Kürzel sah dort
-   * nach einem Fehler aus.
+   * Einzelstimmen. Anonym mit Branche und Stadt: das ist ehrlicher als
+   * erfundene Namen und wirkt trotzdem. Jede Stimme nennt ein konkretes
+   * Ergebnis statt allgemeinem Lob, so liest sich eine echte Rückmeldung.
    */
   items: [
     {
-      author: 'M. Beispiel',
-      business: 'Musterbetrieb Haustechnik, Essen',
+      author: 'Sanitärbetrieb aus Essen',
       rating: 5,
-      text: 'Platzhaltertext. Hier steht später eine echte Bewertung. Am besten eine, die ein konkretes Ergebnis nennt statt nur zu loben: was vorher das Problem war und was sich seitdem geändert hat.',
+      text: 'Platzhalter: Vorher gingen Anrufe verloren, wenn wir auf der Baustelle waren. Jetzt fängt die Assistenz sie auf, und wir rufen abends mit Name und Anliegen zurück statt einer unbekannten Nummer hinterherzutelefonieren.',
       date: '2026-05-14',
     },
     {
-      author: 'S. Vorlage',
-      business: 'Musterpraxis, Bochum',
+      author: 'Zahnarztpraxis aus Bochum',
       rating: 5,
-      text: 'Platzhaltertext. Zwei bis vier Sätze sind ideal. Längere Bewertungen werden überflogen, kürzere wirken beliebig.',
+      text: 'Platzhalter: Die Terminanfragen über WhatsApp landen direkt im Kalender, ohne dass die Anmeldung telefonieren muss. Das Team wurde spürbar entlastet, und die Patienten loben die schnellen Antworten.',
       date: '2026-04-02',
     },
     {
-      author: 'T. Platzhalter',
-      business: 'Musterkanzlei, Essen',
+      author: 'Steuerkanzlei aus Essen',
       rating: 4,
-      text: 'Platzhaltertext. Eine Bewertung mit vier Sternen darf ruhig dabei sein: ein Schnitt von glatt 5,0 bei zwölf Bewertungen wirkt auf viele Leser weniger glaubwürdig als 4,9.',
+      text: 'Platzhalter: Über die neue Website kommen erstmals regelmäßig Anfragen von Mandanten aus dem Umkreis. Die Abstimmung war unkompliziert, ein Ansprechpartner für alles.',
       date: '2026-02-19',
     },
   ] as Array<{

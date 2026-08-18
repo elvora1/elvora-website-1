@@ -11,10 +11,12 @@ import { Image } from 'astro:assets';
  */
 interface Props {
   alt: string;
+  /** Rund statt als stehendes Rechteck, etwa fuer die Vorstellung. */
+  rund?: boolean;
   class?: string;
 }
 
-const { alt, class: className = '' }: Props = Astro.props;
+const { alt, rund = false, class: className = '' }: Props = Astro.props;
 
 const found = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/portrait.{jpg,jpeg,png,webp,avif}',
@@ -23,7 +25,7 @@ const found = import.meta.glob<{ default: ImageMetadata }>(
 const portrait = Object.values(found)[0]?.default ?? null;
 ---
 
-<div class={`overflow-hidden rounded-card bg-surface-subtle ${className}`}>
+<div class:list={['overflow-hidden bg-surface-subtle', rund ? 'rounded-full' : 'rounded-card', className]}>
   {
     portrait ? (
       <Image
@@ -31,11 +33,14 @@ const portrait = Object.values(found)[0]?.default ?? null;
         alt={alt}
         widths={[400, 800]}
         sizes="(min-width: 1024px) 30vw, 90vw"
-        class="aspect-4/5 w-full object-cover"
+        class:list={['w-full object-cover', rund ? 'aspect-square' : 'aspect-4/5']}
       />
     ) : (
       <div
-        class="flex aspect-4/5 w-full flex-col items-center justify-center gap-3 border border-dashed border-border-strong p-6 text-center"
+        class:list={[
+          'flex w-full flex-col items-center justify-center gap-3 border border-dashed border-border-strong p-6 text-center',
+          rund ? 'aspect-square rounded-full' : 'aspect-4/5',
+        ]}
         role="img"
         aria-label={alt}
       >

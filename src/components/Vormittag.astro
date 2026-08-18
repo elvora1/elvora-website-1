@@ -214,15 +214,18 @@ const zeilen = ereignisse.map((e, i) => {
 
   .vormittag-geraet {
     width: 100%;
-    max-width: 52rem;
+    max-width: 56rem;
     margin-inline: auto;
   }
 
   /* --- Das Fenster im Bildschirm ---------------------------------------- */
+  /* Hoeher als vorher: bei 22rem war der Bildschirm ein gepresster
+      Streifen, in dem drei Blasen und die Eingabezeile kaum Luft hatten.
+      Das Seitenverhaeltnis liegt jetzt nahe an einem echten Notebook. */
   .fenster {
     display: flex;
     flex-direction: column;
-    height: clamp(18rem, 40vw, 22.5rem);
+    height: clamp(22rem, 48vw, 28rem);
     background: var(--color-surface);
   }
 

@@ -35,14 +35,29 @@ const zeigen = reviews.enabled && reviews.items.length > 0;
 const sichtbar = reviews.items.slice(0, max);
 const rest = reviews.count - sichtbar.length;
 
-/** Erste Buchstaben von Vor- und Nachname, sonst nur der erste. */
-const initialen = (name: string) =>
-  name
-    .trim()
+/**
+ * Kuerzel fuer den Kreis.
+ *
+ * Bei einem Namen die Anfangsbuchstaben von Vor- und Nachname. Die anonymen
+ * Stimmen haben die Form "Branche aus Stadt"; dort kommen die ersten beiden
+ * Buchstaben der Branche in den Kreis. Anfangsbuchstaben taugen da nicht:
+ * "Sanitärbetrieb aus Essen" und "Steuerkanzlei aus Essen" ergaeben beide
+ * "SE", und zwei gleiche Kreise sehen nach einem Fehler aus.
+ */
+const initialen = (name: string) => {
+  const sauber = name.trim();
+
+  if (/\saus\s/.test(sauber)) {
+    const wort = sauber.split(/\s+/)[0] ?? '';
+    return wort.charAt(0).toUpperCase() + wort.charAt(1).toLowerCase();
+  }
+
+  return sauber
     .split(/\s+/)
     .slice(0, 2)
     .map((teil) => teil[0]?.toUpperCase() ?? '')
-    .join('');
+    .join('') || '?';
+};
 ---
 
 {

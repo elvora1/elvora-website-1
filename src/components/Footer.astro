@@ -8,83 +8,361 @@ import {
   openingHours,
   services,
   serviceArea,
+  cta,
+  versprechen,
 } from '~/config/site';
 
+/**
+ * Fußbereich.
+ *
+ * Dunkel wie das Schlussband darüber, damit die Seite in EINER Fläche
+ * ausklingt statt in einem grauen Anhang. Der Fuß ist die letzte Chance
+ * auf eine Handlung, deshalb stehen Erstgespräch und WhatsApp noch einmal
+ * hier, zusammen mit der Antwortzeit.
+ *
+ * Ganz unten läuft die Wortmarke als Umriss über die volle Breite. Reine
+ * Zier, deshalb aria-hidden, aber sie gibt dem Ende der Seite ein Gewicht,
+ * das drei graue Spalten nie hatten.
+ */
 const year = new Date().getFullYear();
 
 const legalLinks = [
   { label: 'Impressum', href: '/impressum/' },
   { label: 'Datenschutz', href: '/datenschutz/' },
 ];
+
+const seiten = [
+  { label: 'Leistungen', href: '/leistungen/' },
+  { label: 'Über mich', href: '/ueber-mich/' },
+  { label: 'Kontakt', href: '/kontakt/' },
+  { label: 'Erstgespräch', href: cta.primary.href },
+];
 ---
 
-<footer class="border-t border-border bg-surface-subtle">
-  <div class="container-content py-14 md:py-16">
-    <div class="grid gap-10 md:grid-cols-12 md:gap-8">
-      <div class="md:col-span-4">
-        <Logo />
-        <p class="mt-4 max-w-xs text-[0.9375rem] text-ink-muted">
+<footer class="fuss">
+  <div class="container-content">
+    {/* --- Der letzte Aufruf ---------------------------------------------- */}
+    <div class="fuss-kopf">
+      <p class="fuss-schlag">
+        Sagen Sie kurz <em>Hallo</em>, den Rest übernehme ich.
+      </p>
+
+      <div class="fuss-handlung">
+        <a href={contactLinks.whatsapp} target="_blank" rel="noopener noreferrer" class="fuss-knopf">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 17l1.3-3.4A7 7 0 1 1 6.6 16z" />
+          </svg>
+          Auf WhatsApp schreiben
+        </a>
+        <p class="fuss-notiz">{versprechen.antwortzeit}</p>
+      </div>
+    </div>
+
+    <hr class="fuss-linie" />
+
+    {/* --- Spalten --------------------------------------------------------- */}
+    <div class="fuss-spalten">
+      <div class="fuss-marke">
+        <Logo ton="hell" />
+        <p>
           Digitale Sichtbarkeit und weniger Bürokratie für Betriebe und
           Selbstständige in {serviceArea.display}.
         </p>
       </div>
 
-      <div class="md:col-span-3">
-        <h2 class="text-[0.8125rem] font-semibold uppercase tracking-wider text-ink-faint">
-          Leistungen
-        </h2>
-        <ul class="mt-4 flex flex-col gap-2.5">
+      <nav aria-label="Leistungen">
+        <h2 class="fuss-titel kennung">Leistungen</h2>
+        <ul class="fuss-liste">
           {
             services.map((service) => (
               <li>
-                <a
-                  href={service.href}
-                  class="text-[0.9375rem] text-ink-muted transition-colors hover:text-ink"
-                >
+                <a href={service.href} class="fuss-link">
+                  {/* Der Punkt traegt die Farbe der Leistung, aufgehellt:
+                      die Originaltoene sind fuer dunklen Grund zu dunkel. */}
+                  <span
+                    class="fuss-punkt"
+                    style={`--punkt:${service.color}`}
+                    aria-hidden="true"
+                  />
                   {service.label}
                 </a>
               </li>
             ))
           }
         </ul>
-      </div>
+      </nav>
 
-      <div class="md:col-span-5">
-        <h2 class="text-[0.8125rem] font-semibold uppercase tracking-wider text-ink-faint">
-          Kontakt
-        </h2>
-        <address class="mt-4 flex flex-col gap-2.5 text-[0.9375rem] not-italic text-ink-muted">
+      <nav aria-label="Seiten">
+        <h2 class="fuss-titel kennung">Seiten</h2>
+        <ul class="fuss-liste">
+          {
+            seiten.map((eintrag) => (
+              <li>
+                <a href={eintrag.href} class="fuss-link">
+                  {eintrag.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="fuss-titel kennung">Kontakt</h2>
+        <address class="fuss-liste fuss-adresse">
           <span>
             {site.name}<br />
             {address.street}<br />
             {address.postalCode}&nbsp;{address.city}
           </span>
-          <a href={contactLinks.tel} class="transition-colors hover:text-ink">
-            {contact.phoneDisplay}
-          </a>
-          <a href={contactLinks.mail} class="transition-colors hover:text-ink">
-            {contact.email}
-          </a>
-          <span class="text-ink-faint">{openingHours.display}</span>
+          <a href={contactLinks.tel} class="fuss-link">{contact.phoneDisplay}</a>
+          <a href={contactLinks.mail} class="fuss-link">{contact.email}</a>
+          <span class="fuss-dezent">{openingHours.display}</span>
         </address>
       </div>
     </div>
 
-    <div
-      class="mt-12 flex flex-col gap-4 border-t border-border pt-6 text-sm text-ink-faint sm:flex-row sm:items-center sm:justify-between"
-    >
-      <p>&copy; {year} {site.name}</p>
-      <ul class="flex gap-6">
+    {/* --- Schlusszeile ----------------------------------------------------- */}
+    <div class="fuss-schluss">
+      <p>&copy; {year} {site.name} · Aus {address.city} für das Ruhrgebiet</p>
+      <ul class="fuss-recht">
         {
           legalLinks.map((link) => (
             <li>
-              <a href={link.href} class="transition-colors hover:text-ink">
-                {link.label}
-              </a>
+              <a href={link.href} class="fuss-link">{link.label}</a>
             </li>
           ))
         }
       </ul>
     </div>
   </div>
+
+  {/* Die Wortmarke als Umriss, unten angeschnitten. Zier, keine Aussage. */}
+  <p class="fuss-wasserzeichen" aria-hidden="true">ELVORA</p>
 </footer>
+
+<style>
+  .fuss {
+    position: relative;
+    overflow: hidden;
+    background: #101227;
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  .fuss-kopf {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    padding-block: clamp(3rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3rem);
+  }
+
+  @media (width >= 56rem) {
+    .fuss-kopf {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  .fuss-schlag {
+    margin: 0;
+    max-width: 18ch;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-wrap: balance;
+  }
+
+  .fuss-schlag em {
+    font-style: italic;
+    color: color-mix(in oklab, var(--color-accent) 70%, #fff);
+  }
+
+  .fuss-handlung {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .fuss-knopf {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.5rem;
+    border: 1px solid rgb(255 255 255 / 0.25);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.06);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .fuss-knopf:hover {
+    background: rgb(255 255 255 / 0.14);
+    border-color: rgb(255 255 255 / 0.45);
+  }
+
+  .fuss-knopf svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .fuss-notiz {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: rgb(255 255 255 / 0.55);
+  }
+
+  .fuss-linie {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+
+  /* --- Spalten ------------------------------------------------------------ */
+  .fuss-spalten {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  @media (width >= 48rem) {
+    .fuss-spalten {
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1.1fr);
+      gap: 2rem;
+    }
+  }
+
+  .fuss-marke p {
+    margin: 1rem 0 0;
+    max-width: 24ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  .fuss-titel {
+    margin: 0 0 1.1rem;
+    color: rgb(255 255 255 / 0.45);
+  }
+
+  .fuss-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fuss-adresse {
+    font-style: normal;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .fuss-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: fit-content;
+    font-size: 0.9375rem;
+    color: rgb(255 255 255 / 0.75);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .fuss-link:hover {
+    color: #fff;
+  }
+
+  .fuss-punkt {
+    width: 0.5rem;
+    height: 0.5rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    /* Aufgehellt: die Leistungsfarben sind fuer helle Flaechen gerechnet
+       und gingen auf dem dunklen Grund unter. */
+    background: color-mix(in oklab, var(--punkt) 55%, #fff);
+  }
+
+  .fuss-dezent {
+    color: rgb(255 255 255 / 0.45);
+    font-size: 0.875rem;
+  }
+
+  /* --- Schlusszeile --------------------------------------------------------- */
+  .fuss-schluss {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding-block: 1.5rem clamp(4rem, 9vw, 7rem);
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+    font-size: 0.8125rem;
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  .fuss-schluss p {
+    margin: 0;
+  }
+
+  .fuss-recht {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fuss-recht .fuss-link {
+    font-size: 0.8125rem;
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  /* --- Wasserzeichen -------------------------------------------------------- */
+  /* Unten angeschnitten und nur als Umriss. `text-stroke` traegt hier
+     die ganze Zeichnung; die Flaeche bleibt durchsichtig. */
+  .fuss-wasserzeichen {
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.28em;
+    z-index: 0;
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(5rem, 17vw, 15rem);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-align: center;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / 0.14);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      /* Die Wortmarke schiebt sich beim Scrollen ans Ende von unten herauf.
+         Langformen, keine Kurzschreibweise: siehe Warnung in global.css. */
+      .fuss-wasserzeichen {
+        animation-name: marke-heben;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 90%;
+      }
+    }
+  }
+
+  @keyframes marke-heben {
+    from { transform: translateY(45%); }
+    to { transform: none; }
+  }
+</style>

@@ -85,7 +85,45 @@ const schirm = {
 
   .iphone-huelle {
     position: relative;
-    filter: drop-shadow(0 20px 40px rgb(0 0 0 / 0.22));
+    /* Zwei Lagen: ein enger dunkler Kern und ein weiter weicher Schleier.
+       Ein einzelner grosser Schatten sah nach Matsch aus, nicht nach
+       einem Geraet, das vor der Seite steht. */
+    filter: drop-shadow(0 2px 6px rgb(22 25 58 / 0.18))
+      drop-shadow(0 24px 48px rgb(22 25 58 / 0.16));
+  }
+
+  /* Seitentasten. Reines CSS am Rand der Huelle: Lautstaerke links,
+     Standby rechts. Ohne sie wirkte die Silhouette wie ein Rechteck mit
+     Rundungen, nicht wie das Geraet. */
+  .iphone-huelle::before,
+  .iphone-huelle::after {
+    content: '';
+    position: absolute;
+    width: 1.8%;
+    border-radius: 2px;
+    background: #202325;
+  }
+
+  /* Die Gehaeusekante der Vorlage liegt bei 2,2% Innenabstand (4.39 von
+     200 Einheiten). Die Tasten ragen einen Hauch darueber hinaus, der
+     Rest verschwindet hinter dem Gehaeuse. */
+  .iphone-huelle::before {
+    inset-inline-start: 1.1%;
+    inset-block-start: 21%;
+    height: 15%;
+    /* Zwei Lautstaerketasten als Luecke in der Mitte. */
+    background: linear-gradient(
+      to bottom,
+      #24272a 0 42%,
+      transparent 42% 58%,
+      #24272a 58% 100%
+    );
+  }
+
+  .iphone-huelle::after {
+    inset-inline-end: 1.1%;
+    inset-block-start: 26%;
+    height: 11%;
   }
 
   .iphone-rahmen {
@@ -106,6 +144,10 @@ const schirm = {
     /* 24.62 von 171.98 Einheiten Breite. */
     border-radius: 14.3%/6.6%;
     background: #fff;
+    /* Messbereich fuer den Inhalt: der Verlauf darin bemisst seine
+       Schrift an DIESER Breite. Damit sieht der Chat in jedem Rahmen
+       gleich aus, egal wie gross das Geraet auf der Seite steht. */
+    container-type: inline-size;
   }
 
   .iphone-insel {

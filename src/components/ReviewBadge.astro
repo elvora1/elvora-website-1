@@ -37,7 +37,7 @@ const ratingText = reviews.rating.toLocaleString('de-DE', {
   maximumFractionDigits: 1,
 });
 
-const label = `${ratingText} von 5 Sternen aus ${reviews.count} Google-Bewertungen`;
+const label = `${ratingText} von 5 Sternen aus ${reviews.count} ${reviews.quelle}`;
 
 const textColor = tone === 'inverse' ? 'text-white/80' : 'text-ink-muted';
 const strongColor = tone === 'inverse' ? 'text-white' : 'text-ink';
@@ -63,7 +63,7 @@ const Tag = reviews.profileUrl ? 'a' : 'div';
         <span class={`font-semibold ${strongColor}`}>{ratingText}</span>
         {' aus '}
         <span class={strongColor}>{reviews.count}</span>
-        {' Google-Bewertungen'}
+        {` ${reviews.quelle}`}
       </span>
     </Tag>
   )
@@ -87,7 +87,7 @@ const Tag = reviews.profileUrl ? 'a' : 'div';
         </span>
 
         <span class="beleg-text" aria-hidden="true">
-          aus {reviews.count} Google-Bewertungen
+          aus {reviews.count} {reviews.quelle}
         </span>
       </Tag>
 

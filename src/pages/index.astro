@@ -195,7 +195,7 @@ const wege = [
       </div>
 
       <div class="hero-geraet">
-        <Iphone bildunterschrift="Schematische Darstellung" breite="15rem">
+        <Iphone bildunterschrift="Schematische Darstellung" breite="16.5rem">
           <Chat name="Elvora" status="online" nachrichten={empfang} uhrzeit="9:41" />
         </Iphone>
 
@@ -304,20 +304,54 @@ const wege = [
     </div>
   </Band>
 
-  {/* ===================== Der Mensch dahinter ===================== */}
-  <Band ton="hell" kennung="Der Mensch dahinter" heading="Ich komme aus dem Handwerk">
+  {/* ===================== Der Mensch dahinter =====================
+      Rundes Portrait mit laufendem Ring, ein Zitat als Kernaussage,
+      darunter drei belegbare Fakten. Vorher: ein Textblock und ein
+      Rechteckbild, die niemand angeschaut hat. */}
+  <Band
+    ton="gedaempft"
+    textur="punkte"
+    kennung="Der Mensch dahinter"
+    heading="Erst Baustelle, dann Bildschirm"
+  >
     <div class="mensch">
+      <div class="mensch-buehne hereinziehen">
+        <div class="mensch-ring" aria-hidden="true"></div>
+        <Portrait
+          rund
+          class="mensch-foto"
+          alt={`${owner.fullName}, Inhaber von Elvora aus ${address.city}`}
+        />
+        <p class="mensch-schild">
+          <span class="mensch-schild-name">{owner.fullName}</span>
+          <span class="mensch-schild-rolle">Inhaber, Elvora</span>
+        </p>
+      </div>
+
       <div class="mensch-text">
         <p>
-          Mein Name ist {owner.fullName}, gelernter {owner.trade}. Deshalb weiß
-          ich, wie ein Betrieb von innen aussieht: Der Inhaber arbeitet mit, das
-          Telefon klingelt zur Unzeit, und der Papierkram bleibt für abends
-          übrig. Ob Werkstatt, Praxis oder Kanzlei ändert daran wenig.
+          Gelernt habe ich {owner.trade}, nicht Marketing. Auf der Baustelle
+          habe ich erlebt, was in keiner Agentur-Präsentation vorkommt: Das
+          Telefon klingelt, wenn beide Hände voll sind, und der Auftrag geht
+          an den Betrieb, der zufällig gerade abheben konnte.
         </p>
+
+        <blockquote class="mensch-zitat">
+          Wer das Angebot macht, macht auch die Arbeit{' '}
+          <em>und geht ans Telefon.</em>
+        </blockquote>
+
         <p>
-          Sie haben mit mir zu tun, nicht mit einem Team. Wer das Angebot macht,
-          macht auch die Arbeit und geht ans Telefon.
+          Genau dafür gibt es Elvora: Werkzeuge für Betriebe, in denen der
+          Inhaber mitarbeitet. Sie haben mit mir zu tun, nicht mit einem
+          Apparat aus Beratern, Praktikanten und Ticketsystemen.
         </p>
+
+        <ul class="mensch-fakten">
+          <li class="einblenden">Gelernter {owner.trade}</li>
+          <li class="einblenden" style="--verzug:1">Ein Ansprechpartner, keine Weiterleitung</li>
+          <li class="einblenden" style="--verzug:2">Aus {address.city}, für das Ruhrgebiet</li>
+        </ul>
 
         <a class="mensch-weiter" href="/ueber-mich/">
           Mehr über mich
@@ -333,10 +367,6 @@ const wege = [
             <path d="M4 10h11M11 6l4 4-4 4" />
           </svg>
         </a>
-      </div>
-
-      <div class="mensch-bild hereinziehen">
-        <Portrait alt={`${owner.fullName}, Inhaber von Elvora aus ${address.city}`} />
       </div>
     </div>
   </Band>
@@ -402,6 +432,10 @@ const wege = [
   /* ===================== Aufschlag ===================== */
   .hero {
     background: var(--color-surface);
+    /* Der Schein hinter dem Geraet steht seitlich ueber. `clip` statt
+       `hidden`: hidden macht aus dem Hero einen Scrollbereich, clip
+       schneidet nur ab. */
+    overflow-x: clip;
   }
 
   .hero-inner {
@@ -505,10 +539,25 @@ const wege = [
 
   /* --- Die Vorfuehrung im ersten Sichtbereich --------------------------- */
   .hero-geraet {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.25rem;
+  }
+
+  /* Ein weicher Schein in den Markenfarben hinter dem Geraet. Er gibt dem
+     Telefon einen Ort, statt es frei im Weiss haengen zu lassen, und ist
+     die einzige Farbflaeche des ersten Sichtbereichs. */
+  .hero-geraet::before {
+    content: '';
+    position: absolute;
+    inset: -8% -18%;
+    z-index: -1;
+    background:
+      radial-gradient(45% 38% at 62% 30%, color-mix(in oklab, var(--color-accent) 13%, transparent), transparent 70%),
+      radial-gradient(50% 42% at 34% 68%, color-mix(in oklab, #2b2f7a 10%, transparent), transparent 72%);
+    filter: blur(6px);
   }
 
   .hero-geraet-text {
@@ -825,27 +874,149 @@ const wege = [
   /* ===================== Der Mensch ===================== */
   .mensch {
     display: grid;
-    gap: clamp(2rem, 5vw, 4rem);
+    gap: clamp(2.5rem, 5vw, 4.5rem);
     align-items: center;
+    justify-items: center;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 52rem) {
     .mensch {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+      grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+      justify-items: stretch;
     }
   }
 
+  /* --- Buehne: Ring, Foto, Schild --------------------------------------- */
+  .mensch-buehne {
+    position: relative;
+    width: min(17rem, 70vw);
+  }
+
+  .mensch-foto {
+    position: relative;
+    z-index: 1;
+    border: 4px solid var(--color-surface);
+    box-shadow: 0 18px 40px -18px rgb(22 25 58 / 0.35);
+  }
+
+  /* Der laufende Ring. Ein Kegelverlauf in den Markenfarben, per Maske auf
+     einen schmalen Kranz beschnitten. Er dreht langsam und ist die einzige
+     Dauerbewegung der Sektion. */
+  .mensch-ring {
+    position: absolute;
+    inset: -7%;
+    border-radius: 999px;
+    background: conic-gradient(
+      from 0deg,
+      var(--color-accent),
+      #2b2f7a 30%,
+      transparent 55%,
+      #a93d28 80%,
+      var(--color-accent)
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    opacity: 0.85;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mensch-ring {
+      animation-name: ring-drehen;
+      animation-duration: 16s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+  }
+
+  @keyframes ring-drehen {
+    to { transform: rotate(1turn); }
+  }
+
+  /* Das Namensschild haengt unten in das Foto hinein. */
+  .mensch-schild {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    width: fit-content;
+    margin: -1.6rem auto 0;
+    padding: 0.55rem 1.2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    box-shadow: 0 10px 24px -14px rgb(22 25 58 / 0.4);
+    text-align: center;
+  }
+
+  .mensch-schild-name {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.15;
+    color: var(--color-ink);
+  }
+
+  .mensch-schild-rolle {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+  }
+
+  /* --- Text -------------------------------------------------------------- */
   .mensch-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.125rem;
-    max-width: 52ch;
+    gap: 1.25rem;
+    max-width: 54ch;
   }
 
   .mensch-text p {
     margin: 0;
     line-height: 1.65;
+    color: var(--color-ink-muted);
+  }
+
+  /* Das Zitat ist die Kernaussage der Sektion und darf so gross sein wie
+     eine Zwischenueberschrift. Instrument Serif hat keinen Fettschnitt,
+     die Wirkung kommt aus Mass und dem kursiven Schluss. */
+  .mensch-zitat {
+    margin: 0.25rem 0;
+    padding-inline-start: 1.25rem;
+    border-inline-start: 3px solid var(--color-accent);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  .mensch-zitat em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .mensch-fakten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mensch-fakten li {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    font-size: 0.8125rem;
     color: var(--color-ink-muted);
   }
 
@@ -875,23 +1046,6 @@ const wege = [
 
   .mensch-weiter:hover svg {
     transform: translateX(3px);
-  }
-
-  .mensch-bild :global(> div) {
-    border-radius: 0;
-    background: transparent;
-  }
-
-  .mensch-bild :global(img) {
-    aspect-ratio: 4 / 5;
-    width: 100%;
-    object-fit: cover;
-  }
-
-  @media (width < 48rem) {
-    .mensch-bild {
-      max-width: 13rem;
-    }
   }
 
   /* ===================== Bewertungen ===================== */

@@ -243,6 +243,16 @@ const mehrere = folge.length > 1;
     font-size: 0.6875rem;
   }
 
+  /* Auf dem Telefon bemisst sich die Schrift an der Bildschirmbreite des
+     Geraets: 4.6cqi sind knapp 11 Punkte bei 15rem Geraetebreite und
+     wachsen mit, wenn das Geraet groesser steht. Vorher war die Groesse
+     fest, und im kleinen Hero-Telefon war alles gequetscht, im grossen
+     Rahmen verloren. Den Messbereich stellt der Bildschirmausschnitt in
+     `Iphone.astro`. */
+  .chat-in-telefon {
+    font-size: clamp(0.5625rem, 4.6cqi, 0.875rem);
+  }
+
   .chat-in-fenster {
     font-size: 0.8125rem;
   }
