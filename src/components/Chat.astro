@@ -75,6 +75,23 @@ const mehrere = folge.length > 1;
 ---
 
 <div class={`chat chat-in-${geraet} ${className}`} data-chat style={`--wechsel:${WECHSEL}s`}>
+  {/*
+    Die Punkte zeigen, der wievielte Verlauf gerade laeuft, wie bei einem
+    Bildwechsler. Sie liegen UEBER allen Schirmen, damit sie beim Wechsel
+    nicht mitrutschen. Der aktive Punkt haengt an denselben Sekunden wie
+    der Schirm selbst, es kann also nichts auseinanderlaufen.
+  */}
+  {mehrere && (
+    <div class="chat-punkte" aria-hidden="true">
+      {folge.map((g, i) => (
+        <span
+          class:list={['chat-schrittpunkt', i === folge.length - 1 && 'chat-schrittpunkt-letzter']}
+          style={`--von:${g.von.toFixed(2)}s;--bis:${g.bis.toFixed(2)}s`}
+        />
+      ))}
+    </div>
+  )}
+
   {
     folge.map((gespraech, stelle) => (
       <div
@@ -233,6 +250,7 @@ const mehrere = folge.length > 1;
      Zeichen fuer Zeichen dieselbe, nur der Massstab wechselt.
      ====================================================================== */
   .chat {
+    position: relative;
     display: grid;
     grid-template-rows: 1fr;
     height: 100%;
@@ -276,6 +294,64 @@ const mehrere = folge.length > 1;
   .chat-teil.chat-letzte {
     opacity: 1;
     visibility: visible;
+  }
+
+  /* --- Punkte des Bildwechslers ----------------------------------------- */
+  .chat-punkte {
+    position: absolute;
+    inset-inline: 0;
+    /* Ueber der Eingabezeile, unter den Blasen. */
+    inset-block-end: 4.6em;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    pointer-events: none;
+  }
+
+  .chat-schrittpunkt {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 999px;
+    background: rgb(0 0 0 / 0.18);
+    transition: none;
+  }
+
+  /* Ruhezustand: der letzte Verlauf steht, also ist sein Punkt an. */
+  .chat-schrittpunkt-letzter {
+    background: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Laeuft der Ablauf, uebernehmen die Animationen: an, wenn der
+       eigene Schirm kommt, aus, wenn er geht. Der letzte bleibt an.
+       `both` fuellt auch rueckwaerts, damit der letzte Punkt vor seiner
+       Zeit NICHT an ist, obwohl der Ruhezustand ihn an zeigt. */
+    .chat[data-laeuft] .chat-schrittpunkt {
+      animation-name: schrittpunkt-an;
+      animation-duration: 0.3s;
+      animation-timing-function: ease-out;
+      animation-fill-mode: both;
+      animation-delay: var(--von);
+    }
+
+    .chat[data-laeuft] .chat-schrittpunkt:not(.chat-schrittpunkt-letzter) {
+      animation-name: schrittpunkt-an, schrittpunkt-aus;
+      animation-duration: 0.3s, 0.3s;
+      animation-timing-function: ease-out, ease-out;
+      animation-fill-mode: both, forwards;
+      animation-delay: var(--von), var(--bis);
+    }
+  }
+
+  @keyframes schrittpunkt-an {
+    from { background: rgb(0 0 0 / 0.18); transform: scale(0.9); }
+    to { background: var(--color-accent); transform: scale(1.15); }
+  }
+
+  @keyframes schrittpunkt-aus {
+    from { background: var(--color-accent); transform: scale(1.15); }
+    to { background: rgb(0 0 0 / 0.18); transform: scale(0.9); }
   }
 
   /* --- Statusleiste, nur auf dem Telefon -------------------------------- */
