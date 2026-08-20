@@ -1,9 +1,8 @@
 ---
 import Button from './Button.astro';
-import Iphone from './Iphone.astro';
-import Chat from './Chat.astro';
+import Telefonkarussell from './Telefonkarussell.astro';
 import { contactLinks } from '~/config/site';
-import { empfangGespraeche, EMPFANG_TEMPO } from '~/lib/empfang';
+import { empfangGespraeche } from '~/lib/empfang';
 
 /**
  * WhatsApp als bevorzugter Kontaktweg.
@@ -51,9 +50,12 @@ const { variant = 'panel', class: className = '' }: Props = Astro.props;
           Telefon. Die Beschriftung sagt, dass es nachgebaut ist. */}
       {/* Die Vorfuehrung selbst: der Empfang, den man dort bekommt. */}
       <div class="wa-vorfuehrung">
-        <Iphone bildunterschrift="Schematische Darstellung" breite="16rem">
-          <Chat gespraeche={empfangGespraeche} tempo={EMPFANG_TEMPO} />
-        </Iphone>
+        <Telefonkarussell
+          kennung="kontakt-karussell"
+          gespraeche={empfangGespraeche}
+          bildunterschrift="Schematische Darstellung"
+          breite="14.5rem"
+        />
       </div>
 
       <div class="wa-handlung">

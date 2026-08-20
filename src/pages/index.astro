@@ -6,12 +6,11 @@ import Portrait from '~/components/Portrait.astro';
 import Scramble from '~/components/Scramble.astro';
 import Sterne from '~/components/Sterne.astro';
 import ReviewBadge from '~/components/ReviewBadge.astro';
-import Iphone from '~/components/Iphone.astro';
-import Chat from '~/components/Chat.astro';
+import Telefonkarussell from '~/components/Telefonkarussell.astro';
 import Kanalkreise from '~/components/Kanalkreise.astro';
 import Textrolle from '~/components/Textrolle.astro';
 import Vormittag from '~/components/Vormittag.astro';
-import { empfangGespraeche, EMPFANG_TEMPO } from '~/lib/empfang';
+import { empfangGespraeche } from '~/lib/empfang';
 import {
   cta,
   services,
@@ -183,9 +182,14 @@ const wege = [
       </div>
 
       <div class="hero-geraet">
-        <Iphone bildunterschrift="Schematische Darstellung" breite="16.5rem">
-          <Chat gespraeche={empfangGespraeche} tempo={EMPFANG_TEMPO} />
-        </Iphone>
+        {/* Das Karussell nach der Vorlage: drei Telefone, das aktive vorn,
+            die anderen seitlich zurueckgedreht, Pfeile schalten durch.
+            In jedem laeuft ein anderer Verlauf der Assistenz. */}
+        <Telefonkarussell
+          kennung="hero-karussell"
+          gespraeche={empfangGespraeche}
+          bildunterschrift="Schematische Darstellung"
+        />
 
         <p class="hero-geraet-text">
           Auf WhatsApp antwortet zuerst meine KI-Assistenz. Dieselbe, die ich

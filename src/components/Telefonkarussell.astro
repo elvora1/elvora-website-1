@@ -1,0 +1,317 @@
+---
+import Iphone from './Iphone.astro';
+import Chat from './Chat.astro';
+import type { Gespraech } from '~/lib/chat';
+
+/**
+ * Telefon-Karussell nach der Vorlage phone-mockups-1: mehrere Telefone
+ * nebeneinander, das aktive steht vorn, die anderen weichen seitlich
+ * zurück, gedreht und abgedunkelt. Pfeile und Punkte schalten durch.
+ *
+ * ABWEICHUNGEN VON DER VORLAGE
+ *
+ * 1. Kein React, kein Radix, kein class-variance-authority. Der Zustand
+ *    ist eine Gruppe versteckter Radioknöpfe, Pfeile und Punkte sind
+ *    Beschriftungen dafür, und `:has()` setzt die Lage der Telefone.
+ *    Damit funktioniert das Karussell komplett ohne JavaScript, und die
+ *    Pfeiltasten der Tastatur schalten von Haus aus durch, weil das der
+ *    eingebaute Umgang mit einer Radiogruppe ist.
+ *
+ * 2. In den Telefonen stecken keine fremden App-Bilder, sondern die
+ *    laufenden Verläufe der eigenen Assistenz. Alle drei tippen
+ *    gleichzeitig, auch die hinteren, gedimmt: genau das macht die
+ *    Bühne lebendig.
+ *
+ * 3. Die Vorlage kreist endlos von allein. Hier schaltet der Besucher
+ *    selbst; die Pfeile laufen dafür im Kreis (vom letzten zum ersten).
+ *
+ * AUSGELEGT AUF GENAU DREI Telefone: die Lagen sind von Hand gesetzt,
+ * weil CSS ohne Rechenkünste wie abs() auskommen soll. Mehr Einträge
+ * werden ignoriert.
+ */
+interface Props {
+  /** Eindeutiger Name der Radiogruppe, je Seite einmal. */
+  kennung: string;
+  /** Genau drei Verläufe, je Telefon einer. */
+  gespraeche: Gespraech[];
+  /** Beschriftung unter dem Karussell. */
+  bildunterschrift?: string;
+  /** Breite des vorderen Telefons. */
+  breite?: string;
+  class?: string;
+}
+
+const {
+  kennung,
+  gespraeche,
+  bildunterschrift,
+  breite = '15.5rem',
+  class: className = '',
+}: Props = Astro.props;
+
+const drei = gespraeche.slice(0, 3);
+
+/* Wohin die Pfeile je Zustand zeigen: im Kreis. */
+const zurueck = [2, 0, 1];
+const vor = [1, 2, 0];
+---
+
+<div class={`karussell ${className}`} style={`--breite:${breite}`}>
+  {/* Der Zustand. Die Knöpfe sind unsichtbar, aber fokussierbar: die
+      Pfeiltasten der Tastatur schalten die Gruppe durch. */}
+  {
+    drei.map((g, i) => (
+      <input
+        type="radio"
+        name={kennung}
+        id={`${kennung}-${i}`}
+        class="karussell-wahl sr-only"
+        checked={i === 0}
+        aria-label={`Verlauf ${i + 1} von ${drei.length}: ${g.stempel ?? g.name}`}
+      />
+    ))
+  }
+
+  <div class="karussell-buehne">
+    <ol class="karussell-band">
+      {
+        drei.map((g, i) => (
+          <li class={`karussell-telefon karussell-telefon-${i}`}>
+            <Iphone breite="100%">
+              <Chat gespraeche={[g]} />
+            </Iphone>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="karussell-steuer">
+    {/* Je Zustand ein anderes Ziel, deshalb drei Fassungen je Pfeil.
+        Sichtbar ist immer nur die zum aktiven Zustand. */}
+    {
+      drei.map((_, i) => (
+        <label
+          class={`karussell-pfeil karussell-links karussell-bei-${i}`}
+          for={`${kennung}-${zurueck[i]}`}
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 4 6 10l6 6" />
+          </svg>
+        </label>
+      ))
+    }
+
+    <span class="karussell-punkte">
+      {
+        drei.map((g, i) => (
+          <label
+            class={`karussell-punkt karussell-punkt-${i}`}
+            for={`${kennung}-${i}`}
+            title={g.stempel ?? g.name}
+          />
+        ))
+      }
+    </span>
+
+    {
+      drei.map((_, i) => (
+        <label
+          class={`karussell-pfeil karussell-rechts karussell-bei-${i}`}
+          for={`${kennung}-${vor[i]}`}
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 4l6 6-6 6" />
+          </svg>
+        </label>
+      ))
+    }
+  </div>
+
+  {bildunterschrift && <p class="karussell-schrift">{bildunterschrift}</p>}
+</div>
+
+<style>
+  .karussell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+    width: 100%;
+  }
+
+  /* Die Buehne beschneidet die seitlich herausstehenden Telefone, mit
+     Luft nach oben und unten fuer Schatten. */
+  .karussell-buehne {
+    width: 100%;
+    overflow: clip;
+    padding-block: 0.5rem;
+    perspective: 1400px;
+  }
+
+  /* Alle Telefone liegen in derselben Rasterzelle. Die Zelle ist so breit
+     wie das vordere Telefon, die anderen werden hinausgeschoben. */
+  .karussell-band {
+    display: grid;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .karussell-telefon {
+    grid-area: 1 / 1;
+    width: var(--breite);
+    max-width: 74vw;
+    transform-style: preserve-3d;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .karussell-telefon {
+      transition:
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.4s ease,
+        filter 0.4s ease;
+    }
+  }
+
+  /* --- Die Lagen -------------------------------------------------------
+     Je Zustand k bekommt Telefon j seinen Platz: vorn, links hinten,
+     rechts hinten. Von Hand statt errechnet, damit kein abs() noetig ist
+     und aeltere Browser nur die Bewegung verlieren, nicht die Lage. */
+  .karussell-telefon-0 { z-index: 3; }
+  .karussell-telefon-1,
+  .karussell-telefon-2 { z-index: 1; pointer-events: none; }
+
+  /* Zustand 0 (Start): 0 vorn, 1 rechts, 2 links. */
+  .karussell:has(.karussell-wahl:nth-of-type(1):checked) .karussell-telefon-1 {
+    transform: translateX(64%) scale(0.76) rotateY(-22deg);
+    opacity: 0.5;
+    filter: saturate(0.75) blur(1.5px);
+  }
+  .karussell:has(.karussell-wahl:nth-of-type(1):checked) .karussell-telefon-2 {
+    transform: translateX(-64%) scale(0.76) rotateY(22deg);
+    opacity: 0.5;
+    filter: saturate(0.75) blur(1.5px);
+  }
+
+  /* Zustand 1: 1 vorn, 2 rechts, 0 links. */
+  .karussell:has(.karussell-wahl:nth-of-type(2):checked) .karussell-telefon-1 {
+    z-index: 3;
+    pointer-events: auto;
+  }
+  .karussell:has(.karussell-wahl:nth-of-type(2):checked) .karussell-telefon-0 {
+    z-index: 1;
+    pointer-events: none;
+    transform: translateX(-64%) scale(0.76) rotateY(22deg);
+    opacity: 0.5;
+    filter: saturate(0.75) blur(1.5px);
+  }
+  .karussell:has(.karussell-wahl:nth-of-type(2):checked) .karussell-telefon-2 {
+    transform: translateX(64%) scale(0.76) rotateY(-22deg);
+    opacity: 0.5;
+    filter: saturate(0.75) blur(1.5px);
+  }
+
+  /* Zustand 2: 2 vorn, 0 rechts, 1 links. */
+  .karussell:has(.karussell-wahl:nth-of-type(3):checked) .karussell-telefon-2 {
+    z-index: 3;
+    pointer-events: auto;
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+  .karussell:has(.karussell-wahl:nth-of-type(3):checked) .karussell-telefon-0 {
+    z-index: 1;
+    pointer-events: none;
+    transform: translateX(64%) scale(0.76) rotateY(-22deg);
+    opacity: 0.5;
+    filter: saturate(0.75) blur(1.5px);
+  }
+  .karussell:has(.karussell-wahl:nth-of-type(3):checked) .karussell-telefon-1 {
+    transform: translateX(-64%) scale(0.76) rotateY(22deg);
+    opacity: 0.5;
+    filter: saturate(0.75) blur(1.5px);
+  }
+
+  /* --- Steuerung -------------------------------------------------------- */
+  .karussell-steuer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .karussell-pfeil {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 999px;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+
+  .karussell-pfeil:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .karussell-pfeil svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  /* Sichtbar ist je Pfeilseite nur die Fassung des aktiven Zustands. */
+  .karussell:has(.karussell-wahl:nth-of-type(1):checked) .karussell-bei-0,
+  .karussell:has(.karussell-wahl:nth-of-type(2):checked) .karussell-bei-1,
+  .karussell:has(.karussell-wahl:nth-of-type(3):checked) .karussell-bei-2 {
+    display: flex;
+  }
+
+  .karussell-punkte {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .karussell-punkt {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: var(--color-border-strong);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .karussell:has(.karussell-wahl:nth-of-type(1):checked) .karussell-punkt-0,
+  .karussell:has(.karussell-wahl:nth-of-type(2):checked) .karussell-punkt-1,
+  .karussell:has(.karussell-wahl:nth-of-type(3):checked) .karussell-punkt-2 {
+    background: var(--color-accent);
+    transform: scale(1.2);
+  }
+
+  /* Der Fokusring der Tastatur landet auf dem versteckten Knopf; sichtbar
+     machen wir ihn auf den Punkten. */
+  .karussell:has(.karussell-wahl:focus-visible) .karussell-punkte {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 999px;
+  }
+
+  .karussell-schrift {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+    text-align: center;
+  }
+</style>
