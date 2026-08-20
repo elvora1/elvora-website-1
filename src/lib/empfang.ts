@@ -4,6 +4,14 @@ import type { Gespraech } from '~/lib/chat';
 /**
  * Der Empfang, den man auf WhatsApp tatsächlich bekommt.
  *
+ * GESCHRIEBEN WIE ECHTE VERLÄUFE: Kunden schreiben abends und klein,
+ * fragen zuerst nach dem Preis, nennen Zeitfenster. Die Assistenz nimmt
+ * in jedem Verlauf sichtbar Arbeit ab: sie qualifiziert, trägt ein,
+ * organisiert den Rückruf und bereitet Luan vor. Die Preisantwort ist
+ * dieselbe wie in der Fragenliste der Seite (kein Preis ohne Gespräch,
+ * dann fest und schriftlich), damit die Vorführung nicht etwas
+ * verspricht, was die Seite verneint.
+ *
  * EINE Quelle für jede Stelle, an der die Assistenz aus Kundensicht
  * vorgeführt wird: das Telefon im ersten Sichtbereich der Startseite und
  * das Telefon auf der Kontaktseite. Vorher hatten beide eigene, leicht
@@ -21,14 +29,16 @@ export const empfangGespraeche: Gespraech[] = [
   {
     name: 'Elvora',
     status: 'online',
-    uhrzeit: '9:41',
+    uhrzeit: '21:37',
     stempel: 'Termin anfragen',
     bild: mark.src,
     nachrichten: [
-      { von: 'kunde', zeit: '9:41', text: 'Guten Tag, ist diese Woche noch ein Termin frei?' },
-      { von: 'assistenz', zeit: '9:41', text: 'Ja, Donnerstag 9:00 Uhr oder Freitag 14:30 Uhr. Was passt Ihnen?' },
-      { von: 'kunde', zeit: '9:42', text: 'Freitag, gern.' },
-      { von: 'assistenz', zeit: '9:42', text: 'Eingetragen! Sie bekommen gleich eine Bestätigung.' },
+      { von: 'kunde', zeit: '21:37', text: 'Guten Abend, geht so ein Erstgespräch auch abends? Tagsüber steh ich aufm Gerüst.' },
+      { von: 'assistenz', zeit: '21:37', text: 'Guten Abend! Klar, geht auch früh oder abends. Diese Woche wäre Donnerstag 7:30 Uhr oder 18:00 Uhr frei.' },
+      { von: 'kunde', zeit: '21:39', text: 'dann donnerstag 18 uhr' },
+      { von: 'assistenz', zeit: '21:39', text: 'Eingetragen: Donnerstag, 18:00 Uhr. Worum soll es vor allem gehen, damit Luan sich vorbereiten kann?' },
+      { von: 'kunde', zeit: '21:40', text: 'Wir verpassen ständig Anrufe, wenn wir auf dem Dach stehen.' },
+      { von: 'assistenz', zeit: '21:40', text: 'Notiert. Genau dafür gibt es eine Lösung, die zeigt Luan Ihnen am Donnerstag live.' },
     ],
   },
   {
@@ -38,9 +48,11 @@ export const empfangGespraeche: Gespraech[] = [
     stempel: 'Nach verpasstem Anruf',
     bild: mark.src,
     nachrichten: [
-      { von: 'assistenz', zeit: '11:06', text: 'Guten Tag, Sie haben gerade angerufen und wir konnten leider nicht abnehmen. Worum geht es? Ich helfe direkt hier weiter.' },
-      { von: 'kunde', zeit: '11:07', text: 'Oh, das ging schnell. Ich hätte eine Frage zu meiner Website.' },
-      { von: 'assistenz', zeit: '11:07', text: 'Gern! Stellen Sie sie einfach hier, oder ich lasse Sie zurückrufen.' },
+      { von: 'assistenz', zeit: '11:06', text: 'Guten Tag, hier ist die Assistenz von Elvora. Sie haben gerade angerufen, Luan sitzt bis 12 Uhr in einem Termin. Worum geht es?' },
+      { von: 'kunde', zeit: '11:09', text: 'Ah ok. Unsere Website ist von 2016 und auf dem Handy völlig kaputt.' },
+      { von: 'assistenz', zeit: '11:09', text: 'Verstanden. Schicken Sie mir gern den Link, dann schaut Luan heute noch drauf und ruft Sie mit einer ehrlichen Einschätzung zurück.' },
+      { von: 'kunde', zeit: '11:11', text: 'www.mustermann-haustechnik.de. Ab 14 Uhr bin ich erreichbar.' },
+      { von: 'assistenz', zeit: '11:11', text: 'Danke! Rückruf heute zwischen 14 und 15 Uhr an diese Nummer. Ist notiert.' },
     ],
   },
   {
@@ -50,10 +62,12 @@ export const empfangGespraeche: Gespraech[] = [
     stempel: 'Anfrage stellen',
     bild: mark.src,
     nachrichten: [
-      { von: 'kunde', zeit: '14:23', text: 'Wir bräuchten eine neue Website für unseren Betrieb.' },
-      { von: 'assistenz', zeit: '14:23', text: 'Danke! Darf ich fragen, was die Seite vor allem können soll?' },
-      { von: 'kunde', zeit: '14:24', text: 'Mehr Anfragen bringen, ehrlich gesagt.' },
-      { von: 'assistenz', zeit: '14:24', text: 'Verstanden. Ich gebe das an Luan weiter, er meldet sich heute noch bei Ihnen.' },
+      { von: 'kunde', zeit: '14:23', text: 'Hallo, was kostet bei euch ungefähr eine Website? Malerbetrieb, 6 Leute.' },
+      { von: 'assistenz', zeit: '14:23', text: 'Hallo! Ehrliche Antwort: Das hängt vom Umfang ab. Luan nennt Preise erst nach einem kurzen Gespräch, dann aber fest und schriftlich, ohne Nachforderungen.' },
+      { von: 'kunde', zeit: '14:26', text: 'ok, fair. Habt ihr Beispiele von anderen Betrieben?' },
+      { von: 'assistenz', zeit: '14:26', text: 'Ja, die zeigt er Ihnen im Gespräch. Passt morgen 8:00 Uhr, bevor Ihr Tag losgeht?' },
+      { von: 'kunde', zeit: '14:27', text: 'passt 👍' },
+      { von: 'assistenz', zeit: '14:27', text: 'Steht! Morgen, 8:00 Uhr, Luan ruft Sie an. Bestätigung kommt gleich hier rein.' },
     ],
   },
 ];

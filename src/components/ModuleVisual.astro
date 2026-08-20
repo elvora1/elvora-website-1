@@ -30,30 +30,34 @@ const { slug, class: className = '' }: Props = Astro.props;
 type Nachricht = { von: 'kunde' | 'assistenz'; text: string; zeit: string };
 
 const chats: Record<string, { name: string; verlauf: Nachricht[] }> = {
+  /* Jeder Verlauf zeigt einen Handgriff, den die Assistenz wirklich
+     uebernimmt. Kunden schreiben wie Kunden: knapp, mit Dringlichkeit,
+     mit Fotos. Die Assistenz antwortet konkret: Zeiten, Zusagen,
+     naechster Schritt. Allgemeines Lob ohne Vorgang waere Werbung. */
   'whatsapp-assistenz': {
     name: 'Musterbetrieb',
     verlauf: [
-      { von: 'kunde', zeit: '9:41', text: 'Guten Tag, ich hätte gern einen Termin. Was kostet das ungefähr?' },
-      { von: 'assistenz', zeit: '9:41', text: 'Guten Tag! Das hängt vom Umfang ab. Darf ich kurz fragen, worum es genau geht?' },
-      { von: 'kunde', zeit: '9:42', text: 'Eine Beratung, am liebsten noch diese Woche.' },
-      { von: 'assistenz', zeit: '9:42', text: 'Danke. Ich gebe das an Herrn Meyer weiter, er meldet sich heute noch mit einem Termin.' },
+      { von: 'kunde', zeit: '9:41', text: 'Guten Tag, unser Heizkörper im Bad wird nicht mehr warm. Tauschen Sie auch nur ein Thermostat?' },
+      { von: 'assistenz', zeit: '9:41', text: 'Guten Tag! Machen wir, das ist eine kleine Sache. Mögen Sie ein Foto vom Thermostat schicken? Dann bringt der Kollege direkt das passende Ersatzteil mit.' },
+      { von: 'kunde', zeit: '9:43', text: 'Super, Foto kommt gleich. Geht was nächste Woche?' },
+      { von: 'assistenz', zeit: '9:43', text: 'Dienstag 8:30 Uhr ist frei. Soll ich Sie eintragen?' },
     ],
   },
   'anruf-retter': {
     name: 'Musterbetrieb',
     verlauf: [
-      { von: 'assistenz', zeit: '10:03', text: 'Guten Tag, Sie haben uns gerade angerufen und wir konnten leider nicht abnehmen. Worum geht es? Ich helfe direkt hier weiter.' },
-      { von: 'kunde', zeit: '10:04', text: 'Ich brauche kurzfristig einen Termin.' },
-      { von: 'assistenz', zeit: '10:04', text: 'Verstanden, das ist dringend. Wie erreiche ich Sie am besten? Ich gebe das sofort weiter.' },
+      { von: 'assistenz', zeit: '10:03', text: 'Guten Tag, Sie haben uns gerade angerufen. Wir sind bis mittags auf einer Baustelle. Worum geht es? Ich leite es sofort weiter.' },
+      { von: 'kunde', zeit: '10:06', text: 'Bei uns tropft es unter der Spüle, langsam wird es mehr.' },
+      { von: 'assistenz', zeit: '10:06', text: 'Verstanden, das sollte zügig angeschaut werden. Bitte stellen Sie einen Eimer drunter und drehen Sie das Eckventil zu. Sie bekommen heute bis 13 Uhr einen Rückruf mit Termin.' },
     ],
   },
   'terminbuchung': {
     name: 'Musterbetrieb',
     verlauf: [
-      { von: 'kunde', zeit: '14:12', text: 'Passt bei Ihnen nächste Woche was?' },
-      { von: 'assistenz', zeit: '14:12', text: 'Ja, ich habe Dienstag 9:00 Uhr und Donnerstag 14:30 Uhr frei. Was passt Ihnen besser?' },
-      { von: 'kunde', zeit: '14:13', text: 'Donnerstag' },
-      { von: 'assistenz', zeit: '14:13', text: 'Eingetragen. Sie bekommen am Mittwoch eine Erinnerung.' },
+      { von: 'kunde', zeit: '14:12', text: 'Hallo, ich schaffe es morgen um 9 doch nicht. Kann man den Termin verschieben?' },
+      { von: 'assistenz', zeit: '14:12', text: 'Kein Problem! Frei wäre Donnerstag 13:00 Uhr oder Freitag 9:30 Uhr.' },
+      { von: 'kunde', zeit: '14:13', text: 'Freitag bitte.' },
+      { von: 'assistenz', zeit: '14:13', text: 'Verschoben: Freitag, 9:30 Uhr. Die alte Erinnerung ist gelöscht, die neue kommt am Donnerstag.' },
     ],
   },
 };

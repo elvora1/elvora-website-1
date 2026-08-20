@@ -299,6 +299,15 @@ const mehrere = folge.length > 1;
   /* --- Punkte des Bildwechslers ----------------------------------------- */
   .chat-punkte {
     position: absolute;
+  }
+
+  /* Im Fenster auf dem Rechner zeigt die Seitenleiste, welcher Verlauf
+     laeuft. Punkte dazu waeren dieselbe Auskunft zweimal. */
+  .chat-in-fenster .chat-punkte {
+    display: none;
+  }
+
+  .chat-punkte {
     inset-inline: 0;
     /* Ueber der Eingabezeile, unter den Blasen. */
     inset-block-end: 4.6em;
