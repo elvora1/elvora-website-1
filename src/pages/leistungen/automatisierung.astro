@@ -5,7 +5,8 @@ import Button from '~/components/Button.astro';
 import ModuleVisual from '~/components/ModuleVisual.astro';
 import Band from '~/components/Band.astro';
 import Liste from '~/components/Liste.astro';
-import Nachrichtenstapel from '~/components/Nachrichtenstapel.astro';
+import Telefonkarussell from '~/components/Telefonkarussell.astro';
+import { modulGespraechFolge } from '~/lib/modulchats';
 import Geraet from '~/components/Geraet.astro';
 import Iphone from '~/components/Iphone.astro';
 import { automationModules, cta, serviceArea, versprechen } from '~/config/site';
@@ -34,28 +35,6 @@ const shotFor = (slug: string) => {
  */
 const rahmenArt = (slug: string): 'handy' | 'rechner' =>
   slug === 'dashboard' ? 'rechner' : 'handy';
-
-/**
- * Was hereinkommt, während der Betrieb arbeitet. Gattungsneutral formuliert:
- * dieselbe Lage in der Werkstatt, in der Praxis und im Büro.
- */
-const eingang = [
-  {
-    kanal: 'WhatsApp',
-    zeit: '08:14',
-    text: 'Guten Tag, ich bräuchte kurzfristig einen Termin. Geht diese Woche noch was?',
-  },
-  {
-    kanal: 'Verpasster Anruf',
-    zeit: '09:02',
-    text: 'Angerufen, niemand erreicht. Die Assistenz hat nachgefasst und die Nummer notiert.',
-  },
-  {
-    kanal: 'Kontaktformular',
-    zeit: '11:37',
-    text: 'Anfrage über die Website. Bereits beantwortet, Rückruf für 16 Uhr vereinbart.',
-  },
-];
 
 const faq: FaqItem[] = [
   /* Steht bewusst AN ERSTER STELLE. Auf einer Seite ohne Preise ist das die
@@ -139,8 +118,17 @@ const painPoints = [
         class="problem-liste"
       />
 
-      {/* Was stattdessen hereinkommt. Der Stapel faechert beim Scrollen auf. */}
-      <Nachrichtenstapel nachrichten={eingang} class="problem-stapel" />
+      {/* Was stattdessen passiert: die drei Chat-Module bei der Arbeit,
+          im selben Karussell wie auf Startseite und Kontaktseite. Die
+          Verlaeufe sind dieselben wie in den Modulzeilen weiter unten,
+          aus EINER Quelle in lib/modulchats. */}
+      <Telefonkarussell
+        kennung="module-karussell"
+        gespraeche={modulGespraechFolge}
+        bildunterschrift="Schematische Darstellung"
+        breite="14.5rem"
+        class="problem-stapel"
+      />
     </div>
   </Band>
 

@@ -15,6 +15,7 @@
  */
 import Chat from './Chat.astro';
 import Sterne from './Sterne.astro';
+import { modulGespraeche } from '~/lib/modulchats';
 
 interface Props {
   slug: string;
@@ -23,44 +24,9 @@ interface Props {
 
 const { slug, class: className = '' }: Props = Astro.props;
 
-/**
- * Die Verläufe. Blickwinkel ist das Telefon des Kunden: seine Nachrichten
- * stehen rechts, die der Assistenz links mit Profilbild und Namen.
- */
-type Nachricht = { von: 'kunde' | 'assistenz'; text: string; zeit: string };
-
-const chats: Record<string, { name: string; verlauf: Nachricht[] }> = {
-  /* Jeder Verlauf zeigt einen Handgriff, den die Assistenz wirklich
-     uebernimmt. Kunden schreiben wie Kunden: knapp, mit Dringlichkeit,
-     mit Fotos. Die Assistenz antwortet konkret: Zeiten, Zusagen,
-     naechster Schritt. Allgemeines Lob ohne Vorgang waere Werbung. */
-  'whatsapp-assistenz': {
-    name: 'Musterbetrieb',
-    verlauf: [
-      { von: 'kunde', zeit: '9:41', text: 'Guten Tag, unser Heizkörper im Bad wird nicht mehr warm. Tauschen Sie auch nur ein Thermostat?' },
-      { von: 'assistenz', zeit: '9:41', text: 'Guten Tag! Machen wir, das ist eine kleine Sache. Mögen Sie ein Foto vom Thermostat schicken? Dann bringt der Kollege direkt das passende Ersatzteil mit.' },
-      { von: 'kunde', zeit: '9:43', text: 'Super, Foto kommt gleich. Geht was nächste Woche?' },
-      { von: 'assistenz', zeit: '9:43', text: 'Dienstag 8:30 Uhr ist frei. Soll ich Sie eintragen?' },
-    ],
-  },
-  'anruf-retter': {
-    name: 'Musterbetrieb',
-    verlauf: [
-      { von: 'assistenz', zeit: '10:03', text: 'Guten Tag, Sie haben uns gerade angerufen. Wir sind bis mittags auf einer Baustelle. Worum geht es? Ich leite es sofort weiter.' },
-      { von: 'kunde', zeit: '10:06', text: 'Bei uns tropft es unter der Spüle, langsam wird es mehr.' },
-      { von: 'assistenz', zeit: '10:06', text: 'Verstanden, das sollte zügig angeschaut werden. Bitte stellen Sie einen Eimer drunter und drehen Sie das Eckventil zu. Sie bekommen heute bis 13 Uhr einen Rückruf mit Termin.' },
-    ],
-  },
-  'terminbuchung': {
-    name: 'Musterbetrieb',
-    verlauf: [
-      { von: 'kunde', zeit: '14:12', text: 'Hallo, ich schaffe es morgen um 9 doch nicht. Kann man den Termin verschieben?' },
-      { von: 'assistenz', zeit: '14:12', text: 'Kein Problem! Frei wäre Donnerstag 13:00 Uhr oder Freitag 9:30 Uhr.' },
-      { von: 'kunde', zeit: '14:13', text: 'Freitag bitte.' },
-      { von: 'assistenz', zeit: '14:13', text: 'Verschoben: Freitag, 9:30 Uhr. Die alte Erinnerung ist gelöscht, die neue kommt am Donnerstag.' },
-    ],
-  },
-};
+/* Die Chatverlaeufe kommen aus der gemeinsamen Quelle in
+   `~/lib/modulchats`: dieselben Daten treiben auch das Karussell im
+   Abschnitt "Wo es klemmt". Zwei Fassungen wuerden auseinanderlaufen. */
 
 /** Zeilen der Gesprächsnotiz. */
 const callNote = [
@@ -86,7 +52,7 @@ const applicant = [
   { text: 'Verfügbar ab sofort', ok: false },
 ];
 
-const chat = chats[slug];
+const chat = modulGespraeche[slug];
 const istChat = Boolean(chat);
 
 ---
@@ -111,14 +77,7 @@ const istChat = Boolean(chat);
     <div class:list={[istChat ? 'h-full' : 'p-4 md:p-5']}>
       {/* --- Chatverläufe --- */}
       {
-        chat && (
-          <Chat
-            name={chat.name}
-            status="online"
-            nachrichten={chat.verlauf}
-            uhrzeit={chat.verlauf[0]?.zeit ?? '9:41'}
-          />
-        )
+        chat && <Chat gespraeche={[chat]} />
       }
 
       {/* --- Gesprächsnotiz der Telefon-Assistenz --- */}
