@@ -3,23 +3,7 @@ import Button from './Button.astro';
 import Iphone from './Iphone.astro';
 import Chat from './Chat.astro';
 import { contactLinks } from '~/config/site';
-
-/**
- * Der Empfang, den man dort tatsächlich bekommt. Die letzte Zeile schreibt
- * sich selbst, damit der Block die Assistenz zeigt statt sie zu behaupten.
- */
-const empfang = [
-  { von: 'kunde' as const, zeit: '9:41', text: 'Hallo, ich hätte Interesse an einer Website.' },
-  {
-    von: 'assistenz' as const, zeit: '9:41',
-    text: 'Hallo! Ich bin die digitale Assistenz von Elvora. Worum geht es genau?',
-  },
-  { von: 'kunde' as const, zeit: '9:42', text: 'Wir sind ein Betrieb mit acht Leuten.' },
-  {
-    von: 'assistenz' as const, zeit: '9:42',
-    text: 'Danke, ich gebe das an Luan weiter. Er meldet sich heute noch bei Ihnen.',
-  },
-];
+import { empfangGespraeche, EMPFANG_TEMPO } from '~/lib/empfang';
 
 /**
  * WhatsApp als bevorzugter Kontaktweg.
@@ -68,7 +52,7 @@ const { variant = 'panel', class: className = '' }: Props = Astro.props;
       {/* Die Vorfuehrung selbst: der Empfang, den man dort bekommt. */}
       <div class="wa-vorfuehrung">
         <Iphone bildunterschrift="Schematische Darstellung" breite="16rem">
-          <Chat name="Elvora" status="online" nachrichten={empfang} uhrzeit="9:41" />
+          <Chat gespraeche={empfangGespraeche} tempo={EMPFANG_TEMPO} />
         </Iphone>
       </div>
 

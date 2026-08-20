@@ -11,7 +11,7 @@ import Chat from '~/components/Chat.astro';
 import Kanalkreise from '~/components/Kanalkreise.astro';
 import Textrolle from '~/components/Textrolle.astro';
 import Vormittag from '~/components/Vormittag.astro';
-import mark from '~/assets/mark.svg';
+import { empfangGespraeche, EMPFANG_TEMPO } from '~/lib/empfang';
 import {
   cta,
   services,
@@ -100,59 +100,6 @@ const vormittag = [
   },
 ];
 
-/**
- * Der Empfang, den man auf WhatsApp tatsächlich bekommt.
- *
- * Das Telefon blättert durch drei Verläufe, mit Punkten als Anzeige,
- * welcher gerade läuft: Terminanfrage, verpasster Anruf, Website-Anfrage.
- * So zeigt der erste Sichtbereich die Breite der Assistenz statt eines
- * einzelnen Falls. Der Website-Verlauf steht bewusst am Ende, denn der
- * letzte bleibt stehen.
- *
- * Blickwinkel ist das Telefon des Interessenten: seine Nachrichten stehen
- * rechts, die der Assistenz links mit Profilbild.
- */
-const empfang = [
-  {
-    name: 'Elvora',
-    status: 'online',
-    uhrzeit: '9:41',
-    stempel: 'Termin anfragen',
-    bild: mark.src,
-    nachrichten: [
-      { von: 'kunde' as const, zeit: '9:41', text: 'Guten Tag, ist diese Woche noch ein Termin frei?' },
-      { von: 'assistenz' as const, zeit: '9:41', text: 'Ja, Donnerstag 9:00 Uhr oder Freitag 14:30 Uhr. Was passt Ihnen?' },
-      { von: 'kunde' as const, zeit: '9:42', text: 'Freitag, gern.' },
-      { von: 'assistenz' as const, zeit: '9:42', text: 'Eingetragen! Sie bekommen gleich eine Bestätigung.' },
-    ],
-  },
-  {
-    name: 'Elvora',
-    status: 'online',
-    uhrzeit: '11:06',
-    stempel: 'Nach verpasstem Anruf',
-    bild: mark.src,
-    nachrichten: [
-      { von: 'assistenz' as const, zeit: '11:06', text: 'Guten Tag, Sie haben gerade angerufen und wir konnten leider nicht abnehmen. Worum geht es? Ich helfe direkt hier weiter.' },
-      { von: 'kunde' as const, zeit: '11:07', text: 'Oh, das ging schnell. Ich hätte eine Frage zu meiner Website.' },
-      { von: 'assistenz' as const, zeit: '11:07', text: 'Gern! Stellen Sie sie einfach hier, oder ich lasse Sie zurückrufen.' },
-    ],
-  },
-  {
-    name: 'Elvora',
-    status: 'online',
-    uhrzeit: '14:23',
-    stempel: 'Anfrage stellen',
-    bild: mark.src,
-    nachrichten: [
-      { von: 'kunde' as const, zeit: '14:23', text: 'Wir bräuchten eine neue Website für unseren Betrieb.' },
-      { von: 'assistenz' as const, zeit: '14:23', text: 'Danke! Darf ich fragen, was die Seite vor allem können soll?' },
-      { von: 'kunde' as const, zeit: '14:24', text: 'Mehr Anfragen bringen, ehrlich gesagt.' },
-      { von: 'assistenz' as const, zeit: '14:24', text: 'Verstanden. Ich gebe das an Luan weiter, er meldet sich heute noch bei Ihnen.' },
-    ],
-  },
-];
-
 const wege = [
   { label: 'WhatsApp', href: contactLinks.whatsapp, symbol: 'chat' as const, extern: true },
   { label: 'Telefon', href: contactLinks.tel, symbol: 'telefon' as const },
@@ -237,7 +184,7 @@ const wege = [
 
       <div class="hero-geraet">
         <Iphone bildunterschrift="Schematische Darstellung" breite="16.5rem">
-          <Chat gespraeche={empfang} tempo={0.85} />
+          <Chat gespraeche={empfangGespraeche} tempo={EMPFANG_TEMPO} />
         </Iphone>
 
         <p class="hero-geraet-text">
