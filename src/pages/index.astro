@@ -14,6 +14,7 @@ import { empfangGespraeche } from '~/lib/empfang';
 import {
   cta,
   services,
+  automationModules,
   address,
   owner,
   contactLinks,
@@ -116,6 +117,14 @@ const vormittag = [
     },
   },
 ];
+
+/** Zeichen je Leistung, im 24er-Raster. */
+const kachelZeichen: Record<string, string> = {
+  webdesign: 'M3 5h18v14H3zM3 9h18M6 7h.01M9 7h.01',
+  seo: 'M11 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM15.5 14.5 21 20',
+  branding: 'M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 8.7l5.4-.8z',
+  automatisierung: 'M4 17l1.4-3.6A7.5 7.5 0 1 1 8.2 16zM8.5 9h7M8.5 12h4.5',
+};
 
 const wege = [
   { label: 'WhatsApp', href: contactLinks.whatsapp, symbol: 'chat' as const, extern: true },
@@ -253,42 +262,37 @@ const wege = [
   >
     <ul class="leistungen">
       {
-        services.map((service, i) => (
-          <li class="leistung" style={`--farbe:${service.color}`}>
-            <a class="leistung-link" href={service.href}>
-              {/* Die Farbflaeche laeuft beim Vorbeiscrollen von links herein.
-                  Sie ist der Grund, warum sich die vier Zeilen ueberhaupt
-                  voneinander unterscheiden. */}
-              <span class="leistung-flaeche" aria-hidden="true" />
-
-              {/* Die Nummer sitzt in einem Feld in der Farbe der Leistung.
-                  Eine kleine graue Ziffer hat vorher nichts gegliedert, ein
-                  duenner Balken am Rand kaum mehr. Das Feld ist das Erste,
-                  was man beim Scrollen sieht. */}
-              <span class="leistung-nummer ziffern" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
+        services.map((service) => (
+          <li
+            class:list={['kachel', `kachel-${service.slug}`, 'einblenden']}
+            style={`--farbe:${service.color}`}
+          >
+            <a class="kachel-link" href={service.href}>
+              <span class="kachel-zeichen" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d={kachelZeichen[service.slug]} />
+                </svg>
               </span>
 
-              <span class="leistung-haupt einblenden" style="--verzug:1">
-                <span class="leistung-label kennung">{service.label}</span>
-                <span class="leistung-nutzen">{service.benefit}</span>
+              <span class="kachel-inhalt">
+                <span class="kachel-label kennung">{service.label}</span>
+                <span class="kachel-nutzen">{service.benefit}</span>
+                <span class="kachel-teaser">{service.teaser}</span>
+                {service.slug === 'automatisierung' && (
+                  <span class="kachel-chip">{automationModules.length} einsatzbereite Module</span>
+                )}
               </span>
 
-              <span class="leistung-teaser einblenden" style="--verzug:2">
-                {service.teaser}
-              </span>
-
-              <span class="leistung-pfeil" aria-hidden="true">
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.6"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+              <span class="kachel-pfeil" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <path d="M4 10h11M11 6l4 4-4 4" />
                 </svg>
+              </span>
+
+              <span class="kachel-nummer ziffern" aria-hidden="true">
+                {String(services.indexOf(service) + 1).padStart(2, '0')}
               </span>
             </a>
           </li>
@@ -715,205 +719,185 @@ const wege = [
   }
 
   /* ===================== Leistungen =====================
-     Vorher: vier fast gleiche Textbloecke untereinander, alle mit derselben
-     magentafarbenen Kennung, rechts daneben eine leere halbe Seite. Das las
-     sich als Wand und wurde ueberflogen.
-
-     Jetzt traegt jede Leistung IHRE Farbe, die Zeile nutzt die volle Breite,
-     und beim Vorbeiscrollen faehrt die Farbe herein. Damit hat jede der vier
-     einen eigenen Auftritt statt eines Platzes in einer Liste. */
+     Bento-Raster: die KI-Automatisierung als grosse Kachel, Webdesign und
+     SEO gestapelt daneben, Branding als breite Kachel darunter. Jede
+     Kachel ist eine satte Farbflaeche in ihrer Leistungsfarbe, mit
+     Zeichen, Wasserzeichen-Ziffer und Pfeil. Vorher: vier fast gleiche
+     Zeilen untereinander, die als Wand gelesen und uebersprungen wurden. */
   .leistungen {
+    display: grid;
+    gap: 1.25rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .leistung {
-    border-block-start: 1px solid var(--color-border);
+  @media (width >= 60rem) {
+    .leistungen {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        'gross klein1'
+        'gross klein2'
+        'breit breit';
+    }
+
+    .kachel-automatisierung { grid-area: gross; }
+    .kachel-webdesign { grid-area: klein1; }
+    .kachel-seo { grid-area: klein2; }
+    .kachel-branding { grid-area: breit; }
   }
 
-  .leistung:last-child {
-    border-block-end: 1px solid var(--color-border);
+  .kachel {
+    display: grid;
   }
 
-  .leistung-link {
+  .kachel-link {
     position: relative;
     isolation: isolate;
-    display: grid;
-    gap: 0.5rem 2rem;
-    padding: clamp(1.75rem, 3.5vw, 2.75rem) clamp(0.875rem, 2vw, 1.75rem);
-    text-decoration: none;
-    color: inherit;
-  }
-
-  /* Auf breiten Schirmen laeuft die Zeile ueber die ganze Breite: Nummer,
-     Nutzen, Erklaerung, Pfeil. Vorher blieb rechts ein Drittel leer. */
-  @media (width >= 62rem) {
-    .leistung-link {
-      grid-template-columns: 3.75rem minmax(0, 1.05fr) minmax(0, 0.95fr) 2.75rem;
-      align-items: center;
-    }
-  }
-
-  /* Ein Hauch der Leistungsfarbe, von links hereinlaufend. Nur ein Hauch:
-     vier volle Farbflaechen untereinander waeren ein Farbkasten. */
-  .leistung-flaeche {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 15rem;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    border-radius: 1.5rem;
+    /* Die Farbflaeche: satter Verlauf aus der Leistungsfarbe, nach unten
+       rechts leicht abgedunkelt, damit die Flaeche nicht wie Plastik
+       wirkt. Text durchgehend Weiss; alle vier Farben halten mit Weiss
+       die 4,5:1, sie wurden dafuer ausgesucht. */
     background: linear-gradient(
-      to right,
-      color-mix(in oklab, var(--farbe) 18%, transparent),
-      color-mix(in oklab, var(--farbe) 7%, transparent) 45%,
-      transparent 92%
+      135deg,
+      color-mix(in oklab, var(--farbe) 92%, #fff),
+      var(--farbe) 55%,
+      color-mix(in oklab, var(--farbe) 82%, #000)
     );
-    opacity: 0;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 14px 34px -20px var(--farbe);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
   }
 
-  .leistung-nummer {
+  .kachel-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 26px 48px -22px var(--farbe);
+  }
+
+  /* Die grosse Kachel bekommt mehr Hoehe und die groesste Schrift: sie
+     ist das Zugpferd. */
+  .kachel-automatisierung .kachel-link {
+    min-height: clamp(24rem, 44vw, 32rem);
+  }
+
+  .kachel-zeichen {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 3rem;
     height: 3rem;
     border-radius: 0.9rem;
-    background: var(--farbe);
-    color: #fff;
-    font-size: 1.0625rem;
-    line-height: 1;
-    box-shadow: 0 6px 16px -8px var(--farbe);
+    background: rgb(255 255 255 / 0.16);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25);
   }
 
-  .leistung-haupt {
+  .kachel-zeichen svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .kachel-inhalt {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
-    min-width: 0;
+    gap: 0.6rem;
+    margin-block-start: auto;
+    padding-block-start: 1.5rem;
+    max-width: 34rem;
   }
 
-  /* Die Kennung in der Farbe der Leistung statt viermal in derselben. Alle
-     vier Farben halten auf Weiss die 4,5:1 nach WCAG AA. */
-  .leistung-label {
-    color: var(--farbe);
+  .kachel-label {
+    color: rgb(255 255 255 / 0.75);
   }
 
-  .leistung-nutzen {
+  .kachel-nutzen {
     font-family: var(--font-heading);
     font-weight: 400;
-    font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+    font-size: clamp(1.375rem, 2.3vw, 1.75rem);
     line-height: 1.15;
     letter-spacing: -0.01em;
-    color: var(--color-ink);
     text-wrap: balance;
   }
 
-  .leistung-teaser {
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    color: var(--color-ink-muted);
+  .kachel-automatisierung .kachel-nutzen {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
   }
 
-  .leistung-pfeil {
+  .kachel-teaser {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  /* Auf den kleinen Kacheln bleibt die Erklaerung weg, dort tragen Farbe
+     und Nutzenversprechen. Sie steht eine Ebene tiefer ohnehin. */
+  .kachel-webdesign .kachel-teaser,
+  .kachel-seo .kachel-teaser {
+    display: none;
+  }
+
+  @media (width < 60rem) {
+    .kachel-webdesign .kachel-teaser,
+    .kachel-seo .kachel-teaser {
+      display: block;
+    }
+  }
+
+  .kachel-chip {
+    width: fit-content;
+    margin-block-start: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .kachel-pfeil {
+    position: absolute;
+    inset-block-start: clamp(1.5rem, 3vw, 2rem);
+    inset-inline-end: clamp(1.5rem, 3vw, 2rem);
     display: flex;
     align-items: center;
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid rgb(255 255 255 / 0.35);
     border-radius: 999px;
-    color: var(--color-ink-muted);
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
-  }
-
-  .leistung-pfeil svg {
-    width: 1.125rem;
-    height: 1.125rem;
-    transition: transform 0.2s;
-  }
-
-  @media (width < 62rem) {
-    .leistung-pfeil {
-      margin-block-start: 0.75rem;
-    }
-  }
-
-  .leistung-link:hover .leistung-pfeil,
-  .leistung-link:focus-visible .leistung-pfeil {
-    border-color: var(--farbe);
-    background: var(--farbe);
     color: #fff;
+    transition: background 0.2s, transform 0.3s;
   }
 
-  .leistung-link:hover .leistung-pfeil svg,
-  .leistung-link:focus-visible .leistung-pfeil svg {
-    transform: translateX(2px);
+  .kachel-pfeil svg {
+    width: 1.1rem;
+    height: 1.1rem;
   }
 
-  /* Die Farbe faehrt beim Vorbeiscrollen herein, gebunden an die
-     Scrollposition der Zeile. Der Balken zuerst, die Flaeche hinterher.
-
-     `animation-delay` waere hier wirkungslos: bei einer
-     fortschrittsgebundenen Zeitachse gibt es keine Uhr, auf die sich eine
-     Verzoegerung beziehen koennte. Gestaffelt wird ueber `animation-range`,
-     also ueber die Scrollstrecke. */
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      /* Das Farbfeld kippt beim Hereinkommen auf. Zusammen mit der
-         Farbflaeche dahinter ist das der Auftritt jeder einzelnen
-         Leistung, statt vier gleicher Zeilen hintereinander. */
-      .leistung-nummer {
-        animation-name: feld-aufziehen;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: view();
-        animation-range: entry 10% entry 48%;
-      }
-
-      .leistung-pfeil {
-        animation-name: pfeil-faerben;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: view();
-        animation-range: entry 20% entry 60%;
-      }
-
-      .leistung-flaeche {
-        animation-name: flaeche-herein;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: view();
-        animation-range: entry 18% entry 62%;
-      }
-    }
+  .kachel-link:hover .kachel-pfeil {
+    background: rgb(255 255 255 / 0.18);
+    transform: rotate(-45deg);
   }
 
-  @keyframes feld-aufziehen {
-    from {
-      opacity: 0;
-      transform: scale(0.55) rotate(-12deg);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  /* Der Pfeilkreis nimmt beim Vorbeiscrollen die Farbe der Leistung an.
-     Damit ist auch am rechten Rand zu sehen, um welche es geht. */
-  @keyframes pfeil-faerben {
-    from {
-      border-color: var(--color-border-strong);
-      color: var(--color-ink-muted);
-    }
-    to {
-      border-color: color-mix(in oklab, var(--farbe) 45%, transparent);
-      color: var(--farbe);
-    }
-  }
-
-  @keyframes flaeche-herein {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  /* Die Wasserzeichen-Ziffer, wie auf den Verlust-Karten: Zier, die die
+     Flaeche fuellt, ohne Inhalt zu sein. */
+  .kachel-nummer {
+    position: absolute;
+    z-index: -1;
+    inset-inline-end: 0.75rem;
+    inset-block-end: -1.5rem;
+    font-size: clamp(5rem, 9vw, 8rem);
+    line-height: 1;
+    color: rgb(255 255 255 / 0.14);
+    pointer-events: none;
   }
 
   /* Der Aufruf mitten auf der Seite. Bewusst eine Zeile mit Haarlinie und
