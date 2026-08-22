@@ -28,6 +28,10 @@ import type { Gespraech, Nachricht } from '~/lib/chat';
 export interface Ereignis {
   /** Über welchen Weg die Anfrage hereinkam. */
   kanal: string;
+  /** Farbe des Kanals, aus der Leistungspalette. */
+  farbe: string;
+  /** Pfad des Kanalzeichens im 20er-Raster. */
+  zeichen: string;
   zeit: string;
   /** Was daraus geworden ist, in einem Satz. */
   text: string;
@@ -44,10 +48,12 @@ export interface Ereignis {
 
 interface Props {
   ereignisse: Ereignis[];
+  /** Ergebniszeile unter der Liste, erscheint nach dem letzten Verlauf. */
+  bilanz?: string;
   class?: string;
 }
 
-const { ereignisse, class: className = '' }: Props = Astro.props;
+const { ereignisse, bilanz, class: className = '' }: Props = Astro.props;
 
 /** Etwas schneller als der Grundtakt: es laufen drei Verläufe nacheinander. */
 const TEMPO = 0.8;
@@ -67,6 +73,8 @@ const { folge } = planen(gespraeche, 'betrieb', TEMPO);
  * springt auf die Antwort um, sobald diese im Verlauf steht. Genau so
  * verhält sich eine Chatliste auch im Betrieb.
  */
+const schluss = folge[folge.length - 1]?.fertig ?? 0;
+
 const zeilen = ereignisse.map((e, i) => {
   const nachrichten = e.gespraech.nachrichten;
   const frage = nachrichten.find((n) => n.von === 'kunde') ?? nachrichten[0];
@@ -181,13 +189,19 @@ const zeilen = ereignisse.map((e, i) => {
       zeilen.map((z) => (
         <li
           class="vormittag-eintrag"
-          style={`--von:${z.von.toFixed(2)}s;--fenster:${z.fenster.toFixed(2)}s;--fertig:${z.fertig.toFixed(2)}s`}
+          style={`--von:${z.von.toFixed(2)}s;--fenster:${z.fenster.toFixed(2)}s;--fertig:${z.fertig.toFixed(2)}s;--farbe:${z.farbe}`}
         >
           <span class="vormittag-linie" aria-hidden="true">
             <span class="vormittag-fuellung" />
           </span>
 
           <p class="vormittag-kopf">
+            <span class="vormittag-zeichen" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d={z.zeichen} />
+              </svg>
+            </span>
             <span class="vormittag-kanal">{z.kanal}</span>
             <span class="vormittag-zeit">{z.zeit}</span>
           </p>
@@ -203,6 +217,16 @@ const zeilen = ereignisse.map((e, i) => {
       ))
     }
   </ol>
+
+  {bilanz && (
+    <p class="vormittag-bilanz" style={`--ab:${schluss.toFixed(2)}s`}>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 10.5l4 4 8-9" />
+      </svg>
+      {bilanz}
+    </p>
+  )}
 </div>
 
 <style>
@@ -495,14 +519,33 @@ const zeilen = ereignisse.map((e, i) => {
   .vormittag-fuellung {
     display: block;
     height: 100%;
-    background: var(--color-accent);
+    background: var(--farbe, var(--color-accent));
     transform-origin: left;
   }
 
   .vormittag-kopf {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.6rem;
+  }
+
+  /* Das Kanalzeichen in der Kanalfarbe: dieselbe Kachelsprache wie die
+     Karten unter "Wo es klemmt". */
+  .vormittag-zeichen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.65rem;
+    background: var(--farbe, var(--color-accent));
+    color: #fff;
+    box-shadow: 0 5px 12px -6px var(--farbe, var(--color-accent));
+  }
+
+  .vormittag-zeichen svg {
+    width: 1.05rem;
+    height: 1.05rem;
   }
 
   .vormittag-kanal {
@@ -536,12 +579,39 @@ const zeilen = ereignisse.map((e, i) => {
     font-size: 0.6875rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-accent);
+    color: var(--farbe, var(--color-accent));
   }
 
   .vormittag-erledigt svg {
     width: 0.75rem;
     height: 0.75rem;
+  }
+
+  /* Die Bilanz: ein Satz, der das Ergebnis zusammenzieht. Erscheint,
+     wenn der letzte Verlauf steht. */
+  .vormittag-bilanz {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: fit-content;
+    margin: 0 auto;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--color-accent) 30%, transparent);
+    border-radius: 999px;
+    background: var(--color-accent-soft);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .vormittag-bilanz svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
   }
 
   /* ======================================================================
@@ -586,6 +656,14 @@ const zeilen = ereignisse.map((e, i) => {
 
     .vormittag[data-laeuft] .vormittag-erledigt {
       animation: haken-an 0.4s cubic-bezier(0.22, 1, 0.36, 1) var(--fertig) both;
+    }
+
+    :global(html[data-js]) .vormittag:not([data-laeuft]) .vormittag-bilanz {
+      opacity: 0;
+    }
+
+    .vormittag[data-laeuft] .vormittag-bilanz {
+      animation: haken-an 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--ab) both;
     }
 
     /* Die aktive Zeile in der Liste. Zwei Animationen an einem Element: die

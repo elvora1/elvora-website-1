@@ -374,7 +374,7 @@ export const automationModules: AutomationModule[] = [
 export const serviceArea = {
   primary: 'Essen',
   places: ['Essen', 'Mülheim an der Ruhr', 'Bochum', 'Gelsenkirchen', 'Oberhausen', 'Duisburg'],
-  display: 'Essen und das gesamte Ruhrgebiet',
+  display: 'Essen, dem Ruhrgebiet und darüber hinaus',
 } as const;
 
 /**
