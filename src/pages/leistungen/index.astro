@@ -2,14 +2,123 @@
 import Base from '~/layouts/Base.astro';
 import PanelHero from '~/components/PanelHero.astro';
 import Band from '~/components/Band.astro';
+import Button from '~/components/Button.astro';
 import CtaBand from '~/components/CtaBand.astro';
-import { services, automationModules, serviceArea } from '~/config/site';
+import { services, automationModules, serviceArea, cta } from '~/config/site';
+
+/**
+ * Übersicht der Leistungen.
+ *
+ * Vorher: vier fast gleiche Zeilen untereinander, Haarlinie, Nummer,
+ * Pfeil. Wer die Seite aufmacht, sieht viermal dasselbe und liest keine
+ * einzige Zeile zu Ende. Die Startseite hat inzwischen ein Bento-Raster
+ * aus Farbflächen, diese Seite lag noch im alten Muster.
+ *
+ * Der Aufbau folgt jetzt der Reihenfolge, in der ein Kunde denkt:
+ *
+ *   1. Erkennt er sich wieder?   (Stimmen, in seiner Sprache)
+ *   2. Was gibt es dagegen?      (die vier Farbflächen)
+ *   3. Muss er alles kaufen?     (die Reihenfolge, gegen die Überforderung)
+ *
+ * Erst kommt die Diagnose, dann das Mittel. Umgekehrt liest niemand mit.
+ */
+
+/** Zeichen je Leistung, im 24er-Raster. Identisch zur Startseite. */
+const kachelZeichen: Record<string, string> = {
+  webdesign: 'M3 5h18v14H3zM3 9h18M6 7h.01M9 7h.01',
+  seo: 'M11 4a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM15.5 14.5 21 20',
+  branding: 'M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 8.7l5.4-.8z',
+  automatisierung: 'M4 17l1.4-3.6A7.5 7.5 0 1 1 8.2 16zM8.5 9h7M8.5 12h4.5',
+};
+
+/**
+ * Was in der jeweiligen Leistung steckt.
+ *
+ * Auf der Startseite steht der Nutzen, hier eine Ebene tiefer darf die
+ * Frage „und was bekomme ich dafür konkret?" beantwortet werden. Drei
+ * Punkte je Leistung, nicht mehr: eine längere Liste liest wieder keiner.
+ */
+const inhalte: Record<string, string[]> = {
+  webdesign: [
+    'Aufbau, Texte und Bilder',
+    'Technik, Hosting und Pflege',
+    'Zuerst fürs Handy gebaut',
+  ],
+  seo: [
+    'Google-Unternehmensprofil',
+    'Eigene Seite je Ort und Leistung',
+    'Bericht im Klartext, nicht in Kennzahlen',
+  ],
+  branding: [
+    'Logo, Farben, Schrift',
+    'Angebot, Rechnung, Briefpapier',
+    'Fahrzeug, Schild, Visitenkarte',
+  ],
+  automatisierung: [
+    'Assistenz für WhatsApp und Telefon',
+    'Termine direkt in Ihren Kalender',
+    `${automationModules.length} einsatzbereite Module`,
+  ],
+};
+
+/**
+ * Die Stimmen: vier Sätze, wie sie im Erstgespräch tatsächlich fallen.
+ *
+ * Jeder Satz führt zu genau einer Leistung. Der Kunde muss sich nicht
+ * durch Fachbegriffe arbeiten, er sucht nur den Satz, der auf ihn passt,
+ * und ist damit schon in der richtigen Abteilung.
+ */
+const stimmen = [
+  {
+    slug: 'webdesign',
+    satz: 'Meine Seite ist von 2016. Wenn mich jemand danach fragt, wird mir das unangenehm.',
+  },
+  {
+    slug: 'seo',
+    satz: 'Ich google meinen eigenen Betrieb und finde auf der ersten Seite drei andere, aber nicht mich.',
+  },
+  {
+    slug: 'branding',
+    satz: 'Mein Angebot sieht aus wie ein Word-Dokument. Weil es eins ist.',
+  },
+  {
+    slug: 'automatisierung',
+    satz: 'Abends liegen zwölf Nachrichten auf dem Handy und ich weiß nicht, welche davon ein Auftrag war.',
+  },
+] as const;
+
+const nachSlug = Object.fromEntries(services.map((s) => [s.slug, s]));
+
+/**
+ * Die Reihenfolge.
+ *
+ * Der häufigste unausgesprochene Einwand auf einer Leistungsseite ist
+ * nicht der Preis, sondern der Umfang: „muss ich das jetzt alles machen?"
+ * Solange der offen steht, wird kein Termin gebucht. Also steht er hier,
+ * ausgesprochen und beantwortet, direkt unter den Leistungen.
+ */
+const reihenfolge = [
+  {
+    titel: 'Zuerst das, was blutet',
+    text: 'Wir schauen, wo gerade Anfragen verloren gehen. Meistens ist das nicht die Website, sondern das Telefon am Donnerstagnachmittag.',
+    farbe: '#a93d28',
+  },
+  {
+    titel: 'Dann die Grundlage',
+    text: 'Website und Auffindbarkeit gehören zusammen. Eine schöne Seite, die niemand findet, bringt so wenig wie ein guter Platz bei Google, der auf eine Seite von 2016 führt.',
+    farbe: '#2b2f7a',
+  },
+  {
+    titel: 'Zuletzt das Bild',
+    text: 'Logo, Angebot, Fahrzeug. Das lohnt sich, wenn die Anfragen schon kommen und Sie Ihre Preise durchsetzen wollen, ohne zu diskutieren.',
+    farbe: '#a63082',
+  },
+] as const;
 ---
 
 <Base
- 
   title="Leistungen für Betriebe in Essen"
-  description="Webdesign, lokale Suchmaschinenoptimierung, Branding und KI-Automatisierung für Betriebe und Selbstständige in Essen und im Ruhrgebiet."
+  description="Webdesign, lokale Suchmaschinenoptimierung, Branding und KI-Automatisierung für Betriebe und Selbstständige in Essen, im Ruhrgebiet und darüber hinaus."
   breadcrumbs={[{ label: 'Leistungen' }]}
 >
   <PanelHero
@@ -18,41 +127,144 @@ import { services, automationModules, serviceArea } from '~/config/site';
     intro="Sie müssen nicht alles auf einmal angehen. Meistens beginnen wir dort, wo gerade am meisten Geld liegen bleibt, und bauen von da aus weiter."
     color="#2b2f7a"
     breadcrumbs={[{ label: 'Leistungen' }]}
-  />
+  >
+    {/* Der Kopf ist auf allen Unterseiten hell, das ist so entschieden und
+        bleibt so. Farbe kommt hier ueber die Marken selbst: vier Sprungmarken
+        in den Leistungsfarben. Sie kuendigen das Raster weiter unten an und
+        geben zugleich vier Wege nach unten, bevor der erste Bildschirm zu
+        Ende ist. */}
+    <ul class="marken">
+      {
+        services.map((service) => (
+          <li>
+            <a class="marke" href={service.href} style={`--farbe:${service.color}`}>
+              <span class="marke-punkt" aria-hidden="true" />
+              {service.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </PanelHero>
 
-  <Band ton="hell" kennung="Die vier Bausteine">
+  {/* ===================== 1. Erkennen Sie sich wieder? ===================== */}
+  <Band
+    ton="gedaempft"
+    kennung="Erkennen Sie sich wieder"
+    heading="Vier Sätze, die ich fast jede Woche höre"
+    intro="Suchen Sie den, der auf Sie passt. Er führt direkt dorthin, wo etwas dagegen steht."
+  >
+    <ul class="stimmen">
+      {
+        stimmen.map((stimme, i) => {
+          const dienst = nachSlug[stimme.slug];
+          return (
+            <li class="stimme einblenden" style={`--verzug:${i};--farbe:${dienst.color}`}>
+              <a class="stimme-link" href={dienst.href}>
+                <span class="stimme-zitat">{stimme.satz}</span>
+                <span class="stimme-antwort">
+                  <span class="stimme-marke kennung">{dienst.label}</span>
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 10h11M11 6l4 4-4 4" />
+                  </svg>
+                </span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </Band>
+
+  {/* ===================== 2. Die vier Bausteine ===================== */}
+  <Band
+    ton="hell"
+    kennung="Die vier Bausteine"
+    heading="Einzeln oder zusammen, in Ihrer Reihenfolge"
+    intro="Jeder Baustein steht für sich und wirkt allein. Zusammen wirken sie schneller, weil sie sich gegenseitig zuarbeiten."
+  >
     <ul class="leistungen">
       {
         services.map((service, i) => (
-          <li class="leistung einblenden" style={`--verzug:${i};--farbe:${service.color}`}>
-            <a class="leistung-link" href={service.href}>
-              <span class="leistung-nummer ziffern" aria-hidden="true">
+          <li
+            class:list={['kachel', `kachel-${service.slug}`, 'einblenden']}
+            style={`--farbe:${service.color};--verzug:${i}`}
+          >
+            <a class="kachel-link" href={service.href}>
+              <span class="kachel-zeichen" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d={kachelZeichen[service.slug]} />
+                </svg>
+              </span>
+
+              {/* Die grosse Kachel hat oben Platz, den sonst nichts fuellt.
+                  Statt Zierrat stehen dort die Modulnamen: das ist die
+                  einzige Leistung, die aus abzaehlbaren Teilen besteht,
+                  und sieben Namen wirken staerker als die blosse Zahl. */}
+              {service.slug === 'automatisierung' && (
+                <span class="kachel-module" aria-hidden="true">
+                  {automationModules.map((modul) => (
+                    <span class="kachel-modul">{modul.name}</span>
+                  ))}
+                </span>
+              )}
+
+              <span class="kachel-inhalt">
+                <span class="kachel-label kennung">{service.label}</span>
+                <span class="kachel-nutzen">{service.benefit}</span>
+                <span class="kachel-teaser">{service.teaser}</span>
+
+                <span class="kachel-punkte">
+                  {inhalte[service.slug].map((punkt) => (
+                    <span class="kachel-punkt">
+                      <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 8.5 6.5 12 13 4.5" />
+                      </svg>
+                      {punkt}
+                    </span>
+                  ))}
+                </span>
+              </span>
+
+              <span class="kachel-pfeil" aria-hidden="true">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 10h11M11 6l4 4-4 4" />
+                </svg>
+              </span>
+
+              <span class="kachel-nummer ziffern" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
-
-              <span class="leistung-text">
-                <span class="leistung-label kennung">{service.label}</span>
-                <span class="leistung-nutzen">{service.benefit}</span>
-                <span class="leistung-teaser">{service.teaser}</span>
-                {service.slug === 'automatisierung' && (
-                  <span class="leistung-zusatz kennung">
-                    {automationModules.length} einsatzbereite Module
-                  </span>
-                )}
-              </span>
-
-              <svg
-                class="leistung-pfeil"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 10h11M11 6l4 4-4 4" />
-              </svg>
             </a>
           </li>
         ))
@@ -62,101 +274,537 @@ import { services, automationModules, serviceArea } from '~/config/site';
     <p class="gebiet">Betreut werden Betriebe in {serviceArea.display}.</p>
   </Band>
 
+  {/* ===================== 3. Muss ich alles auf einmal? ===================== */}
+  <Band
+    ton="gedaempft"
+    kennung="Reihenfolge"
+    heading="Nein, Sie müssen nicht alles auf einmal machen"
+    intro="Fast alle fangen mit einem Baustein an. Welcher das ist, hängt davon ab, wo es gerade am meisten kostet."
+  >
+    <ol class="folge">
+      {
+        reihenfolge.map((schritt, i) => (
+          <li class="schritt einblenden" style={`--verzug:${i};--farbe:${schritt.farbe}`}>
+            <span class="schritt-nummer ziffern" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <p class="schritt-titel">{schritt.titel}</p>
+            <p class="schritt-text">{schritt.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="zwischenruf">
+      <p class="zwischenruf-satz">
+        Welcher Baustein bei Ihnen zuerst dran ist, sehen wir in einer
+        Viertelstunde. Danach wissen Sie es, auch wenn wir nie wieder
+        miteinander sprechen.
+      </p>
+      <Button href={cta.primary.href} class="max-sm:w-full">
+        {cta.primary.label}
+      </Button>
+    </div>
+  </Band>
+
   <CtaBand />
 </Base>
 
 <style>
-  /* Zeilen mit Haarlinien statt Farbstreifen. Die Farbe der Leistung bleibt
-     als schmale Kante links erhalten -- gerade genug, um Uebersicht,
-     Startseite und Detailseite zusammenzuhalten. */
-  .leistungen {
+  /* ===================== Marken im Kopf ===================== */
+  .marken {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .marke {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid color-mix(in oklab, var(--farbe) 30%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--farbe) 8%, var(--color-surface));
+    color: var(--farbe);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      background 0.2s,
+      border-color 0.2s,
+      transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .marke:hover {
+    transform: translateY(-2px);
+    background: color-mix(in oklab, var(--farbe) 14%, var(--color-surface));
+    border-color: color-mix(in oklab, var(--farbe) 55%, transparent);
+  }
+
+  .marke-punkt {
+    width: 0.45rem;
+    height: 0.45rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--farbe);
+  }
+
+  /* ===================== Stimmen =====================
+     Getoente Karten in der Farbe der Leistung, dieselbe Bildsprache wie
+     die Verlust-Karten der Startseite. Das Zitat traegt, die Leistung
+     steht klein darunter: erst erkennt sich der Kunde, dann erfaehrt er,
+     wie das Fach dazu heisst. */
+  .stimmen {
+    display: grid;
+    gap: 1rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .leistung {
-    border-top: 1px solid var(--color-border);
-  }
-
-  .leistung:last-child {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .leistung-link {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: baseline;
-    gap: 0.875rem 1.25rem;
-    padding-block: clamp(1.75rem, 3.5vw, 2.75rem);
-    color: inherit;
-    text-decoration: none;
-    border-inline-start: 3px solid transparent;
-    padding-inline-start: 1rem;
-    transition: border-color 0.25s, padding-inline-start 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
   @media (width >= 48rem) {
-    .leistung-link {
-      gap: 1rem 2.5rem;
-    }
-
-    .leistung-link:hover {
-      border-inline-start-color: var(--farbe);
-      padding-inline-start: 1.75rem;
+    .stimmen {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
     }
   }
 
-  .leistung-nummer {
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    color: var(--color-ink-faint);
-  }
-
-  .leistung-text {
+  .stimme-link {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    justify-content: space-between;
+    gap: 1.25rem;
+    height: 100%;
+    padding: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--farbe) 22%, transparent);
+    border-radius: 1.25rem;
+    background: color-mix(in oklab, var(--farbe) 7%, var(--color-surface));
+    color: inherit;
+    text-decoration: none;
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s,
+      background 0.25s;
   }
 
-  .leistung-label {
+  .stimme-link:hover {
+    transform: translateY(-4px);
+    background: color-mix(in oklab, var(--farbe) 12%, var(--color-surface));
+    box-shadow: 0 18px 36px -22px color-mix(in oklab, var(--farbe) 55%, transparent);
+  }
+
+  /* Das Anfuehrungszeichen als Zier, damit sofort klar ist: hier spricht
+     ein Kunde, nicht die Agentur. */
+  .stimme-zitat {
+    position: relative;
+    padding-inline-start: 1.75rem;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    line-height: 1.3;
+    color: var(--color-ink);
+    text-wrap: pretty;
+  }
+
+  .stimme-zitat::before {
+    content: '\201E';
+    position: absolute;
+    inset-inline-start: 0;
+    /* Das deutsche oeffnende Anfuehrungszeichen sitzt auf der Grundlinie.
+       Ohne Verschiebung haengt es unter der ersten Zeile und liest sich
+       wie ein schliessendes. Der Versatz zieht es auf die erste Zeile. */
+    inset-block-start: -0.72em;
+    font-size: 2.5em;
+    line-height: 1;
+    color: color-mix(in oklab, var(--farbe) 45%, transparent);
+  }
+
+  .stimme-antwort {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
     color: var(--farbe);
   }
 
-  .leistung-nutzen {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
-    line-height: 1.12;
-    letter-spacing: -0.015em;
+  .stimme-marke {
+    color: inherit;
   }
 
-  .leistung-teaser {
-    max-width: 52ch;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    color: var(--color-ink-muted);
+  .stimme-antwort svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .leistung-zusatz {
-    color: var(--color-ink-faint);
-  }
-
-  .leistung-pfeil {
-    width: 1.25rem;
-    height: 1.25rem;
-    flex-shrink: 0;
-    color: var(--color-ink-faint);
-    transition: transform 0.2s, color 0.2s;
-  }
-
-  .leistung-link:hover .leistung-pfeil {
+  .stimme-link:hover .stimme-antwort svg {
     transform: translateX(4px);
-    color: var(--farbe);
+  }
+
+  /* ===================== Die vier Bausteine =====================
+     Dasselbe Bento-Raster wie auf der Startseite, bewusst Zeichen fuer
+     Zeichen gleich: wer von dort kommt, erkennt die Flaechen wieder und
+     muss sich nicht neu zurechtfinden. Unterschied ist nur, dass hier
+     zusaetzlich steht, was drinsteckt. */
+  .leistungen {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 60rem) {
+    .leistungen {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        'gross klein1'
+        'gross klein2'
+        'breit breit';
+    }
+
+    .kachel-automatisierung {
+      grid-area: gross;
+    }
+    .kachel-webdesign {
+      grid-area: klein1;
+    }
+    .kachel-seo {
+      grid-area: klein2;
+    }
+    .kachel-branding {
+      grid-area: breit;
+    }
+  }
+
+  .kachel {
+    display: grid;
+  }
+
+  /* Auf dem Handy liegen die Kacheln in Quelltextreihenfolge, die
+     Automatisierung stuende damit ganz unten. Im Raster daneben ist sie
+     die grosse Flaeche oben links und wird als Erstes gelesen. Also
+     bekommt sie auch schmal den ersten Platz. */
+  @media (width < 60rem) {
+    .kachel-automatisierung {
+      order: -1;
+    }
+  }
+
+  .kachel-link {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 15rem;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    border-radius: 1.5rem;
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--farbe) 92%, #fff),
+      var(--farbe) 55%,
+      color-mix(in oklab, var(--farbe) 82%, #000)
+    );
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 14px 34px -20px var(--farbe);
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s;
+  }
+
+  .kachel-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 26px 48px -22px var(--farbe);
+  }
+
+  .kachel-automatisierung .kachel-link {
+    min-height: clamp(26rem, 46vw, 34rem);
+  }
+
+  .kachel-zeichen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.9rem;
+    background: rgb(255 255 255 / 0.16);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25);
+  }
+
+  .kachel-zeichen svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Die Modulnamen fuellen die obere Haelfte der grossen Kachel. Sie
+     stehen zurueckgenommen, weil sie Beleg sind und nicht Ueberschrift:
+     man soll sehen, DASS es sieben Stueck sind, ohne sie lesen zu
+     muessen. Unterhalb von 60rem ist die Kachel nicht mehr hoch, dann
+     entfallen sie. */
+  .kachel-module {
+    display: none;
+  }
+
+  @media (width >= 60rem) {
+    .kachel-module {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+      margin-block-start: 1.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      letter-spacing: 0.02em;
+      color: rgb(255 255 255 / 0.55);
+    }
+  }
+
+  .kachel-modul {
+    position: relative;
+    padding-inline-start: 1.35rem;
+  }
+
+  /* Ein Haken je Zeile, gezeichnet statt als weiteres SVG: sieben
+     zusaetzliche Symbole waeren nur Ballast im Dokument. */
+  .kachel-modul::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.35em;
+    width: 0.45rem;
+    height: 0.25rem;
+    border-inline-start: 1.5px solid currentColor;
+    border-block-end: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+    opacity: 0.8;
+  }
+
+  .kachel-inhalt {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-block-start: auto;
+    padding-block-start: 1.5rem;
+    max-width: 34rem;
+  }
+
+  .kachel-label {
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .kachel-nutzen {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(1.375rem, 2.3vw, 1.75rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .kachel-automatisierung .kachel-nutzen {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .kachel-teaser {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  /* Auf den beiden schmalen Kacheln waere Erklaerung UND Inhaltsliste zu
+     viel Text auf zu wenig Flaeche. Dort traegt die Liste, weil sie
+     konkreter ist. Unterhalb von 60rem liegen alle Kacheln ohnehin
+     untereinander und haben Platz fuer beides. */
+  @media (width >= 60rem) {
+    .kachel-webdesign .kachel-teaser,
+    .kachel-seo .kachel-teaser {
+      display: none;
+    }
+  }
+
+  .kachel-punkte {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-block-start: 0.5rem;
+  }
+
+  /* Die breite Kachel unten laeuft ueber die ganze Zeile. Bliebe der
+     Inhalt links, staende rechts die halbe Flaeche leer. Also Text
+     links, die Inhaltsliste rechts, beide auf der gleichen Grundlinie. */
+  @media (width >= 60rem) {
+    .kachel-branding .kachel-inhalt {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: end;
+      gap: 0.6rem 3rem;
+      max-width: none;
+      padding-inline-end: 4rem;
+    }
+
+    .kachel-branding .kachel-label {
+      grid-column: 1;
+    }
+
+    .kachel-branding .kachel-nutzen,
+    .kachel-branding .kachel-teaser {
+      grid-column: 1;
+    }
+
+    .kachel-branding .kachel-punkte {
+      grid-column: 2;
+      /* Kennung, Nutzen und Erklaerung sind genau drei Zeilen. `1 / -1`
+         waere hier falsch: es gibt kein explizites Raster, `-1` faellt
+         auf Linie 1 zurueck und die Liste landet in der ersten Zeile. */
+      grid-row: 1 / span 3;
+      flex-direction: column;
+      align-items: flex-start;
+      align-self: end;
+      margin-block-start: 0;
+    }
+  }
+
+  .kachel-punkt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.8rem 0.4rem 0.6rem;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.12);
+    font-size: 0.8125rem;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  .kachel-punkt svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  .kachel-pfeil {
+    position: absolute;
+    inset-block-start: clamp(1.5rem, 3vw, 2rem);
+    inset-inline-end: clamp(1.5rem, 3vw, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: 999px;
+    color: #fff;
+    transition:
+      background 0.2s,
+      transform 0.3s;
+  }
+
+  .kachel-pfeil svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .kachel-link:hover .kachel-pfeil {
+    background: rgb(255 255 255 / 0.18);
+    transform: rotate(-45deg);
+  }
+
+  .kachel-nummer {
+    position: absolute;
+    z-index: -1;
+    inset-inline-end: 0.75rem;
+    inset-block-end: -1.5rem;
+    font-size: clamp(5rem, 9vw, 8rem);
+    line-height: 1;
+    color: rgb(255 255 255 / 0.14);
+    pointer-events: none;
   }
 
   .gebiet {
     margin: clamp(2rem, 4vw, 3rem) 0 0;
     font-size: 0.9375rem;
     color: var(--color-ink-muted);
+  }
+
+  /* ===================== Reihenfolge =====================
+     Kein Kasten, sondern drei Spalten mit farbiger Oberkante. Der
+     Abschnitt beantwortet einen Einwand, er soll nicht mit den
+     Leistungen darueber um Aufmerksamkeit kaempfen. */
+  .folge {
+    display: grid;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+  }
+
+  @media (width >= 52rem) {
+    .folge {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.5rem;
+    }
+  }
+
+  .schritt {
+    padding-block-start: 1.25rem;
+    border-block-start: 3px solid var(--farbe);
+  }
+
+  .schritt-nummer {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--farbe);
+  }
+
+  .schritt-titel {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.15;
+    color: var(--color-ink);
+  }
+
+  .schritt-text {
+    margin: 0.5rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-ink-muted);
+  }
+
+  /* Der Aufruf an der Stelle, an der der Einwand gerade ausgeraeumt
+     wurde. Bis zum Fuss soll niemand scrollen muessen. */
+  .zwischenruf {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    margin-block-start: clamp(2.5rem, 5vw, 3.5rem);
+    padding-block-start: clamp(1.75rem, 3vw, 2.25rem);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .zwischenruf-satz {
+    margin: 0;
+    max-width: 46ch;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    line-height: 1.3;
+    color: var(--color-ink);
+    text-wrap: pretty;
   }
 </style>

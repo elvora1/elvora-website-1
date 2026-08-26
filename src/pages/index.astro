@@ -751,6 +751,16 @@ const wege = [
     display: grid;
   }
 
+  /* Auf dem Handy liegen die Kacheln in Quelltextreihenfolge, die
+     Automatisierung stuende damit ganz unten. Im Raster daneben ist sie
+     die grosse Flaeche oben links und wird als Erstes gelesen. Also
+     bekommt sie auch schmal den ersten Platz. */
+  @media (width < 60rem) {
+    .kachel-automatisierung {
+      order: -1;
+    }
+  }
+
   .kachel-link {
     position: relative;
     isolation: isolate;
