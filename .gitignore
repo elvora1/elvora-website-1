@@ -1,5 +1,18 @@
 # build output
-dist/
+#
+# ACHTUNG: `dist/` steht hier bewusst NICHT drin.
+#
+# Das gebaute Ergebnis liegt mit im Repo, damit man es ohne Node und ohne
+# Bauvorgang herunterladen und per FTP hochladen kann. Solange `dist/`
+# ignoriert war, wurden einzelne Dateien von Hand mit `git add -f`
+# aufgenommen, andere nicht. Herausgekommen ist ein halbes Ergebnis:
+# die Seiten waren da, das Stylesheet, die Schriften und zwei Logos
+# fehlten. Wer das heruntergeladen hat, bekam eine Website ohne jede
+# Gestaltung, ohne dass es hier irgendwo aufgefallen waere.
+#
+# Wer das Ergebnis kuenftig doch aus dem Repo nehmen will, loescht es
+# vollstaendig (`git rm -r --cached dist`) und traegt `dist/` hier ein.
+# Aber bitte nicht beides halb.
 .astro/
 
 # dependencies
